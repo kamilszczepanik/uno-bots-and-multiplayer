@@ -7,7 +7,7 @@ import * as deck from "../../src/model/deck";
 import * as hand from "../../src/model/hand";
 import * as uno from "../../src/model/uno";
 
-export function createInitialDeck(): deck.Deck {
+export function createInitialDeck(): deck.Props {
   return deck.createInitialDeck();
 }
 
