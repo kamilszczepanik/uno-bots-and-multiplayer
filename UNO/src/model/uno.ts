@@ -30,7 +30,7 @@ export class Game {
     this._scores = new Map(players.map((_, i) => [i, 0]));
     this._winner = undefined;
     this._randomizer = randomizer;
-    this._currentHand = new Hand(this._players.length, this._randomizer);
+    this._currentHand = new Hand({playerCount: this._players.length, randomizer: this._randomizer});
   }
 
   get playerCount() {
