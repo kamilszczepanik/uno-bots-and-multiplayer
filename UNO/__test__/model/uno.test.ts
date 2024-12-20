@@ -36,28 +36,29 @@ describe("Game set up", () => {
     expect(game.score(2)).toBe(0);
     expect(game.score(3)).toBe(0);
   });
-  // it("has no winner", () => {
-  //   expect(game.winner()).toBeUndefined();
-  // });
-  // it("requires at least 2 players", () => {
-  //   expect(() => createGame({ players: ["a"], targetScore: 500 })).toThrow();
-  // });
-  // it("requires a target score of more than 0", () => {
-  //   expect(() =>
-  //     createGame({ players: ["a", "b", "c", "d"], targetScore: 0 })
-  //   ).toThrow();
-  // });
-  // it("requires player index to be in bounds", () => {
-  //   expect(() => game.player(-1)).toThrow();
-  //   expect(() => game.player(4)).toThrow();
-  // });
-  // it("starts a hand", () => {
-  //   expect(game.currentHand()).toBeDefined();
-  // });
-  // it("doesn't start a new hand if no action is taken", () => {
-  //   const hand = game.currentHand();
-  //   expect(game.currentHand()).toBe(hand);
-  // });
+  it("has no winner", () => {
+    expect(game.winner()).toBeUndefined();
+  });
+  it("requires at least 2 players", () => {
+    expect(() => createGame({ players: ["a"], targetScore: 500 })).toThrow();
+  });
+  it("requires a target score of more than 0", () => {
+    expect(() =>
+      createGame({ players: ["a", "b", "c", "d"], targetScore: 0 })
+    ).toThrow();
+  });
+  it("requires player index to be in bounds", () => {
+    expect(() => game.player(-1)).toThrow();
+    expect(() => game.player(4)).toThrow();
+  });
+  it("starts a hand", () => {
+    expect(game.currentHand()).toBeDefined();
+  });
+  // The test below works perfectly without any changes in uno.ts
+  it("doesn't start a new hand if no action is taken", () => {
+    const hand = game.currentHand();
+    expect(game.currentHand()).toBe(hand);
+  });
   // it("selects a random player as dealer", () => {
   //   const game: Game = createGame({
   //     players: ["a", "b", "c", "d"],
