@@ -1,4 +1,8 @@
-import { Randomizer, standardRandomizer } from "./../utils/random_utils";
+import {
+  Randomizer,
+  standardRandomizer,
+  standardShuffler,
+} from "./../utils/random_utils";
 import { Hand } from "./hand";
 
 export interface Props {
@@ -30,7 +34,12 @@ export class Game {
     this._scores = new Map(players.map((_, i) => [i, 0]));
     this._winner = undefined;
     this._randomizer = randomizer;
-    this._currentHand = new Hand({playerCount: this._players.length, randomizer: this._randomizer});
+    this._currentHand = new Hand({
+      players,
+      dealer: randomizer(players.length),
+      cardsPerPlayer: 7,
+      shuffler: standardShuffler,
+    });
   }
 
   get playerCount() {
