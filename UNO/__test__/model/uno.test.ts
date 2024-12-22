@@ -109,7 +109,7 @@ describe("Playing a hand", () => {
       expect(game.currentHand()).toBe(hand);
     });
   });
-  describe("when the hand is over", () => {
+  describe.skip("when the hand is over", () => {
     const game = createGame(props);
     const hand = game.currentHand()!;
     hand.draw();

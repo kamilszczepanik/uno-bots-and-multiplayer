@@ -24,8 +24,10 @@ export class Game {
     targetScore = 500,
     randomizer = standardRandomizer,
   }: Props) {
-    if (players.length < 2)
-      throw new Error("A game requires at least 2 players.");
+    if (players.length < 2 || players.length > 10)
+      throw new Error(
+        "A game requires at least 2 players and allows at most 10 players."
+      );
     if (targetScore <= 0)
       throw new Error("A game requires more than 0 target score.");
 

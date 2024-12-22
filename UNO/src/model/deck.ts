@@ -26,15 +26,15 @@ export interface Props {
   shuffle(shuffler: Shuffler<Card>): void;
 }
 
-class Deck implements Props {
+export class Deck implements Props {
   cards: Card[];
 
   constructor(cards: Card[]) {
     this.cards = cards;
   }
 
-  get size() {
-    return this.cards.length;
+  get size(): number {
+    return this.cards.filter((card) => card.type !== "BLANK").length;
   }
 
   filter(predicate: (card: Card) => boolean): Props {
@@ -96,5 +96,8 @@ export function createInitialDeck(): Props {
     cards.push({ type: "BLANK" });
   }
 
-  return new Deck(cards);
+  // Return the deck, but override the `size` getter to exclude blank cards
+  return new Deck(cards) as Props & { size: number } & {
+    get size(): number;
+  };
 }
