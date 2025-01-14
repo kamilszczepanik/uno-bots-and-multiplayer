@@ -16,6 +16,7 @@ export class Hand {
   private _players: string[];
   private _deck: deck.Deck;
   private _playerHands: Map<number, deck.Card[]>;
+  private _discardPile: DiscardPile;
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -47,6 +48,12 @@ export class Hand {
         }
       }
     }
+
+    const topCard = this._deck.deal();
+    if (!topCard) {
+      throw new Error("Deck is empty; cannot initialize discard pile.");
+    }
+    this._discardPile = new DiscardPile([topCard]);
   }
 
   get dealer() {
@@ -90,6 +97,10 @@ export class Hand {
   score() {
     return this._score;
   }
+
+  discardPile(): DiscardPile {
+    return this._discardPile;
+  }
 }
 
 export function createHand(props: Partial<Props>): Hand {
@@ -102,4 +113,20 @@ export function createHand(props: Partial<Props>): Hand {
 
   const mergedProps = { ...defaultProps, ...props };
   return new Hand(mergedProps);
+}
+
+class DiscardPile {
+  private _cards: deck.Card[];
+
+  constructor(cards: deck.Card[]) {
+    this._cards = cards;
+  }
+
+  get size() {
+    return this._cards.length;
+  }
+
+  top(): deck.Card | undefined {
+    return this._cards[this._cards.length - 1];
+  }
 }

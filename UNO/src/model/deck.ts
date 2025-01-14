@@ -42,6 +42,7 @@ export class Deck implements Props {
   }
 
   deal(): Card | undefined {
+    // todo: handle shuffle if deck is empty
     return this.cards.shift();
   }
 
