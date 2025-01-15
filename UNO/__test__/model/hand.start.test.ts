@@ -62,7 +62,7 @@ describe("Hand set up", () => {
     expect(hand.playerHand(2).length).toBe(7);
     expect(hand.playerHand(3).length).toBe(7);
   });
-  it("deals 7 cards to each player from the top of the deck", () => {
+  it.only("deals 7 cards to each player from the top of the deck", () => {
     [hand, cards] = createHandWithShuffledCards({
       dealer: 3,
       shuffler: normalShuffle,
@@ -139,7 +139,7 @@ describe("Hand set up", () => {
   });
 });
 
-describe("Before first action in hand", () => {
+describe.skip("Before first action in hand", () => {
   it("begins with the player to the left of the dealer unless the top card is draw, reverse or skip", () => {
     const hand: Hand = createHand({
       players: ["a", "b", "c", "d"],

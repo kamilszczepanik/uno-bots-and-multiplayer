@@ -50,12 +50,23 @@ export class Hand {
       }
     }
 
-    //todo: implement shuffling if top card is undefined
-    const topCard = this._deck.deal();
-    if (!topCard) {
-      throw new Error("Deck is empty; cannot initialize discard pile.");
-    }
-    this._discardPile = new DiscardPile([topCard]);
+    const initializeDiscardPile = (): DiscardPile => {
+      const topCard = this._deck.deal();
+      if (!topCard) {
+        throw new Error("Deck is empty; cannot initialize discard pile.");
+      }
+
+      if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
+        console.log("Reshuffling because top card is:", topCard);
+        this._deck.cards.push(topCard);
+        this._deck.shuffle(shuffler);
+        return initializeDiscardPile();
+      }
+
+      return new DiscardPile([topCard]);
+    };
+
+    this._discardPile = initializeDiscardPile();
     this._drawPile = new DrawPile(this._deck.cards);
   }
 
@@ -123,18 +134,18 @@ export function createHand(props: Partial<Props>): Hand {
 }
 
 class DiscardPile {
-  private _cards: deck.Card[];
+  public cards: deck.Card[];
 
   constructor(cards: deck.Card[]) {
-    this._cards = cards;
+    this.cards = cards;
   }
 
   get size() {
-    return this._cards.length;
+    return this.cards.length;
   }
 
   top(): deck.Card | undefined {
-    return this._cards[this._cards.length - 1];
+    return this.cards[this.cards.length - 1];
   }
 }
 
