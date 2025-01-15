@@ -41,14 +41,16 @@ export class Hand {
 
     this._playerHands = new Map(players.map((_, index) => [index, []]));
 
-    for (let i = 0; i < cardsPerPlayer; i++) {
-      for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+    for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+      for (let i = 0; i < cardsPerPlayer; i++) {
         const card = this._deck.deal();
         if (card) {
           this._playerHands.get(playerIndex)!.push(card);
         }
       }
     }
+
+    console.log(this._playerHands);
 
     const initializeDiscardPile = (): DiscardPile => {
       const topCard = this._deck.deal();
