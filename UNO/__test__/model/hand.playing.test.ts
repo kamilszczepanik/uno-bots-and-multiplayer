@@ -309,7 +309,7 @@ describe("Playing a card", () => {
   });
 });
 
-describe.skip("Drawing a card", () => {
+describe("Drawing a card", () => {
   describe("can play any", () => {
     it("returns true if the player has a playable card", () => {
       const shuffler = shuffleBuilder()
@@ -347,7 +347,7 @@ describe.skip("Drawing a card", () => {
     });
   });
 
-  describe.skip("draw", () => {
+  describe("draw", () => {
     let builder = shuffleBuilder();
     beforeEach(() => {
       builder = shuffleBuilder()
@@ -415,7 +415,7 @@ describe.skip("Drawing a card", () => {
     });
   });
 
-  describe.skip("drawing the last card", () => {
+  describe("drawing the last card", () => {
     describe("succesive play", () => {
       const builder = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
         .discard()
@@ -473,6 +473,7 @@ describe.skip("Drawing a card", () => {
         hand.draw();
         hand.play(1);
         const top = hand.discardPile().top();
+
         hand.draw();
         expect(hand.discardPile().top()).toEqual(top);
       });
