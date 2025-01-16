@@ -94,28 +94,49 @@ export class Hand {
 
   draw() {}
 
-  play(cardIndex: number): deck.Card {
-    const currentPlayer = this._currentPlayerIndex;
-    const playerHand = this._playerHands.get(currentPlayer);
-
+  private getCurrentPlayerHand(): deck.Card[] {
+    const playerHand = this._playerHands.get(this._currentPlayerIndex);
     if (!playerHand) {
-      throw new Error(`Player ${currentPlayer} has no hand.`);
+      throw new Error(`Player ${this._currentPlayerIndex} has no hand.`);
     }
+    return playerHand;
+  }
 
+  private validateCardIndex(cardIndex: number, playerHand: deck.Card[]): void {
     if (cardIndex < 0 || cardIndex >= playerHand.length) {
       throw new Error(
-        `Invalid card index ${cardIndex} for player ${currentPlayer}.`
+        `Invalid card index ${cardIndex} for player ${this._currentPlayerIndex}.`
       );
     }
+  }
+
+  private isCardPlayable(
+    cardToPlay: deck.Card,
+    topCard: deck.Card | undefined
+  ): boolean {
+    return (
+      cardToPlay.color === topCard?.color ||
+      cardToPlay.number === topCard?.number ||
+      cardToPlay.type === topCard?.type
+    );
+  }
+
+  canPlay(cardIndex: number): boolean {
+    const playerHand = this.getCurrentPlayerHand();
+    this.validateCardIndex(cardIndex, playerHand);
 
     const cardToPlay = playerHand[cardIndex];
     const topCard = this._discardPile.top();
-    const isValidPlay =
-      cardToPlay.color === topCard?.color ||
-      cardToPlay.number === topCard?.number ||
-      cardToPlay.type === topCard?.type;
+    return this.isCardPlayable(cardToPlay, topCard);
+  }
 
-    if (!isValidPlay) {
+  play(cardIndex: number): deck.Card {
+    const playerHand = this.getCurrentPlayerHand();
+    this.validateCardIndex(cardIndex, playerHand);
+
+    if (!this.canPlay(cardIndex)) {
+      const cardToPlay = playerHand[cardIndex];
+      const topCard = this._discardPile.top();
       throw new Error(
         `Illegal play: card ${JSON.stringify(
           cardToPlay
@@ -123,7 +144,7 @@ export class Hand {
       );
     }
 
-    playerHand.splice(cardIndex, 1);
+    const cardToPlay = playerHand.splice(cardIndex, 1)[0]; // Remove the card from the hand
     this._discardPile.add(cardToPlay);
     this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
 

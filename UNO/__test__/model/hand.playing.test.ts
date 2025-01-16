@@ -46,7 +46,7 @@ describe("Playing a card", () => {
       const card = hand.play(0);
       expect(hand.discardPile().top()).toEqual(card);
     });
-    it.only("moves the action to the next hand", () => {
+    it("moves the action to the next hand", () => {
       expect(hand.playerInTurn()).toEqual(0);
       hand.play(0);
       expect(hand.playerInTurn()).toEqual(1);
