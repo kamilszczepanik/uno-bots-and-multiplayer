@@ -19,7 +19,8 @@ export class Hand {
   private _discardPile: DiscardPile;
   private _drawPile: DrawPile;
   private _currentPlayerIndex: number;
-  private _startingPlayerIndex: number; // New property
+  private _startingPlayerIndex: number;
+  private _playingDirection: "clockwise" | "counterclockwise";
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -37,10 +38,10 @@ export class Hand {
     this._score = 0;
     this._ended = false;
     this._dealer = dealer;
+    this._playingDirection = "clockwise";
 
     this._deck = deck.createInitialDeck();
     this._deck.shuffle(shuffler);
-
     this._playerHands = new Map(players.map((_, index) => [index, []]));
 
     for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
@@ -116,8 +117,7 @@ export class Hand {
   ): boolean {
     return (
       cardToPlay.color === topCard?.color ||
-      cardToPlay.number === topCard?.number ||
-      cardToPlay.type === topCard?.type
+      cardToPlay.number === topCard?.number
     );
   }
 
@@ -190,31 +190,57 @@ export class Hand {
   }
 
   calculateNextPlayer(cardPlayed: deck.Card): number {
-    if (cardPlayed.type === "SKIP") {
-      return (this._currentPlayerIndex + 2) % this._players.length;
-    }
     if (cardPlayed.type === "REVERSE") {
-      return (
-        (this._currentPlayerIndex - 1 + this._players.length) %
-        this._players.length
-      );
+      this._playingDirection =
+        this._playingDirection === "clockwise"
+          ? "counterclockwise"
+          : "clockwise";
     }
-    return (this._currentPlayerIndex + 1) % this._players.length;
+
+    const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
+
+    const baseNextPlayerIndex =
+      (this._currentPlayerIndex + directionModifier + this._players.length) %
+      this._players.length;
+
+    return cardPlayed.type === "SKIP"
+      ? (baseNextPlayerIndex + directionModifier + this._players.length) %
+          this._players.length
+      : baseNextPlayerIndex;
   }
 
   calculateStartingPlayer(): number {
     const topCard = this._discardPile.top();
+
     if (!topCard) {
       throw new Error("Discard pile is empty.");
     }
 
-    if (topCard.type === "REVERSE") {
-      return (this._dealer - 1 + this._players.length) % this._players.length;
+    const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
+
+    switch (topCard.type) {
+      case "REVERSE":
+        this._playingDirection =
+          this._playingDirection === "clockwise"
+            ? "counterclockwise"
+            : "clockwise";
+        return (
+          (this._dealer + directionModifier + this._players.length) %
+          this._players.length
+        );
+
+      case "SKIP":
+        return (
+          (this._dealer + 2 * directionModifier + this._players.length) %
+          this._players.length
+        );
+
+      default:
+        return (
+          (this._dealer + directionModifier + this._players.length) %
+          this._players.length
+        );
     }
-    if (topCard.type === "SKIP") {
-      return (this._dealer + 2) % this._players.length;
-    }
-    return (this._dealer + 1) % this._players.length;
   }
 }
 
