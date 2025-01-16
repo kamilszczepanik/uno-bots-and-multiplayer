@@ -252,14 +252,17 @@ export class Hand {
       throw new Error("Discard pile is empty.");
     }
 
+    if (topCard.type === "REVERSE") {
+      this._playingDirection =
+        this._playingDirection === "clockwise"
+          ? "counterclockwise"
+          : "clockwise";
+    }
+
     const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
 
     switch (topCard.type) {
       case "REVERSE":
-        this._playingDirection =
-          this._playingDirection === "clockwise"
-            ? "counterclockwise"
-            : "clockwise";
         return (
           (this._dealer + directionModifier + this._players.length) %
           this._players.length
