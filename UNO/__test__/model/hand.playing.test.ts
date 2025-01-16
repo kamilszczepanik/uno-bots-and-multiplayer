@@ -256,7 +256,7 @@ describe("Playing a card", () => {
     });
   });
 
-  describe.skip("Boundaries", () => {
+  describe("Boundaries", () => {
     it("is illegal to play a non-existant card", () => {
       const hand = createHand({ players: ["a", "b", "c", "d"], dealer: 3 });
       expect(() => hand.play(-1)).toThrow();
