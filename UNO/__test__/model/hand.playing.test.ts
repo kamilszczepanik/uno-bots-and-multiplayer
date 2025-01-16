@@ -535,7 +535,7 @@ describe("Drawing a card", () => {
   });
 });
 
-describe.skip("special 2-player rules", () => {
+describe("special 2-player rules", () => {
   test("playing a reverse card works as a skip card", () => {
     const shuffler = shuffleBuilder({ players: 2, cardsPerPlayer: 7 })
       .discard()

@@ -20,7 +20,7 @@ export class Hand {
   private _drawPile: DrawPile;
   private _currentPlayerIndex: number;
   private _startingPlayerIndex: number;
-  private _playingDirection: "clockwise" | "counterclockwise";
+  private _playingDirectionModifier: 1 | -1;
   private _newColor: deck.Color | undefined;
   private _shuffler: Shuffler<deck.Card>;
 
@@ -40,7 +40,7 @@ export class Hand {
     this._score = 0;
     this._ended = false;
     this._dealer = dealer;
-    this._playingDirection = "clockwise";
+    this._playingDirectionModifier = 1;
 
     this._deck = deck.createInitialDeck();
     this._shuffler = shuffler;
@@ -114,9 +114,10 @@ export class Hand {
     const isPlayable = this.isCardPlayable(drawnCard, topCard);
 
     if (!isPlayable) {
-      const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
       this._currentPlayerIndex =
-        (this._currentPlayerIndex + directionModifier + this._players.length) %
+        (this._currentPlayerIndex +
+          this._playingDirectionModifier +
+          this._players.length) %
         this._players.length;
     }
   }
@@ -199,10 +200,11 @@ export class Hand {
     this._discardPile.add(cardToPlay);
 
     if (cardToPlay.type === "DRAW" || cardToPlay.type === "WILD DRAW") {
-      const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
       const amountOfCardsToDraw = cardToPlay.type === "DRAW" ? 2 : 4;
       const nextPlayerIndex =
-        (this._currentPlayerIndex + directionModifier + this._players.length) %
+        (this._currentPlayerIndex +
+          this._playingDirectionModifier +
+          this._players.length) %
         this._players.length;
 
       for (let i = 0; i < amountOfCardsToDraw; i++) {
@@ -271,22 +273,25 @@ export class Hand {
 
   calculateNextPlayer(cardPlayed: deck.Card): number {
     if (cardPlayed.type === "REVERSE") {
-      this._playingDirection =
-        this._playingDirection === "clockwise"
-          ? "counterclockwise"
-          : "clockwise";
+      if (this._players.length === 2) {
+        return this._currentPlayerIndex;
+      }
+
+      this._playingDirectionModifier *= -1;
     }
 
-    const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
-
     const baseNextPlayerIndex =
-      (this._currentPlayerIndex + directionModifier + this._players.length) %
+      (this._currentPlayerIndex +
+        this._playingDirectionModifier +
+        this._players.length) %
       this._players.length;
 
     return cardPlayed.type === "SKIP" ||
       cardPlayed.type === "DRAW" ||
       cardPlayed.type === "WILD DRAW"
-      ? (baseNextPlayerIndex + directionModifier + this._players.length) %
+      ? (baseNextPlayerIndex +
+          this._playingDirectionModifier +
+          this._players.length) %
           this._players.length
       : baseNextPlayerIndex;
   }
@@ -298,28 +303,30 @@ export class Hand {
       throw new Error("Discard pile is empty.");
     }
 
-    const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
-
     switch (topCard.type) {
       case "REVERSE":
-        this._playingDirection =
-          this._playingDirection === "clockwise"
-            ? "counterclockwise"
-            : "clockwise";
+        this._playingDirectionModifier *= -1;
+
         return (
-          (this._dealer + directionModifier + this._players.length) %
+          (this._dealer +
+            this._playingDirectionModifier +
+            this._players.length) %
           this._players.length
         );
 
       case "SKIP":
         return (
-          (this._dealer + 2 * directionModifier + this._players.length) %
+          (this._dealer +
+            2 * this._playingDirectionModifier +
+            this._players.length) %
           this._players.length
         );
 
       default:
         return (
-          (this._dealer + directionModifier + this._players.length) %
+          (this._dealer +
+            this._playingDirectionModifier +
+            this._players.length) %
           this._players.length
         );
     }
