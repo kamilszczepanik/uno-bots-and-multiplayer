@@ -21,6 +21,7 @@ export class Hand {
   private _currentPlayerIndex: number;
   private _startingPlayerIndex: number;
   private _playingDirection: "clockwise" | "counterclockwise";
+  private _newColor: deck.Color | undefined;
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -111,10 +112,15 @@ export class Hand {
     }
   }
 
-  private isCardPlayable(
-    cardToPlay: deck.Card,
-    topCard: deck.Card | undefined
-  ): boolean {
+  private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
+    if (cardToPlay.type === "WILD" || cardToPlay.type === "WILD DRAW") {
+      return true;
+    }
+
+    if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
+      return this._newColor === cardToPlay.color;
+    }
+
     return (
       cardToPlay.color === topCard?.color ||
       cardToPlay.number === topCard?.number
@@ -130,7 +136,7 @@ export class Hand {
     return this.isCardPlayable(cardToPlay, topCard);
   }
 
-  play(cardIndex: number): deck.Card {
+  play(cardIndex: number, newColor?: deck.Color): deck.Card {
     const playerHand = this.getCurrentPlayerHand();
     this.validateCardIndex(cardIndex, playerHand);
 
@@ -147,18 +153,27 @@ export class Hand {
     const cardToPlay = playerHand.splice(cardIndex, 1)[0]; // Remove the card from the hand
     this._discardPile.add(cardToPlay);
 
-    if (cardToPlay.type === "DRAW") {
+    if (cardToPlay.type === "DRAW" || cardToPlay.type === "WILD DRAW") {
       const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
+      const amountOfCardsToDraw = cardToPlay.type === "DRAW" ? 2 : 4;
       const nextPlayerIndex =
         (this._currentPlayerIndex + directionModifier + this._players.length) %
         this._players.length;
 
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < amountOfCardsToDraw; i++) {
         const drawnCard = this._drawPile.deal();
         if (drawnCard) {
           this._playerHands.get(nextPlayerIndex)!.push(drawnCard);
         }
       }
+    }
+
+    if (cardToPlay.type === "WILD" || cardToPlay.type === "WILD DRAW") {
+      if (!newColor) {
+        throw new Error("Cannot play WILD card without specifying a color.");
+      }
+
+      this._newColor = newColor;
     }
 
     this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
@@ -218,7 +233,9 @@ export class Hand {
       (this._currentPlayerIndex + directionModifier + this._players.length) %
       this._players.length;
 
-    return cardPlayed.type === "SKIP" || cardPlayed.type === "DRAW"
+    return cardPlayed.type === "SKIP" ||
+      cardPlayed.type === "DRAW" ||
+      cardPlayed.type === "WILD DRAW"
       ? (baseNextPlayerIndex + directionModifier + this._players.length) %
           this._players.length
       : baseNextPlayerIndex;
@@ -282,7 +299,7 @@ class DiscardPile {
     return this.cards.length;
   }
 
-  top(): deck.Card | undefined {
+  top(): deck.Card {
     return this.cards[this.cards.length - 1];
   }
 

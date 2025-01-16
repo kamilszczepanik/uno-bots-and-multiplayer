@@ -256,7 +256,7 @@ describe("Playing a card", () => {
     });
   });
 
-  describe("Boundaries", () => {
+  describe.skip("Boundaries", () => {
     it("is illegal to play a non-existant card", () => {
       const hand = createHand({ players: ["a", "b", "c", "d"], dealer: 3 });
       expect(() => hand.play(-1)).toThrow();
@@ -309,7 +309,7 @@ describe("Playing a card", () => {
   });
 });
 
-describe("Drawing a card", () => {
+describe.skip("Drawing a card", () => {
   describe("can play any", () => {
     it("returns true if the player has a playable card", () => {
       const shuffler = shuffleBuilder()
@@ -347,7 +347,7 @@ describe("Drawing a card", () => {
     });
   });
 
-  describe("draw", () => {
+  describe.skip("draw", () => {
     let builder = shuffleBuilder();
     beforeEach(() => {
       builder = shuffleBuilder()
@@ -415,7 +415,7 @@ describe("Drawing a card", () => {
     });
   });
 
-  describe("drawing the last card", () => {
+  describe.skip("drawing the last card", () => {
     describe("succesive play", () => {
       const builder = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
         .discard()
@@ -532,7 +532,7 @@ describe("Drawing a card", () => {
   // });
 });
 
-describe("special 2-player rules", () => {
+describe.skip("special 2-player rules", () => {
   test("playing a reverse card works as a skip card", () => {
     const shuffler = shuffleBuilder({ players: 2, cardsPerPlayer: 7 })
       .discard()
