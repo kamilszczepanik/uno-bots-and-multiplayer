@@ -18,6 +18,8 @@ export class Hand {
   private _playerHands: Map<number, deck.Card[]>;
   private _discardPile: DiscardPile;
   private _drawPile: DrawPile;
+  private _currentPlayerIndex: number;
+  private _startingPlayerIndex: number; // New property
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -57,9 +59,9 @@ export class Hand {
       }
 
       if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
-        console.log("Reshuffling because top card is:", topCard);
         this._deck.cards.push(topCard);
         this._deck.shuffle(shuffler);
+
         return initializeDiscardPile();
       }
 
@@ -78,6 +80,8 @@ export class Hand {
 
     this._discardPile = initializeDiscardPile();
     this._drawPile = new DrawPile(this._deck.cards);
+    this._startingPlayerIndex = this.calculateStartingPlayer();
+    this._currentPlayerIndex = this._startingPlayerIndex;
   }
 
   get dealer() {
@@ -90,9 +94,40 @@ export class Hand {
 
   draw() {}
 
-  play(cardNumber: number) {
-    console.log("Playing card", cardNumber); // todo: implement this
-    this._ended = true;
+  play(cardIndex: number): deck.Card {
+    const currentPlayer = this._currentPlayerIndex;
+    const playerHand = this._playerHands.get(currentPlayer);
+
+    if (!playerHand) {
+      throw new Error(`Player ${currentPlayer} has no hand.`);
+    }
+
+    if (cardIndex < 0 || cardIndex >= playerHand.length) {
+      throw new Error(
+        `Invalid card index ${cardIndex} for player ${currentPlayer}.`
+      );
+    }
+
+    const cardToPlay = playerHand[cardIndex];
+    const topCard = this._discardPile.top();
+    const isValidPlay =
+      cardToPlay.color === topCard?.color ||
+      cardToPlay.number === topCard?.number ||
+      cardToPlay.type === topCard?.type;
+
+    if (!isValidPlay) {
+      throw new Error(
+        `Illegal play: card ${JSON.stringify(
+          cardToPlay
+        )} does not match top card ${JSON.stringify(topCard)}.`
+      );
+    }
+
+    playerHand.splice(cardIndex, 1);
+    this._discardPile.add(cardToPlay);
+    this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
+
+    return cardToPlay;
   }
 
   player(playerNumber: number) {
@@ -106,7 +141,6 @@ export class Hand {
     if (playerNumber < 0 || playerNumber >= this._players.length) {
       throw new Error("Requested player is out of bounds.");
     }
-    console.log("Player hand", this._playerHands.get(playerNumber));
     return this._playerHands.get(playerNumber)!;
   }
 
@@ -131,10 +165,32 @@ export class Hand {
   }
 
   playerInTurn(): number {
-    if (this._discardPile.top()?.type === "REVERSE") {
+    return this._currentPlayerIndex;
+  }
+
+  calculateNextPlayer(cardPlayed: deck.Card): number {
+    if (cardPlayed.type === "SKIP") {
+      return (this._currentPlayerIndex + 2) % this._players.length;
+    }
+    if (cardPlayed.type === "REVERSE") {
+      return (
+        (this._currentPlayerIndex - 1 + this._players.length) %
+        this._players.length
+      );
+    }
+    return (this._currentPlayerIndex + 1) % this._players.length;
+  }
+
+  calculateStartingPlayer(): number {
+    const topCard = this._discardPile.top();
+    if (!topCard) {
+      throw new Error("Discard pile is empty.");
+    }
+
+    if (topCard.type === "REVERSE") {
       return (this._dealer - 1 + this._players.length) % this._players.length;
     }
-    if (this._discardPile.top()?.type === "SKIP") {
+    if (topCard.type === "SKIP") {
       return (this._dealer + 2) % this._players.length;
     }
     return (this._dealer + 1) % this._players.length;
@@ -166,6 +222,10 @@ class DiscardPile {
 
   top(): deck.Card | undefined {
     return this.cards[this.cards.length - 1];
+  }
+
+  add(card: deck.Card): void {
+    this.cards.push(card);
   }
 }
 
