@@ -101,12 +101,7 @@ export class Hand {
     const drawnCard = this._drawPile.deal();
 
     if (this._drawPile.size === 0) {
-      const topCard = this._discardPile.top();
-      const remainingDiscardPile = this._discardPile.cards.slice(0, -1);
-
-      this._drawPile = new DrawPile(remainingDiscardPile);
-      this._drawPile.shuffle(this._shuffler);
-      this._discardPile = new DiscardPile([topCard]);
+      this.replenishDrawPile();
     }
 
     if (!drawnCard) {
@@ -124,6 +119,15 @@ export class Hand {
         (this._currentPlayerIndex + directionModifier + this._players.length) %
         this._players.length;
     }
+  }
+
+  private replenishDrawPile(): void {
+    const topCard = this._discardPile.top();
+    const remainingDiscardPile = this._discardPile.cards.slice(0, -1);
+
+    this._drawPile = new DrawPile(remainingDiscardPile);
+    this._drawPile.shuffle(this._shuffler);
+    this._discardPile = new DiscardPile([topCard]);
   }
 
   private getCurrentPlayerHand(): deck.Card[] {
@@ -203,8 +207,13 @@ export class Hand {
 
       for (let i = 0; i < amountOfCardsToDraw; i++) {
         const drawnCard = this._drawPile.deal();
+
         if (drawnCard) {
           this._playerHands.get(nextPlayerIndex)!.push(drawnCard);
+        }
+
+        if (this._drawPile.size === 0) {
+          this.replenishDrawPile();
         }
       }
     }
