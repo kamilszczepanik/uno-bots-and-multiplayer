@@ -108,6 +108,7 @@ export class Hand {
           this._players.length
         );
 
+      case "DRAW":
       case "SKIP":
         return (
           (this._dealer +
@@ -154,9 +155,11 @@ export class Hand {
 
   private getCurrentPlayerHand(): deck.Card[] {
     const playerHand = this._playerHands.get(this._currentPlayerIndex);
+
     if (!playerHand) {
       throw new Error(`Player ${this._currentPlayerIndex} has no hand.`);
     }
+
     return playerHand;
   }
 
@@ -252,8 +255,13 @@ export class Hand {
   private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
     if (cardToPlay.type === "WILD DRAW") {
       const playerHand = this.getCurrentPlayerHand();
+      const hasMatchingColorCard = playerHand.some((card) => {
+        const colorToMatch = this._newColor || topCard.color;
 
-      return !playerHand.some((card) => card.color === topCard.color);
+        return card.color === colorToMatch;
+      });
+
+      return !hasMatchingColorCard;
     }
 
     if (cardToPlay.type === "WILD") {
