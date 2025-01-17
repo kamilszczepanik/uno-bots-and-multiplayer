@@ -102,12 +102,12 @@ describe('catching failure to say "UNO!"', () => {
       expect(hand.catchUnoFailure({ accuser: 2, accused: 1 })).toBeFalsy();
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeTruthy();
     });
-    it.skip("fails if the accused has said 'UNO!' before playing", () => {
+    it("fails if the accused has said 'UNO!' before playing", () => {
       hand.sayUno(0);
       hand.play(0);
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeFalsy();
     });
-    it.skip("fails if the accused has said 'UNO!' after playing but before the accusation", () => {
+    it("fails if the accused has said 'UNO!' after playing but before the accusation", () => {
       hand.play(0);
       hand.sayUno(0);
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeFalsy();
