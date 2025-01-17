@@ -128,6 +128,8 @@ export class Hand {
   }
 
   draw(): void {
+    this.throwErrorIfGameHasEnded();
+
     const playerHand = this.getCurrentPlayerHand();
     const drawnCard = this._drawPile.deal();
 
@@ -177,6 +179,8 @@ export class Hand {
   }
 
   play(cardIndex: number, newColor?: deck.Color): deck.Card {
+    this.throwErrorIfGameHasEnded();
+
     this._playersWhoDrewCard.clear();
     const playerHand = this.getCurrentPlayerHand();
 
@@ -225,10 +229,22 @@ export class Hand {
       this._newColor = newColor;
     }
 
+    if (playerHand.length === 0) {
+      this._ended = true;
+      this._winner = this._currentPlayerIndex;
+      return cardToPlay;
+    }
+
     this._lastPlayerIndex = this._currentPlayerIndex;
     this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
 
     return cardToPlay;
+  }
+
+  private throwErrorIfGameHasEnded() {
+    if (this._ended) {
+      throw new Error("The game has already ended. No further plays allowed.");
+    }
   }
 
   canPlay(cardIndex: number): boolean {
@@ -366,6 +382,16 @@ export class Hand {
   }): boolean {
     const accusedPlayerCards = this.playerHand(accused);
 
+    // todo: fix say uno tests
+    // console.log(
+    //   `Player ${accuser} is accusing player ${accused} of UNO failure. Accused player has ${JSON.stringify(
+    //     accusedPlayerCards
+    //   )} cards.
+    //     And the players that told uno were
+    //   )}`
+    // );
+    // console.log(this._playersWhoSaidUno);
+
     if (
       accusedPlayerCards.length > 1 ||
       this._lastPlayerIndex !== accused ||
@@ -384,6 +410,8 @@ export class Hand {
   }
 
   sayUno(playerNumber: number): void {
+    this.throwErrorIfGameHasEnded();
+
     const playerHand = this.playerHand(playerNumber);
     const topCard = this._discardPile.top();
 
@@ -400,6 +428,15 @@ export class Hand {
         "Cannot say UNO! if no playable card exists among the two cards."
       );
     }
+
+    // todo: fix say uno tests
+    // console.log(
+    //   `Player ${
+    //     this._players[playerNumber]
+    //   } says UNO, his hand is ${JSON.stringify(
+    //     playerHand
+    //   )} --- top card is ${JSON.stringify(topCard)}!`
+    // );
 
     this._playersWhoSaidUno.add(playerNumber);
   }
@@ -424,7 +461,10 @@ export class Hand {
     return this._drawPile;
   }
 
-  playerInTurn(): number {
+  playerInTurn(): number | undefined {
+    if (this._ended) {
+      return undefined;
+    }
     return this._currentPlayerIndex;
   }
 

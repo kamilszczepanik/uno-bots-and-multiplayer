@@ -156,7 +156,7 @@ describe('catching failure to say "UNO!"', () => {
       hand.sayUno(3);
       hand.play(0);
     });
-    test.skip("set up is as expected", () => {
+    test("set up is as expected", () => {
       expect(hand.playerHand(0).length).toEqual(2);
       expect(hand.playerHand(1).length).toEqual(3);
       expect(hand.playerHand(2).length).toEqual(3);
@@ -166,7 +166,7 @@ describe('catching failure to say "UNO!"', () => {
       expect(hand.drawPile().size).toEqual(2);
       expect(hand.discardPile().size).toEqual(3);
     });
-    test.skip("adding 4 cards to the hand shuffles the draw pile if necessary", () => {
+    test("adding 4 cards to the hand shuffles the draw pile if necessary", () => {
       hand.play(0);
       expect(hand.drawPile().size).toEqual(2);
       expect(hand.discardPile().size).toEqual(4);
@@ -197,7 +197,7 @@ describe('catching failure to say "UNO!"', () => {
       hand.draw();
       hand.draw();
     });
-    test.skip("set up is as expected", () => {
+    test("set up is as expected", () => {
       expect(hand.playerHand(0).length).toEqual(2);
       expect(hand.playerHand(1).length).toEqual(3);
       expect(hand.playerHand(2).length).toEqual(3);
@@ -237,16 +237,16 @@ describe('catching failure to say "UNO!"', () => {
       shuffler,
       cardsPerPlayer: 2,
     });
-    test.skip("accused cannot be negative", () => {
+    test("accused cannot be negative", () => {
       expect(() => hand.catchUnoFailure({ accused: -1, accuser: 0 })).toThrow();
     });
-    test.skip("accused cannot be beyond the player count", () => {
+    test("accused cannot be beyond the player count", () => {
       expect(() => hand.catchUnoFailure({ accused: 4, accuser: 0 })).toThrow();
     });
-    test.skip("the player saying 'UNO!' cannot be negative", () => {
+    test("the player saying 'UNO!' cannot be negative", () => {
       expect(() => hand.sayUno(-1)).toThrow();
     });
-    test.skip("the player saying 'UNO!' cannot be beyond the player count", () => {
+    test("the player saying 'UNO!' cannot be beyond the player count", () => {
       expect(() => hand.sayUno(4)).toThrow();
     });
   });
@@ -268,10 +268,10 @@ describe("ending the hand", () => {
       shuffler,
       cardsPerPlayer: 1,
     });
-    it.skip("returns false from hasEnded()", () => {
+    it("returns false from hasEnded()", () => {
       expect(hand.hasEnded()).toBeFalsy();
     });
-    it.skip("doesn't return a winner", () => {
+    it("doesn't return a winner", () => {
       expect(hand.winner()).toBeUndefined();
     });
   });
@@ -292,26 +292,26 @@ describe("ending the hand", () => {
       cardsPerPlayer: 1,
     });
     hand.play(0);
-    it.skip("returns true from hasEnded()", () => {
+    it("returns true from hasEnded()", () => {
       expect(hand.hasEnded()).toBeTruthy();
     });
-    it.skip("returns the winner", () => {
+    it("returns the winner", () => {
       expect(hand.winner()).toEqual(0);
     });
-    it.skip("makes the player in turn undefined", () => {
+    it("makes the player in turn undefined", () => {
       expect(hand.playerInTurn()).toBeUndefined();
     });
-    it.skip("ceases play", () => {
+    it("ceases play", () => {
       expect(hand.canPlay(0)).toBeFalsy();
       expect(hand.canPlayAny()).toBeFalsy();
     });
-    it.skip("gives error on attempted play", () => {
+    it("gives error on attempted play", () => {
       expect(() => hand.play(0)).toThrow();
     });
-    it.skip("gives error on attempted draw", () => {
+    it("gives error on attempted draw", () => {
       expect(() => hand.draw()).toThrow();
     });
-    it.skip("gives error on attempting to say 'UNO!'", () => {
+    it("gives error on attempting to say 'UNO!'", () => {
       expect(() => hand.sayUno(1)).toThrow();
     });
   });
