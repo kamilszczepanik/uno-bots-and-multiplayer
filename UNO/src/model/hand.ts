@@ -10,8 +10,8 @@ export interface Props {
 
 export class Hand {
   private _winner: number | undefined;
-  private _score: number;
-  private _ended: boolean;
+  private _score: number = 0;
+  private _ended: boolean = false;
   private _dealer: number;
   private _players: string[];
   private _deck: deck.Deck;
@@ -19,9 +19,10 @@ export class Hand {
   private _discardPile: DiscardPile;
   private _drawPile: DrawPile;
   private _currentPlayerIndex: number;
+  private _lastPlayerIndex: number | undefined = undefined;
   private _startingPlayerIndex: number;
-  private _playingDirectionModifier: 1 | -1;
-  private _newColor: deck.Color | undefined;
+  private _playingDirectionModifier: 1 | -1 = 1;
+  private _newColor: deck.Color | undefined = undefined;
   private _shuffler: Shuffler<deck.Card>;
 
   constructor({
@@ -33,10 +34,7 @@ export class Hand {
     this.constrainNumberOfPlayers(players);
     this._players = players;
     this._playerHands = new Map(players.map((_, index) => [index, []]));
-    this._score = 0;
-    this._ended = false;
     this._dealer = dealer;
-    this._playingDirectionModifier = 1;
     this._shuffler = shuffler;
     this._deck = deck.createInitialDeck();
     this._deck.shuffle(this._shuffler);
@@ -206,17 +204,10 @@ export class Hand {
           this._players.length) %
         this._players.length;
 
-      for (let i = 0; i < amountOfCardsToDraw; i++) {
-        const drawnCard = this._drawPile.deal();
-
-        if (drawnCard) {
-          this._playerHands.get(nextPlayerIndex)!.push(drawnCard);
-        }
-
-        if (this._drawPile.size === 0) {
-          this.replenishDrawPile();
-        }
-      }
+      this.giveCardsToPlayer({
+        playerIndex: nextPlayerIndex,
+        count: amountOfCardsToDraw,
+      });
     }
 
     if (cardToPlay.type === "WILD" || cardToPlay.type === "WILD DRAW") {
@@ -227,6 +218,7 @@ export class Hand {
       this._newColor = newColor;
     }
 
+    this._lastPlayerIndex = this._currentPlayerIndex;
     this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
 
     return cardToPlay;
@@ -292,6 +284,26 @@ export class Hand {
     );
   }
 
+  private giveCardsToPlayer({
+    playerIndex,
+    count,
+  }: {
+    playerIndex: number;
+    count: number;
+  }): void {
+    for (let i = 0; i < count; i++) {
+      const drawnCard = this._drawPile.deal();
+
+      if (drawnCard) {
+        this._playerHands.get(playerIndex)!.push(drawnCard);
+      }
+
+      if (this._drawPile.size === 0) {
+        this.replenishDrawPile();
+      }
+    }
+  }
+
   private calculateNextPlayer(cardPlayed: deck.Card): number {
     if (cardPlayed.type === "REVERSE") {
       if (this._players.length === 2) {
@@ -336,6 +348,30 @@ export class Hand {
       throw new Error("Requested player is out of bounds.");
     }
     return this._playerHands.get(playerNumber)!;
+  }
+
+  catchUnoFailure({
+    accuser,
+    accused,
+  }: {
+    accuser: number;
+    accused: number;
+  }): boolean {
+    const accusedPlayerCards = this.playerHand(accused);
+
+    if (accusedPlayerCards.length === 2 || this._lastPlayerIndex !== accused) {
+      return false;
+    }
+
+    if (accusedPlayerCards.length === 1) {
+      this.giveCardsToPlayer({
+        playerIndex: accused,
+        count: 4,
+      });
+      return true;
+    }
+
+    return true;
   }
 
   hasEnded() {
