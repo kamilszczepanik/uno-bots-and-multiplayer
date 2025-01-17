@@ -24,6 +24,7 @@ export class Hand {
   private _playingDirectionModifier: 1 | -1 = 1;
   private _newColor: deck.Color | undefined = undefined;
   private _shuffler: Shuffler<deck.Card>;
+  private _playersWhoDrewCard: Set<number> = new Set();
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -138,6 +139,7 @@ export class Hand {
     }
 
     playerHand.push(drawnCard);
+    this._playersWhoDrewCard.add(this._currentPlayerIndex);
 
     const topCard = this._discardPile.top();
     const isPlayable = this.isCardPlayable(drawnCard, topCard);
@@ -171,6 +173,7 @@ export class Hand {
   }
 
   play(cardIndex: number, newColor?: deck.Color): deck.Card {
+    this._playersWhoDrewCard.clear();
     const playerHand = this.getCurrentPlayerHand();
 
     if (!this.isValidCardIndex(cardIndex, playerHand)) {
@@ -359,17 +362,18 @@ export class Hand {
   }): boolean {
     const accusedPlayerCards = this.playerHand(accused);
 
-    if (accusedPlayerCards.length === 2 || this._lastPlayerIndex !== accused) {
+    if (
+      accusedPlayerCards.length > 1 ||
+      this._lastPlayerIndex !== accused ||
+      this._playersWhoDrewCard.size > 0
+    ) {
       return false;
     }
 
-    if (accusedPlayerCards.length === 1) {
-      this.giveCardsToPlayer({
-        playerIndex: accused,
-        count: 4,
-      });
-      return true;
-    }
+    this.giveCardsToPlayer({
+      playerIndex: accused,
+      count: 4,
+    });
 
     return true;
   }
