@@ -475,7 +475,7 @@ describe("callback", () => {
     .hand(3)
     .is({ number: 3 });
   const shuffler = builder.build();
-  test.skip("callback gets called at the end of the hand", () => {
+  test("callback gets called at the end of the hand", () => {
     const events: any[] = [];
     const hand = createHand({
       players: ["a", "b", "c", "d"],
@@ -489,7 +489,7 @@ describe("callback", () => {
     hand.play(0, "YELLOW");
     expect(events).toEqual([{ winner: 1 }]);
   });
-  test.skip("all callbacks get called at the end of the hand", () => {
+  test("all callbacks get called at the end of the hand", () => {
     const events: any[] = [];
     const hand = createHand({
       players: ["a", "b", "c", "d"],
