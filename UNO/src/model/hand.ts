@@ -67,6 +67,7 @@ export class Hand {
 
   private initializeDiscardPile = (): DiscardPile => {
     const topCard = this._deck.deal();
+
     if (!topCard) {
       throw new Error("Deck is empty; cannot initialize discard pile.");
     }
