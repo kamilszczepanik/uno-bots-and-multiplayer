@@ -19,8 +19,8 @@ export class Game {
   private _players: string[];
   private _targetScore: number;
   private _scores: Map<number, number>;
-  private _winner: string | undefined;
-  private _currentHand: Hand;
+  private _winner: number | undefined;
+  private _currentHand: Hand | undefined;
   private _dealer: number;
   private _cardsPerPlayer: number;
   private _shuffler: Shuffler<Card>;
@@ -87,6 +87,10 @@ export class Game {
   }
 
   endHand(): void {
+    if (!this._currentHand) {
+      throw new Error("Cannot end a hand that has not started.");
+    }
+
     if (!this._currentHand.hasEnded()) {
       throw new Error("Cannot end the hand while it is still in progress.");
     }
@@ -102,11 +106,13 @@ export class Game {
     this._scores.set(handWinner, currentScore + handScore);
 
     if (this._scores.get(handWinner)! >= this._targetScore) {
-      this._winner = this._players[handWinner];
+      this._winner = handWinner;
+      this._currentHand = undefined;
+
       return;
     }
 
-    // todo: change dealer
+    // todo: change dealer for next hand, if needed
     // this._dealer = this.calcu`lateNextDealer(this._dealer);
     this.startNewHand();
   }
