@@ -1,14 +1,17 @@
 import {
   Randomizer,
+  Shuffler,
   standardRandomizer,
   standardShuffler,
 } from "./../utils/random_utils";
+import { Card } from "./deck";
 import { Hand } from "./hand";
 
 export interface Props {
   players: string[];
   targetScore: number;
   randomizer: Randomizer;
+  shuffler: Shuffler<Card>;
 }
 
 export class Game {
@@ -17,12 +20,12 @@ export class Game {
   private _scores: Map<number, number>;
   private _winner: string | undefined;
   private _currentHand: Hand;
-  private _randomizer: Randomizer;
 
   constructor({
     players = ["a", "b", "c", "d", "e"], // Probably this constructor is never used, becuase we use createGame() intead
     targetScore = 500,
     randomizer = standardRandomizer,
+    shuffler = standardShuffler,
   }: Props) {
     if (players.length < 2 || players.length > 10)
       throw new Error(
@@ -31,16 +34,21 @@ export class Game {
     if (targetScore <= 0)
       throw new Error("A game requires more than 0 target score.");
 
+    const dealer = randomizer(players.length);
+
+    if (dealer < 0 || dealer >= players.length) {
+      throw new Error("Randomizer returned an invalid dealer index.");
+    }
+
     this._players = players;
     this._targetScore = targetScore;
     this._scores = new Map(players.map((_, i) => [i, 0]));
     this._winner = undefined;
-    this._randomizer = randomizer;
     this._currentHand = new Hand({
       players,
-      dealer: randomizer(players.length),
+      dealer,
       cardsPerPlayer: 7,
-      shuffler: standardShuffler,
+      shuffler,
     });
   }
 
@@ -79,6 +87,7 @@ export function createGame(props: Partial<Props>): Game {
     players: ["A", "B"],
     targetScore: 500,
     randomizer: standardRandomizer,
+    shuffler: standardShuffler,
   };
 
   const mergedProps = { ...defaultProps, ...props };
