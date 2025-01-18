@@ -51,7 +51,7 @@ export class Hand {
   private constrainNumberOfPlayers(players: string[]) {
     if (players.length < 2 || players.length > 10) {
       throw new Error(
-        "A game requires at least 2 players and allows at most 10 players."
+        "A hand requires at least 2 players and allows at most 10 players."
       );
     }
   }
@@ -129,7 +129,7 @@ export class Hand {
   }
 
   draw(): void {
-    this.throwErrorIfGameHasEnded();
+    this.throwErrorIfHandHasEnded();
 
     const playerHand = this.getCurrentPlayerHand();
     const drawnCard = this._drawPile.deal();
@@ -156,8 +156,6 @@ export class Hand {
         currentPlayerDrawn: true,
       });
     }
-
-    console.log(this._playerHands, "sadfsadfasd");
   }
 
   private getCurrentPlayerHand(): deck.Card[] {
@@ -180,7 +178,7 @@ export class Hand {
   }
 
   play(cardIndex: number, newColor?: deck.Color): deck.Card {
-    this.throwErrorIfGameHasEnded();
+    this.throwErrorIfHandHasEnded();
 
     this._playersWhoDrewCard.clear();
     const playerHand = this.getCurrentPlayerHand();
@@ -244,9 +242,9 @@ export class Hand {
     return cardToPlay;
   }
 
-  private throwErrorIfGameHasEnded() {
+  private throwErrorIfHandHasEnded() {
     if (this._ended) {
-      throw new Error("The game has already ended. No further plays allowed.");
+      throw new Error("The hand has already ended. No further plays allowed.");
     }
   }
 
@@ -418,7 +416,7 @@ export class Hand {
   }
 
   sayUno(playerNumber: number): void {
-    this.throwErrorIfGameHasEnded();
+    this.throwErrorIfHandHasEnded();
 
     const playerHand = this.playerHand(playerNumber);
     const topCard = this._discardPile.top();
