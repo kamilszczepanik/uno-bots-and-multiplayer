@@ -54,7 +54,6 @@ describe("Game set up", () => {
   it("starts a hand", () => {
     expect(game.currentHand()).toBeDefined();
   });
-  // The test below works perfectly without any changes in uno.ts
   it("doesn't start a new hand if no action is taken", () => {
     const hand = game.currentHand();
     expect(game.currentHand()).toBe(hand);
@@ -113,13 +112,13 @@ describe("Playing a hand", () => {
     const game = createGame(props);
     const hand = game.currentHand()!;
     hand.draw();
-    // hand.play(0);
+    hand.play(0);
     test("the setup is as expected", () => {
       expect(hand.hasEnded()).toBeTruthy();
       expect(hand.winner()).toEqual(1);
       expect(hand.score()).toEqual(78);
     });
-    test.skip("the game still has no winner", () => {
+    test("the game still has no winner", () => {
       expect(game.winner()).toBeUndefined();
     });
     test.skip("the score is updated", () => {

@@ -12,6 +12,7 @@ export interface Props {
   targetScore: number;
   randomizer: Randomizer;
   shuffler: Shuffler<Card>;
+  cardsPerPlayer: number;
 }
 
 export class Game {
@@ -22,10 +23,11 @@ export class Game {
   private _currentHand: Hand;
 
   constructor({
-    players = ["a", "b", "c", "d", "e"], // Probably this constructor is never used, becuase we use createGame() intead
-    targetScore = 500,
+    players,
+    targetScore,
     randomizer = standardRandomizer,
     shuffler = standardShuffler,
+    cardsPerPlayer,
   }: Props) {
     if (players.length < 2 || players.length > 10)
       throw new Error(
@@ -47,7 +49,7 @@ export class Game {
     this._currentHand = new Hand({
       players,
       dealer,
-      cardsPerPlayer: 7,
+      cardsPerPlayer,
       shuffler,
     });
   }
@@ -91,5 +93,6 @@ export function createGame(props: Partial<Props>): Game {
   };
 
   const mergedProps = { ...defaultProps, ...props };
+  console.log("mergedProps", mergedProps);
   return new Game(mergedProps);
 }
