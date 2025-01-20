@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import router from '@/router'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
 import { useGameStore } from '@/stores/gameStore'
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { z } from 'zod'
 
 type FormData = z.infer<typeof startGameFormSchema>
@@ -47,6 +48,7 @@ const handleSubmit = async () => {
     }
 
     gameStore.initializeGame(props)
+    router.push('/hand')
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
@@ -67,9 +69,6 @@ const addBot = () => {
 const removeBot = (index: number) => {
   form.bots.splice(index, 1)
 }
-
-const playerCount = computed(() => gameStore.playerCount)
-console.log(computed(() => gameStore.playerCount))
 </script>
 
 <template>
@@ -166,10 +165,5 @@ console.log(computed(() => gameStore.playerCount))
         </button>
       </div>
     </form>
-
-    <div v-if="playerCount > 0">
-      <h2 class="text-2xl text-center font-semibold mb-6">Players</h2>
-      <p>{{ playerCount }}</p>
-    </div>
   </div>
 </template>
