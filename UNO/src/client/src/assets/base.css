@@ -34,6 +34,8 @@
   --color-text: var(--vt-c-text-light-1);
 
   --section-gap: 160px;
+
+  --primary: 222.2 47.4% 11.2%;
 }
 
 @media (prefers-color-scheme: dark) {
