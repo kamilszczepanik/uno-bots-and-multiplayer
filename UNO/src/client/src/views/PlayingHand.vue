@@ -4,7 +4,8 @@ import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
 import { standardRandomizer } from '../../../utils/random_utils'
-import GameCard from '@/components/GameCard.vue'
+import DrawPile from '@/components/DrawPile.vue'
+import DiscardPile from '@/components/DiscardPile.vue'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -22,11 +23,9 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .build()
 
 const gameStore = useGameStore()
-const dealer = computed(() => gameStore.currentHand?.dealer)
 const playerCount = computed(() => gameStore.currentHand?.playerCount)
-const topCard = computed(() => {
-  return gameStore.currentHand?.discardPile()?.top() ?? undefined
-})
+const discardPile = computed(() => gameStore.currentHand?.discardPile())
+const drawPile = computed(() => gameStore.currentHand?.drawPile())
 
 onMounted(() => {
   const mockProps: Props = {
@@ -42,12 +41,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-96 mx-auto p-2">
-    <h1 class="text-7xl text-center">UNO Game</h1>
-    <h2 class="text-2xl text-center font-semibold mb-6">Number of Players: {{ playerCount }}</h2>
-    <h3 v-if="dealer !== null">Dealer: {{ dealer }}</h3>
-    <h3 v-else>Loading dealer...</h3>
-    <!-- <DrawPile :drawPile="drawPile" @drawCard="handleDrawCard" /> -->
-    <GameCard :card="topCard" />
+  <div class="w-full h-screen flex flex-col justify-between items-center mx-auto p-2">
+    <div>
+      <h1 class="text-7xl text-center">UNO Game</h1>
+      <h2 class="text-2xl text-center font-semibold mb-6">Number of Players: {{ playerCount }}</h2>
+    </div>
+    <div class="flex">
+      <DiscardPile :discardPile="discardPile" />
+      <DrawPile :drawPile="drawPile" />
+    </div>
+    <div>Player hand</div>
   </div>
 </template>

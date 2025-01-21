@@ -526,7 +526,7 @@ export function createHand(props: Partial<Props>): Hand {
   return new Hand(mergedProps);
 }
 
-class DiscardPile {
+export class DiscardPile {
   public cards: deck.Card[];
 
   constructor(cards: deck.Card[]) {
