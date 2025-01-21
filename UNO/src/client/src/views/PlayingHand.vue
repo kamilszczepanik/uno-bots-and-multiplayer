@@ -8,6 +8,7 @@ import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
 import GameStatus from '@/components/GameStatus.vue'
+import OpponentHand from '@/components/OpponentHand.vue'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -28,6 +29,9 @@ const gameStore = useGameStore()
 const discardPile = computed(() => gameStore.currentHand?.discardPile())
 const drawPile = computed(() => gameStore.currentHand?.drawPile())
 const userHand = computed(() => gameStore.currentHand?.playerHand(0))
+const firstOpponentHand = computed(() => gameStore.currentHand?.playerHand(1))
+const secondOpponentHand = computed(() => gameStore.currentHand?.playerHand(2))
+const thirdOpponentHand = computed(() => gameStore.currentHand?.playerHand(3))
 
 onMounted(() => {
   const mockProps: Props = {
@@ -43,14 +47,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex h-screen w-full flex-col items-center justify-between p-2">
+  <div class="mx-auto flex h-screen w-full flex-col items-center justify-between">
     <div class="flex w-full">
       <GameStatus />
-      <div class="flex flex-grow justify-center">Second player</div>
+      <OpponentHand
+        class="flex flex-grow justify-center"
+        :opponent-hand="firstOpponentHand"
+        :placement="'top'"
+      />
     </div>
-    <div class="flex gap-16">
-      <DiscardPile :discardPile="discardPile" />
-      <DrawPile :drawPile="drawPile" />
+    <div class="flex w-full justify-between">
+      <OpponentHand :opponent-hand="thirdOpponentHand" :placement="'left'" />
+      <div class="flex gap-16 pt-12">
+        <DiscardPile :discardPile="discardPile" />
+        <DrawPile :drawPile="drawPile" />
+      </div>
+      <OpponentHand :opponent-hand="secondOpponentHand" :placement="'right'" />
     </div>
     <UserHand :userHand="userHand" />
   </div>
