@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ControlButton from '@/components/ControlButton.vue'
 import router from '@/router'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
 import { useGameStore } from '@/stores/gameStore'
@@ -72,20 +73,20 @@ const removeBot = (index: number) => {
 </script>
 
 <template>
-  <div class="w-96 mx-auto p-2">
-    <h1 class="text-7xl text-center">UNO</h1>
+  <div class="mx-auto w-96 p-2">
+    <h1 class="text-center text-7xl">UNO</h1>
 
     <form @submit.prevent="handleSubmit">
-      <h2 class="text-2xl text-center font-semibold mb-6">Start new game</h2>
+      <h2 class="mb-6 text-center text-2xl font-semibold">Start new game</h2>
 
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2" for="name">Your name</label>
+        <label class="mb-2 block font-bold text-gray-700" for="name">Your name</label>
         <input
           type="text"
           v-model="form.userName"
           id="name"
           name="name"
-          class="border rounded w-full py-2 px-3 mb-2"
+          class="mb-2 w-full rounded border px-3 py-2"
           placeholder="eg. bestplayer123"
           required
         />
@@ -93,19 +94,19 @@ const removeBot = (index: number) => {
       </div>
 
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2" for="targetScore">Target score</label>
+        <label class="mb-2 block font-bold text-gray-700" for="targetScore">Target score</label>
         <input
           type="number"
           v-model="form.targetScore"
           id="targetScore"
           name="targetScore"
-          class="border rounded w-full py-2 px-3 mb-2"
+          class="mb-2 w-full rounded border px-3 py-2"
         />
         <p v-if="errors.targetScore" class="text-red-500">{{ errors.targetScore }}</p>
       </div>
 
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2" for="cardsPerPlayer"
+        <label class="mb-2 block font-bold text-gray-700" for="cardsPerPlayer"
           >Cards per player</label
         >
         <input
@@ -113,7 +114,7 @@ const removeBot = (index: number) => {
           v-model="form.cardsPerPlayer"
           id="cardsPerPlayer"
           name="cardsPerPlayer"
-          class="border rounded w-full py-2 px-3 mb-2"
+          class="mb-2 w-full rounded border px-3 py-2"
         />
         <p v-if="errors.cardsPerPlayer" class="text-red-500">
           {{ errors.cardsPerPlayer }}
@@ -121,20 +122,20 @@ const removeBot = (index: number) => {
       </div>
 
       <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2">Bots</label>
+        <label class="mb-2 block font-bold text-gray-700">Bots</label>
         <div v-for="(bot, index) in form.bots" :key="index" class="mb-2">
-          <div class="flex items-center mb-2">
+          <div class="mb-2 flex items-center">
             <input
               type="text"
               v-model="bot.name"
-              class="border rounded w-full py-2 px-3 mr-2"
+              class="mr-2 w-full rounded border px-3 py-2"
               :placeholder="'Bot ' + (index + 1) + ' name'"
               required
             />
 
             <button
               type="button"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+              class="focus:shadow-outline rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 focus:outline-none"
               @click="removeBot(index)"
             >
               Delete
@@ -146,23 +147,18 @@ const removeBot = (index: number) => {
         </div>
         <p v-if="errors.bots" class="text-red-500">{{ errors.bots }}</p>
 
-        <button
-          type="button"
-          class="text-primary-700 border-primary-500 border font-bold py-2 px-4 rounded-full mt-2 focus:outline-none focus:shadow-outline disabled:cursor-not-allowed"
+        <ControlButton
+          variant="secondary"
+          class="focus:shadow-outline mt-2 rounded-full border border-primary-500 px-4 py-2 font-bold text-primary-700 focus:outline-none disabled:cursor-not-allowed"
           @click="addBot"
           :disabled="form.bots.length >= 3"
         >
           Add Bot
-        </button>
+        </ControlButton>
       </div>
 
       <div>
-        <button
-          class="bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
-          type="submit"
-        >
-          Start Game
-        </button>
+        <ControlButton variant="primary" type="submit"> Start Game </ControlButton>
       </div>
     </form>
   </div>
