@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-import type { DiscardPile } from '../../../model/hand'
+import { useGameStore } from '@/stores/gameStore'
 
-const { discardPile } = defineProps({
-  discardPile: {
-    type: Object as () => DiscardPile,
-  },
-})
-const topCard = computed(() => discardPile?.top())
+const gameStore = useGameStore()
+const topCard = computed(() => gameStore.currentHand?.discardPile().top())
 </script>
 
 <template>
