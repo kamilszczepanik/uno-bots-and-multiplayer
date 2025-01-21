@@ -4,10 +4,7 @@ import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
 import { standardRandomizer } from '../../../utils/random_utils'
-
-const gameStore = useGameStore()
-const dealer = computed(() => gameStore.currentHand?.dealer ?? 'Unknown')
-const playerCount = computed(() => gameStore.currentHand?.playerCount ?? 0)
+import GameCard from '@/components/GameCard.vue'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -23,6 +20,13 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .drawPile()
   .is({ color: 'GREEN', number: 5 })
   .build()
+
+const gameStore = useGameStore()
+const dealer = computed(() => gameStore.currentHand?.dealer)
+const playerCount = computed(() => gameStore.currentHand?.playerCount)
+const topCard = computed(() => {
+  return gameStore.currentHand?.discardPile()?.top() ?? undefined
+})
 
 onMounted(() => {
   const mockProps: Props = {
@@ -43,5 +47,7 @@ onMounted(() => {
     <h2 class="text-2xl text-center font-semibold mb-6">Number of Players: {{ playerCount }}</h2>
     <h3 v-if="dealer !== null">Dealer: {{ dealer }}</h3>
     <h3 v-else>Loading dealer...</h3>
+    <!-- <DrawPile :drawPile="drawPile" @drawCard="handleDrawCard" /> -->
+    <GameCard :card="topCard" />
   </div>
 </template>

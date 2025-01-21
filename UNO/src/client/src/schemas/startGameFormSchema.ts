@@ -17,7 +17,7 @@ export const startGameFormSchema = z.object({
         name: z
           .string()
           .min(1, 'Bot name is required.')
-          .max(10, 'Bot name must contain at most 20 characters.'),
+          .max(20, 'Bot name must contain at most 20 characters.'),
       }),
     )
     .min(1, 'At least one bot is required.')
