@@ -41,12 +41,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full h-screen flex flex-col justify-between items-center mx-auto p-2">
+  <div class="mx-auto flex h-screen w-full flex-col items-center justify-between p-2">
     <div>
-      <h1 class="text-7xl text-center">UNO Game</h1>
-      <h2 class="text-2xl text-center font-semibold mb-6">Number of Players: {{ playerCount }}</h2>
+      <h1 class="text-center text-7xl">UNO Game</h1>
+      <h2 class="mb-6 text-center text-2xl font-semibold">Number of Players: {{ playerCount }}</h2>
     </div>
-    <div class="flex">
+    <div class="flex gap-16">
       <DiscardPile :discardPile="discardPile" />
       <DrawPile :drawPile="drawPile" />
     </div>
