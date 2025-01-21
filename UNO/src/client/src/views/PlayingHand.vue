@@ -29,7 +29,7 @@ const gameStore = useGameStore()
 
 onMounted(() => {
   const mockProps: Props = {
-    players: ['Player One', 'Player Two', 'Player Three', 'Player four'],
+    players: ['Player One', 'Player Two', 'Player Three', 'Player Four'],
     targetScore: 500,
     randomizer: standardRandomizer,
     shuffler: firstShuffle,

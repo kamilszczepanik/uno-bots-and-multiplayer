@@ -3,17 +3,30 @@ import { computed } from 'vue'
 import GameCard from './GameCard.vue'
 
 import { useGameStore } from '@/stores/gameStore'
+import { USER_INDEX } from '@/utils/constants'
 
 const gameStore = useGameStore()
-const drawPile = computed(() => gameStore.gameInstance?.currentHand()?.drawPile())
 const currentHand = computed(() => gameStore.currentHand)
+const drawPile = computed(() => gameStore.gameInstance?.currentHand()?.drawPile())
+const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
+const userIsCurrentPlayer = computed(() => {
+  return currentPlayerIndex.value === USER_INDEX
+})
 
 const visibleCards = computed(() => {
-  if (!drawPile.value) return 0
+  if (!drawPile.value) {
+    return 0
+  }
+
   return Math.min(drawPile.value.size, 10)
 })
 
 const onClick = () => {
+  if (!userIsCurrentPlayer.value) {
+    alert('Not your turn')
+    return
+  }
+
   currentHand.value?.draw()
 }
 </script>
@@ -23,10 +36,10 @@ const onClick = () => {
     <div
       v-for="i in visibleCards"
       :key="i"
-      class="card-stack absolute left-0 top-0"
+      :class="`card-stack absolute left-0 top-0 ${userIsCurrentPlayer ? 'cursor-pointer' : 'cursor-not-allowed'}`"
       :style="{ zIndex: i, transform: `translateY(-${i}px)` }"
     >
-      <GameCard :showBack="true" @click="onClick" />
+      <GameCard :showBack="true" @click="onClick" class="'hover:scale-105'" />
     </div>
   </div>
 </template>
