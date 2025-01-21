@@ -29,13 +29,10 @@ const gameStore = useGameStore()
 const discardPile = computed(() => gameStore.currentHand?.discardPile())
 const drawPile = computed(() => gameStore.currentHand?.drawPile())
 const userHand = computed(() => gameStore.currentHand?.playerHand(0))
-const firstOpponentHand = computed(() => gameStore.currentHand?.playerHand(1))
-const secondOpponentHand = computed(() => gameStore.currentHand?.playerHand(2))
-const thirdOpponentHand = computed(() => gameStore.currentHand?.playerHand(3))
 
 onMounted(() => {
   const mockProps: Props = {
-    players: ['Player One', 'Player Two', 'Player Three', 'Player Four'],
+    players: ['Player One', 'Player Two', 'Player Three', 'Player four'],
     targetScore: 500,
     randomizer: standardRandomizer,
     shuffler: firstShuffle,
@@ -51,18 +48,18 @@ onMounted(() => {
     <div class="flex w-full">
       <GameStatus />
       <OpponentHand
-        class="flex flex-grow justify-center"
-        :opponent-hand="firstOpponentHand"
+        class="flex flex-grow justify-center pr-96"
         :placement="'top'"
+        :opponent-index="1"
       />
     </div>
     <div class="flex w-screen justify-between">
-      <OpponentHand :opponent-hand="thirdOpponentHand" :placement="'left'" />
+      <OpponentHand :placement="'left'" :opponent-index="2" />
       <div class="flex gap-16 pt-12">
         <DiscardPile :discardPile="discardPile" />
         <DrawPile :drawPile="drawPile" />
       </div>
-      <OpponentHand :opponent-hand="secondOpponentHand" :placement="'right'" />
+      <OpponentHand :opponent-index="3" :placement="'right'" />
     </div>
     <UserHand :userHand="userHand" />
   </div>
