@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
@@ -37,26 +37,41 @@ onMounted(() => {
 
   gameStore.initializeGame(mockProps)
 })
-</script>
 
+const players = computed(() => gameStore.gameInstance?.players || [])
+</script>
 <template>
-  <div class="mx-auto flex h-screen w-full flex-col items-center justify-between">
-    <div class="flex w-full">
-      <GameStatus />
-      <OpponentHand
-        class="flex flex-grow justify-center pr-96"
-        :placement="'top'"
-        :opponent-index="1"
-      />
-    </div>
-    <div class="flex w-screen justify-between">
-      <OpponentHand :placement="'left'" :opponent-index="2" />
-      <div class="flex gap-16 pt-12">
-        <DiscardPile />
-        <DrawPile />
+  <div class="flex h-screen w-full flex-col">
+    <div class="flex w-full items-center justify-between">
+      <div class="flex w-1/4 justify-start">
+        <GameStatus />
       </div>
-      <OpponentHand :opponent-index="3" :placement="'right'" />
+      <div class="flex w-1/2 justify-center">
+        <OpponentHand v-if="players.length === 1" :placement="'top'" :opponent-index="1" />
+        <OpponentHand v-else-if="players.length > 1" :placement="'top'" :opponent-index="2" />
+      </div>
+      <div class="w-1/4"></div>
     </div>
-    <UserHand />
+
+    <div class="flex flex-grow">
+      <div class="flex w-1/4 items-center justify-center">
+        <OpponentHand v-if="players.length > 1" :placement="'left'" :opponent-index="1" />
+      </div>
+
+      <div class="flex w-1/2 flex-col items-center justify-center">
+        <div class="flex gap-12">
+          <DiscardPile />
+          <DrawPile />
+        </div>
+      </div>
+
+      <div class="flex w-1/4 items-center justify-center">
+        <OpponentHand v-if="players.length > 3" :placement="'right'" :opponent-index="3" />
+      </div>
+    </div>
+
+    <div class="flex justify-center">
+      <UserHand />
+    </div>
   </div>
 </template>
