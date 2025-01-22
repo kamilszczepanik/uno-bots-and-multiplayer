@@ -9,10 +9,11 @@ import UserHand from '@/components/UserHand.vue'
 import GameStatus from '@/components/GameStatus.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
 import BotService, { DELAY_TO_MAKE_MOVE_MS } from '../../../services/BotService'
+import { useRouter } from 'vue-router'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
-  .is({ type: 'NUMBERED', color: 'BLUE', number: 8 })
+  .is({ type: 'NUMBERED', color: 'GREEN', number: 8 })
   .hand(0)
   .is({ color: 'GREEN', type: 'DRAW' })
   .hand(1)
@@ -26,6 +27,7 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .build()
 
 const gameStore = useGameStore()
+const router = useRouter()
 
 onMounted(() => {
   const mockProps: Props = {
@@ -33,7 +35,7 @@ onMounted(() => {
     targetScore: 500,
     randomizer: () => 3,
     shuffler: firstShuffle,
-    cardsPerPlayer: 2,
+    cardsPerPlayer: 1,
   }
 
   gameStore.initializeGame(mockProps)
@@ -45,6 +47,17 @@ const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
 watch(currentPlayerIndex, (newIndex) => {
   if (newIndex !== null && newIndex !== undefined && newIndex !== 0) {
     handleBotTurn(newIndex)
+  }
+})
+
+onMounted(() => {
+  const currentHand = gameStore.currentHand
+  if (currentHand) {
+    gameStore.setCurrentHandAsPreviousHand()
+
+    currentHand.onEnd(() => {
+      router.push('/hand-over')
+    })
   }
 })
 
