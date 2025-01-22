@@ -1,4 +1,4 @@
-import { showMessage } from "../client/src/utils/helpers";
+import { handleGameAction, showMessage } from "../client/src/utils/helpers";
 import { colors } from "../model/deck";
 import { Hand } from "../model/hand";
 import { Game } from "../model/uno";
@@ -8,6 +8,8 @@ const BotService = {
     if (!currentHand) return;
 
     const botHand = currentHand.playerHand(botIndex);
+    const botName = currentHand.player(botIndex);
+
     if (!botHand) return;
 
     let playableIndex = botHand.findIndex((_, index) =>
@@ -26,12 +28,16 @@ const BotService = {
       }
     }
 
+    if (botHand.length === 2) {
+      this.maybeSayUno(currentHand, botIndex, botName);
+    }
+
     const cardToPlay = botHand[playableIndex];
 
     if (cardToPlay.type === "WILD" || cardToPlay.type === "WILD DRAW") {
       const randomColor = this.getRandomColor();
       currentHand.play(playableIndex, randomColor);
-      showMessage(`The bot played a wild card and chose ${randomColor}`);
+      showMessage(`${botName} played a wild card and chose ${randomColor}`);
     } else {
       currentHand.play(playableIndex);
     }
@@ -43,6 +49,16 @@ const BotService = {
 
   async wait(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  },
+
+  maybeSayUno(currentHand: Hand, botIndex: number, botName: string) {
+    const willSayUno = Math.random() < 0.5;
+
+    if (willSayUno) {
+      handleGameAction(() => currentHand.sayUno(botIndex), {
+        successMessage: `${botName} said UNO!`,
+      });
+    }
   },
 };
 

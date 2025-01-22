@@ -4,7 +4,7 @@ import GameCard from './GameCard.vue'
 
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
-import { showMessage } from '@/utils/helpers'
+import { handleGameAction, showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.currentHand)
@@ -28,7 +28,7 @@ const onClick = () => {
     return
   }
 
-  currentHand.value?.draw()
+  handleGameAction(() => currentHand.value?.draw())
 }
 </script>
 
