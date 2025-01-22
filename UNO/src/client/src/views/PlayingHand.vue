@@ -33,7 +33,7 @@ onMounted(() => {
     targetScore: 500,
     randomizer: () => 3,
     shuffler: firstShuffle,
-    cardsPerPlayer: 7,
+    cardsPerPlayer: 2,
   }
 
   gameStore.initializeGame(mockProps)

@@ -1,21 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import GameCard from './GameCard.vue'
 import PlayerInfo from './PlayerInfo.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 import GameControls from './GameControls.vue'
 import { handleGameAction, showMessage } from '@/utils/helpers'
+import SelectColorModal from './SelectColorModal.vue'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.currentHand)
+const showSelectColorModal = ref(false)
+const selectedCardIndex = ref<number | null>(null)
 const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
 const userHand = computed(() => gameStore.currentHand?.playerHand(USER_INDEX))
 const userIsCurrentPlayer = computed(() => currentPlayerIndex.value === USER_INDEX)
 
-function playCard(index: number) {
+const handlePlayCard = (index: number) => {
   if (!userIsCurrentPlayer.value) {
-    showMessage("It's not your turn")
+    return showMessage("It's not your turn")
+  }
+
+  const card = userHand.value?.[index]
+  if (!card) {
+    return showMessage("Card doesn't exist")
+  }
+
+  if (card.type === 'WILD' || card.type === 'WILD DRAW') {
+    selectedCardIndex.value = index
+    showSelectColorModal.value = true
     return
   }
 
@@ -42,7 +55,7 @@ const spacing = computed(() => {
             class="absolute transform-gpu transition-transform"
             :style="{ transform: `translateX(${index * spacing}px)` }"
             :class="[userIsCurrentPlayer ? 'cursor-pointer hover:z-10' : 'cursor-not-allowed']"
-            @click="userIsCurrentPlayer ? playCard(index) : null"
+            @click="handlePlayCard(index)"
           >
             <GameCard
               :card="card"
@@ -58,5 +71,10 @@ const spacing = computed(() => {
     </div>
 
     <GameControls class="pb-2" />
+    <SelectColorModal
+      :card-index="selectedCardIndex"
+      v-if="showSelectColorModal"
+      @close="showSelectColorModal = false"
+    />
   </div>
 </template>

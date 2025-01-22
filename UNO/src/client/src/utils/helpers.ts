@@ -4,14 +4,20 @@ export const showMessage = (message: string) => {
   toast(message)
 }
 
-export function handleGameAction(action: () => void) {
+export function handleGameAction(
+  action: () => void,
+  options?: { successMessage?: string; errorMessage?: string },
+) {
   try {
     action()
+    if (options?.successMessage) {
+      showMessage(options.successMessage)
+    }
   } catch (error) {
     if (error instanceof Error) {
-      showMessage(error.message)
+      showMessage(options?.errorMessage || error.message)
     } else {
-      showMessage('An unknown error occurred.')
+      showMessage(options?.errorMessage || 'An unknown error occurred.')
     }
   }
 }
