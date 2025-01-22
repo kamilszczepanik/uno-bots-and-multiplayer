@@ -7,6 +7,8 @@ export default {
     extend: {
       colors: {
         primary: colors.green,
+        background: 'var(--color-background)',
+        text: 'var(--color-text)',
       },
     },
   },

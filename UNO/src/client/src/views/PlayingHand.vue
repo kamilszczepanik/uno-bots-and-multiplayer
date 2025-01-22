@@ -8,7 +8,7 @@ import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
 import GameStatus from '@/components/GameStatus.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
-import BotService from '../../../services/BotService'
+import BotService, { DELAY_TO_MAKE_MOVE_MS } from '../../../services/BotService'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -51,7 +51,7 @@ watch(currentPlayerIndex, (newIndex) => {
 const handleBotTurn = (botIndex: number) => {
   setTimeout(() => {
     BotService.takeTurn(gameStore.gameInstance?.currentHand(), botIndex)
-  }, 2000)
+  }, DELAY_TO_MAKE_MOVE_MS)
 }
 </script>
 <template>
