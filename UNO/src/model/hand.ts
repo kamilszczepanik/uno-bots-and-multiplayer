@@ -506,6 +506,10 @@ export class Hand {
     return this._playersThatSaidUno;
   }
 
+  get newColor() {
+    return this._newColor;
+  }
+
   onEnd(callback: (event: { winner: number }) => void): void {
     this._onEndCallbacks.push(callback);
   }
