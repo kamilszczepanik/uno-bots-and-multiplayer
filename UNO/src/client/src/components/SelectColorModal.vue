@@ -39,12 +39,12 @@ const colorClasses: Record<string, string> = {
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     @click.self="closeModal"
   >
-    <div class="z-50 w-96 space-y-4 rounded-lg bg-white p-4">
+    <div class="bg-backgroundSoft z-50 w-96 space-y-4 rounded-lg p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold">Select the color that you want</h2>
         <ControlButton
           variant="destructive"
-          class="w-12 border border-red-600 bg-inherit text-red-600 hover:bg-inherit"
+          class="hover:bg-backgroundSoft w-11 border border-red-600 text-red-600"
           @click="closeModal"
           >X</ControlButton
         >

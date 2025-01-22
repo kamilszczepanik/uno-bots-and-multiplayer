@@ -15,5 +15,8 @@ export const useGameStore = defineStore('game', {
     initializeGame(props: GameServiceProps) {
       this.gameInstance = GameService.initializeGame(props)
     },
+    endGame() {
+      this.gameInstance = null
+    },
   },
 })
