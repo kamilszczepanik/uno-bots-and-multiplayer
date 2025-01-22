@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
@@ -8,6 +8,7 @@ import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
 import GameStatus from '@/components/GameStatus.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
+import BotService from '../../../services/BotService'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -39,6 +40,19 @@ onMounted(() => {
 })
 
 const players = computed(() => gameStore.gameInstance?.players || [])
+const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
+
+watch(currentPlayerIndex, (newIndex) => {
+  if (newIndex !== null && newIndex !== undefined && newIndex !== 0) {
+    handleBotTurn(newIndex)
+  }
+})
+
+const handleBotTurn = (botIndex: number) => {
+  setTimeout(() => {
+    BotService.takeTurn(gameStore.gameInstance?.currentHand(), botIndex)
+  }, 2000)
+}
 </script>
 <template>
   <div class="flex h-screen w-full flex-col">
