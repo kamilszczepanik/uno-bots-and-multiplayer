@@ -5,7 +5,7 @@ import PlayerInfo from './PlayerInfo.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 import GameControls from './GameControls.vue'
-import { handleGameAction } from '@/utils/handleGameAction'
+import { handleGameAction, showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.currentHand)
@@ -15,7 +15,7 @@ const userIsCurrentPlayer = computed(() => currentPlayerIndex.value === USER_IND
 
 function playCard(index: number) {
   if (!userIsCurrentPlayer.value) {
-    alert("It's not your turn")
+    showMessage("It's not your turn")
     return
   }
 

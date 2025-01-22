@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineEmits } from 'vue'
 import ControlButton from './ControlButton.vue'
-import { handleGameAction } from '@/utils/handleGameAction'
+import { handleGameAction, showMessage } from '@/utils/helpers'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 
@@ -19,12 +19,21 @@ const closeModal = () => {
 }
 
 const handleCatchUnoFailure = (playerIndex: number) => {
-  handleGameAction(() =>
-    gameStore.currentHand?.catchUnoFailure({
+  handleGameAction(() => {
+    const isSuccess = gameStore.currentHand?.catchUnoFailure({
       accuser: USER_INDEX,
       accused: playerIndex,
-    }),
-  )
+    })
+
+    if (!isSuccess) {
+      showMessage('Failed to catch UNO failure.')
+    } else {
+      closeModal()
+      showMessage(
+        `Successfully caught UNO failure! ${gameStore.gameInstance?.players[USER_INDEX]} has to take 4 cards.`,
+      )
+    }
+  })
 }
 </script>
 <template>
