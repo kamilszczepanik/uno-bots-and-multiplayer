@@ -137,7 +137,6 @@ export class Game {
 
   private startNewHand(): void {
     this._previusHand = this._currentHand;
-    console.log("previous hand", this._previusHand);
     this._currentHand = new Hand({
       players: this._players,
       dealer: this._dealer,
@@ -145,7 +144,6 @@ export class Game {
       shuffler: this._shuffler,
     });
     this._currentHand.onEnd(() => this.endHand());
-    console.log("new hand", this._currentHand);
   }
 }
 

@@ -15,14 +15,15 @@ const { playerIndex } = defineProps({
 const gameStore = useGameStore()
 const score = computed(() => gameStore.gameInstance?.score(playerIndex))
 const name = computed(() => gameStore.gameInstance?.player(playerIndex))
-const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
-const playersThatSaidUno = computed(() => gameStore.currentHand?.playersThatSaidUno)
+const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
+const playersThatSaidUno = computed(() => currentHand.value?.playersThatSaidUno)
 const playerSaidUno = computed(() => playersThatSaidUno.value?.has(playerIndex))
 
 const handleCatchUnoFailure = () => {
   handleGameAction(() => {
-    const isSuccess = gameStore.currentHand?.catchUnoFailure({
-      accuser: gameStore.currentHand?.playerInTurn() || 0,
+    const isSuccess = currentHand.value?.catchUnoFailure({
+      accuser: currentHand.value?.playerInTurn() || 0,
       accused: playerIndex,
     })
 
@@ -43,7 +44,7 @@ const handleCatchUnoFailure = () => {
     >
       CURRENTLY PLAYING
     </p>
-    <p v-if="playerSaidUno">SAID UNO</p>
+    <p v-if="playerSaidUno" class="text-primary-500">SAID UNO</p>
     <h3 class="text-lg font-bold">{{ name }}</h3>
     <p class="text-sm text-gray-600">Score: {{ score }}</p>
     <ControlButton

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ControlButton from './ControlButton.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
@@ -8,9 +8,10 @@ import EndGameModal from './EndGameModal.vue'
 
 const gameStore = useGameStore()
 const showEndGameModal = ref(false)
+const currentHand = computed(() => gameStore.gameInstance?.currentHand())
 
 const handleSayUno = () => {
-  handleGameAction(() => gameStore.currentHand?.sayUno(USER_INDEX), {
+  handleGameAction(() => currentHand.value?.sayUno(USER_INDEX), {
     successMessage: 'You said UNO',
   })
 }

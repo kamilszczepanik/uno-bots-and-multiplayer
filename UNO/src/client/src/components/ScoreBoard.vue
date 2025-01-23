@@ -13,7 +13,7 @@ const scores = computed(() =>
 </script>
 
 <template>
-  <table class="w-1/2 table-auto border-collapse border border-border text-center">
+  <table class="w-96 table-auto border-collapse border border-border text-center">
     <thead>
       <tr>
         <th class="border border-borderHover px-4 py-2 font-bold">Player</th>

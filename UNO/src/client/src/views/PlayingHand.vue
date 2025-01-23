@@ -14,8 +14,8 @@ import { USER_INDEX } from '@/utils/constants'
 const gameStore = useGameStore()
 const router = useRouter()
 const players = computed(() => gameStore.gameInstance?.players || [])
-const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
-const currentHand = computed(() => gameStore.currentHand)
+const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
 
 watch(currentPlayerIndex, (newIndex) => {
   if (newIndex !== null && newIndex !== undefined && newIndex !== 0) {
@@ -30,16 +30,16 @@ const handleBotTurn = (botIndex: number) => {
 }
 
 onMounted(() => {
-  console.log('currentHand.value', currentHand.value)
   if (currentPlayerIndex.value && currentPlayerIndex.value !== USER_INDEX) {
     handleBotTurn(currentPlayerIndex.value)
   }
-  if (!gameStore.currentHand) {
+  if (!currentHand.value) {
+    console.log('here we gio')
     router.push('/').then(() => {
       showMessage('Provide details in the form to create a game.')
     })
   } else {
-    gameStore.currentHand?.onEnd(() => {
+    currentHand.value.onEnd(() => {
       router.push('/hand-over')
     })
   }

@@ -8,9 +8,11 @@ import { showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const router = useRouter()
+const game = gameStore.gameInstance
+const currentHand = computed(() => game?.currentHand())
 
 const winner = computed(() => {
-  const winnerIndex = gameStore.currentHand?.winner()
+  const winnerIndex = currentHand.value?.winner()
   return winnerIndex !== undefined ? gameStore.gameInstance?.player(winnerIndex) : 'Unknown'
 })
 
@@ -36,7 +38,12 @@ const handleEndGame = () => {
 }
 
 onMounted(() => {
-  if (!gameStore.currentHand) {
+  if (game?.winner) {
+    router.push('/game-over').then(() => {
+      showMessage('The game is over!')
+    })
+  } else if (!currentHand.value) {
+    console.log('here')
     router.push('/').then(() => {
       showMessage('Provide details in the form to create a game.')
     })
