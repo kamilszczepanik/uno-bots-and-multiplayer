@@ -71,7 +71,6 @@ export class Game {
   }
 
   get currentRound() {
-    console.log("currentRound", this._currentRound);
     return this._currentRound;
   }
 
@@ -128,7 +127,6 @@ export class Game {
 
     // todo: change dealer for next hand, if needed
     // this._dealer = this.calculateNextDealer(this._dealer);
-    console.log("starging new hand");
     this._currentRound++;
     this.startNewHand();
   }
