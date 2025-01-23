@@ -8,7 +8,7 @@ import { showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const router = useRouter()
-const game = computed(() => gameStore.gameInstance)
+const game = computed(() => gameStore.game)
 const currentHand = computed(() => game.value?.currentHand())
 const previousHand = computed(() => game.value?.previousHand)
 const gameWinner = computed(() => game.value?.winner())

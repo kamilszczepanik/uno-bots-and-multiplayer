@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 
 const gameStore = useGameStore()
 const router = useRouter()
-const game = computed(() => gameStore.gameInstance)
+const game = computed(() => gameStore.game)
 const targetScore = computed(() => game.value?.targetScore)
 const winnerIndex = computed(() => game.value?.winner())
 const winnerData = computed(() => {

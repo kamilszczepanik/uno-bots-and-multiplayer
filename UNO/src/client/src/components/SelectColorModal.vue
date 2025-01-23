@@ -5,7 +5,7 @@ import { useGameStore } from '@/stores/gameStore'
 import { colors, type Color } from '../../../model/deck'
 
 const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const currentHand = computed(() => gameStore.game?.currentHand())
 
 const emit = defineEmits(['close'])
 

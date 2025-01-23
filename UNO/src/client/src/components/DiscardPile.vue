@@ -5,7 +5,7 @@ import { useGameStore } from '@/stores/gameStore'
 
 const gameStore = useGameStore()
 const newColor = computed(() => currentHand.value?.newColor)
-const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const currentHand = computed(() => gameStore.game?.currentHand())
 const topCard = computed(() => currentHand.value?.discardPile().top())
 </script>
 
