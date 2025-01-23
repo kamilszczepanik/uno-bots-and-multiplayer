@@ -89,6 +89,7 @@ const removeBot = (index: number) => {
           class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
           placeholder="eg. bestplayer123"
           required
+          autofocus
         />
         <p v-if="errors.userName" class="text-red-500">{{ errors.userName }}</p>
       </div>
