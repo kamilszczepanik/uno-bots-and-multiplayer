@@ -25,6 +25,7 @@ export class Game {
   private _cardsPerPlayer: number;
   private _currentRound: number = 1;
   private _shuffler: Shuffler<Card>;
+  private _previusHand: Hand | undefined;
 
   constructor({
     players,
@@ -65,7 +66,12 @@ export class Game {
     return this._targetScore;
   }
 
+  get previousHand() {
+    return this._previusHand;
+  }
+
   get currentRound() {
+    console.log("currentRound", this._currentRound);
     return this._currentRound;
   }
 
@@ -121,7 +127,8 @@ export class Game {
     }
 
     // todo: change dealer for next hand, if needed
-    // this._dealer = this.calcu`lateNextDealer(this._dealer);
+    // this._dealer = this.calculateNextDealer(this._dealer);
+    console.log("starging new hand");
     this._currentRound++;
     this.startNewHand();
   }
@@ -131,6 +138,7 @@ export class Game {
   }
 
   private startNewHand(): void {
+    this._previusHand = this._currentHand;
     this._currentHand = new Hand({
       players: this._players,
       dealer: this._dealer,

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
-import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
-import type { Props } from '../../../model/uno'
 import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
@@ -10,37 +8,10 @@ import GameStatus from '@/components/GameStatus.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
 import BotService, { DELAY_TO_MAKE_MOVE_MS } from '../../../services/BotService'
 import { useRouter } from 'vue-router'
-
-const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
-  .discard()
-  .is({ type: 'NUMBERED', color: 'GREEN', number: 8 })
-  .hand(0)
-  .is({ color: 'GREEN', type: 'DRAW' })
-  .hand(1)
-  .is({ number: 8 })
-  .hand(2)
-  .is({ type: 'WILD DRAW' })
-  .hand(3)
-  .is({ number: 3 })
-  .drawPile()
-  .is({ color: 'GREEN', number: 5 })
-  .build()
+import { showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const router = useRouter()
-
-onMounted(() => {
-  const mockProps: Props = {
-    players: ['Player One', 'Player Two', 'Player Three', 'Player Four'],
-    targetScore: 500,
-    randomizer: () => 3,
-    shuffler: firstShuffle,
-    cardsPerPlayer: 1,
-  }
-
-  gameStore.initializeGame(mockProps)
-})
-
 const players = computed(() => gameStore.gameInstance?.players || [])
 const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
 
@@ -50,22 +21,23 @@ watch(currentPlayerIndex, (newIndex) => {
   }
 })
 
-onMounted(() => {
-  const currentHand = gameStore.currentHand
-  if (currentHand) {
-    gameStore.setCurrentHandAsPreviousHand()
-
-    currentHand.onEnd(() => {
-      router.push('/hand-over')
-    })
-  }
-})
-
 const handleBotTurn = (botIndex: number) => {
   setTimeout(() => {
     BotService.takeTurn(gameStore.gameInstance?.currentHand(), botIndex)
   }, DELAY_TO_MAKE_MOVE_MS)
 }
+
+onMounted(() => {
+  if (!gameStore.currentHand) {
+    router.push('/').then(() => {
+      showMessage('Provide details in the form to create a game.')
+    })
+  } else {
+    gameStore.currentHand?.onEnd(() => {
+      router.push('/hand-over')
+    })
+  }
+})
 </script>
 <template>
   <div class="flex h-screen w-full flex-col">
