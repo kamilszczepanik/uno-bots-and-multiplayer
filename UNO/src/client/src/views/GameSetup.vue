@@ -127,7 +127,7 @@ const removeBot = (index: number) => {
             <input
               type="text"
               v-model="bot.name"
-              class="mr-2 w-full rounded border px-3 py-2"
+              class="mr-2 w-full rounded border bg-backgroundMute px-3 py-2"
               :placeholder="'Bot ' + (index + 1) + ' name'"
               required
             />

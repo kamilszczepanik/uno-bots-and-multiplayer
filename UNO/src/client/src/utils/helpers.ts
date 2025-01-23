@@ -1,7 +1,11 @@
 import { toast } from 'vue3-toastify'
 
 export const showMessage = (message: string) => {
-  toast(message)
+  toast(message, {
+    style: {
+      background: 'var(--color-background)',
+    },
+  })
 }
 
 export function handleGameAction(
