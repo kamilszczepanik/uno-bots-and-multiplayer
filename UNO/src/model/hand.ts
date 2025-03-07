@@ -140,6 +140,10 @@ export class Hand {
     const playerHand = this.getCurrentPlayerHand();
     this.validateCardIndex(cardIndex, playerHand);
 
+    if (playerHand[cardIndex].color && newColor) {
+      throw new Error("It is illegal to name a color on a colored card");
+    }
+
     if (!this.canPlay(cardIndex)) {
       const cardToPlay = playerHand[cardIndex];
       const topCard = this._discardPile.top();
@@ -150,7 +154,7 @@ export class Hand {
       );
     }
 
-    const cardToPlay = playerHand.splice(cardIndex, 1)[0]; // Remove the card from the hand
+    const cardToPlay = playerHand.splice(cardIndex, 1)[0];
     this._discardPile.add(cardToPlay);
 
     if (cardToPlay.type === "DRAW" || cardToPlay.type === "WILD DRAW") {
