@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
 import { useUserStore } from '@/stores/userStore'
 import GameStatus from '@/components/GameStatus.vue'
@@ -8,9 +8,9 @@ import UserHand from '@/components/UserHand.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import DrawPile from '@/components/DrawPile.vue'
+import * as api from '@/model/api'
 
 const route = useRoute()
-const router = useRouter()
 const userStore = useUserStore()
 const inProgressGamesStore = useInProgressGamesStore()
 const userId = computed(() => userStore.userInfo.id)
@@ -22,9 +22,13 @@ const opponents = computed(() => {
 })
 
 onMounted(async () => {
-  if (userStore.userInfo.id === undefined) {
-    router.push(`/login?game=${id.value}`)
-    return
+  if (!game.value) {
+    try {
+      const fetchedGame = await api.game(id.value as string)
+      inProgressGamesStore.upsert(fetchedGame)
+    } catch (error) {
+      console.error('Failed to load game:', error)
+    }
   }
 })
 </script>

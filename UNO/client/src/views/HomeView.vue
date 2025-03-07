@@ -8,12 +8,67 @@ import { usePausedGamesStore } from '@/stores/pausedGamesStore'
 import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
 import { useFinishedGamesStore } from '@/stores/finishedGamesStore'
 import CreateGameForm from '@/components/CreateGameForm.vue'
+import { onMounted, onUnmounted } from 'vue'
+import * as api from '@/model/api'
 
 const userStore = useUserStore()
 const waitingGamesStore = useWaitingGamesStore()
 const pausedGamesStore = usePausedGamesStore()
 const inProgressGamesStore = useInProgressGamesStore()
 const finishedGamesStore = useFinishedGamesStore()
+
+onMounted(async () => {
+  const ws = new WebSocket('ws://localhost:9090/publish')
+  ws.onopen = () => ws.send(JSON.stringify({ type: 'subscribe' }))
+  ws.onmessage = ({ data: gameJSON }) => {
+    const game = JSON.parse(gameJSON)
+
+    waitingGamesStore.remove(game)
+    pausedGamesStore.remove(game)
+    inProgressGamesStore.remove(game)
+
+    switch (game.status) {
+      case 'waiting':
+        if (game.players.length !== 0) {
+          waitingGamesStore.upsert(game)
+        }
+        break
+      case 'paused':
+        pausedGamesStore.upsert(game)
+        break
+      case 'in_progress':
+        inProgressGamesStore.upsert(game)
+        break
+      case 'finished':
+        finishedGamesStore.upsert(game)
+        break
+      default:
+        console.error(`Unexpected status: ${game.status}`)
+    }
+  }
+  onUnmounted(() => {
+    ws.send(JSON.stringify({ type: 'unsubscribe' }))
+    ws.close()
+  })
+
+  const allGames = await api.games()
+
+  allGames
+    .filter((game) => game.status === 'waiting')
+    .forEach((game) => waitingGamesStore.upsert(game))
+
+  allGames
+    .filter((game) => game.status === 'paused')
+    .forEach((game) => pausedGamesStore.upsert(game))
+
+  allGames
+    .filter((game) => game.status === 'in_progress')
+    .forEach((game) => inProgressGamesStore.upsert(game))
+
+  allGames
+    .filter((game) => game.status === 'finished')
+    .forEach((game) => finishedGamesStore.upsert(game))
+})
 </script>
 
 <template>

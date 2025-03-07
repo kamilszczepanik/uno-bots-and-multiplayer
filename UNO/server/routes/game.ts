@@ -43,7 +43,7 @@ router.get('/games/:gameId', async (req: Request, res: Response) => {
       return
     }
 
-    res.json({ game })
+    res.json(game)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: `Failed to fetch game ${gameId}` })

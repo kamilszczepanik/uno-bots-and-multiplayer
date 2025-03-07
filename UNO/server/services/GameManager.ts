@@ -10,9 +10,13 @@ class GameManager {
   async getGame(gameId: string): Promise<Game> {
     console.log(this.games.get(gameId))
     if (!this.games.has(gameId)) {
-      //   const gameData = await loadGameFromDb(gameId)
-      //   const game = new Game(gameData)
-      //   this.games.set(gameId, game)
+      const gameData = await prisma.game.findUniqueOrThrow({
+        where: { id: gameId },
+        include: { players: true, hands: true },
+      })
+      console.log(gameData)
+      // const game = new Game(gameData)
+      // this.games.set(gameId, game)
     }
     return this.games.get(gameId)!
   }

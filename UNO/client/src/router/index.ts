@@ -6,6 +6,7 @@ import HandOver from '@/views/HandOver.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
+import { useUserStore } from '@/stores/userStore'
 
 const routes = [
   {
@@ -30,4 +31,12 @@ const router = createRouter({
   routes,
 })
 
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+  if (to.meta.requiresAuth && !userStore.userInfo.id) {
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+  } else {
+    next()
+  }
+})
 export default router

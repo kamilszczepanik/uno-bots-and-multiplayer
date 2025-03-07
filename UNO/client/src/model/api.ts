@@ -95,7 +95,7 @@ export async function leave(game: IndexedGameSpecs, player: User) {
 }
 
 async function perform_action(action: Action) {
-  return post(`http://localhost:8080/games/${action.gameId}/actions`, action)
+  return post(`api/games/${action.gameId}/actions`, action)
 }
 
 export async function draw(game: IndexedGame) {
