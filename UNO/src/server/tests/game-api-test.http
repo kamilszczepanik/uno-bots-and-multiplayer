@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### List all games
-GET http://localhost:8000/api/games
+GET http://localhost:8000/api/waiting-games
 
 ### Join a game (replace {{gameId}})
 POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/join

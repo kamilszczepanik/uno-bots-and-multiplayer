@@ -1,7 +1,7 @@
 import prisma from '../utils/db.server'
 import { Request, RequestHandler, Response } from 'express'
 
-export const listGames: RequestHandler = async (
+export const listWaitingGames: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
@@ -145,8 +145,10 @@ export const deleteGame: RequestHandler = async (
       return
     }
 
-    if (game.users.length > 0) {
-      res.status(400).json({ error: 'Cannot delete a game with players' })
+    if (game.users.length > 1) {
+      res
+        .status(400)
+        .json({ error: 'Cannot delete a game with more than one player' })
       return
     }
 
