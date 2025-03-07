@@ -25,7 +25,7 @@ const buttonClasses: Record<Button, string> = {
 </script>
 
 <template>
-  <button :class="['rounded px-4 py-2 transition', buttonClasses[variant], additionalClasses]">
+  <button :class="`rounded px-4 py-2 transition ${buttonClasses[variant]} ${additionalClasses}`">
     <slot />
   </button>
 </template>

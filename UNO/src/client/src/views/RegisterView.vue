@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
 import ControlButton from '@/components/ControlButton.vue'
-import { fetchUserInfo } from '@/utils/helpers'
+import { fetchUserInfo, showMessage } from '@/utils/helpers'
 
 const registerFormSchema = z
   .object({
@@ -42,7 +42,17 @@ const handleSubmit = async () => {
       password: form.value.password,
     })
 
-    router.push('/')
+    const response = await axiosInstance.post(`/api/auth/login`, {
+      username: form.value.username,
+      password: form.value.password,
+    })
+
+    const { token } = response.data
+    localStorage.setItem('authToken', token)
+
+    router.push('/').then(() => {
+      showMessage('You have successfully registered.')
+    })
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<FormErrors>((acc, curr) => {

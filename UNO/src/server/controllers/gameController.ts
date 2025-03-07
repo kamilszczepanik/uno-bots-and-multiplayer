@@ -7,7 +7,6 @@ export const listGames: RequestHandler = async (
 ) => {
   try {
     const games = await prisma.game.findMany({
-      where: { status: 'waiting' },
       include: { users: true },
       orderBy: { createdAt: 'desc' },
     })
@@ -63,6 +62,7 @@ export const joinGame: RequestHandler = async (req, res) => {
     })
 
     if (!game || game.status !== 'waiting') {
+      console.log(game)
       res.status(400).json({ error: 'Game is not available for joining' })
       return
     }
@@ -162,5 +162,41 @@ export const deleteGame: RequestHandler = async (
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to delete game' })
+  }
+}
+
+export const leaveGame = async (req: Request, res: Response) => {
+  const { gameId } = req.params
+  const { userId } = req.body
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      select: { users: true, name: true },
+    })
+
+    if (!game) {
+      res.status(404).json({ error: 'Game not found' })
+      return
+    }
+
+    if (!game.users.some((user) => user.id === userId)) {
+      res.status(400).json({ error: 'User is not in the game' })
+      return
+    }
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        users: {
+          disconnect: { id: userId },
+        },
+      },
+    })
+
+    res.json({ message: `You have left the game ${game.name}` })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to leave game' })
   }
 }

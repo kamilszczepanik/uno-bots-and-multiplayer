@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
 import ControlButton from '@/components/ControlButton.vue'
-import { fetchUserInfo } from '@/utils/helpers'
+import { fetchUserInfo, showMessage } from '@/utils/helpers'
 
 const loginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -38,7 +38,9 @@ const handleSubmit = async () => {
     const { token } = response.data
     localStorage.setItem('authToken', token)
 
-    router.push('/')
+    router.push('/').then(() => {
+      showMessage('You have successfully login.')
+    })
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<FormErrors>((acc, curr) => {
