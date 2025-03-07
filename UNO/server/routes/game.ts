@@ -140,11 +140,12 @@ router.post('/games/:gameId/join', async (req, res) => {
     }
 
     broadcast(formattedGame)
-    return
+    res
+      .status(200)
+      .json({ message: 'Joined the game successfully', game: formattedGame })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to join game' })
-    return
   }
 })
 
@@ -187,9 +188,104 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
     }
 
     broadcast(formattedGame)
+    res.status(200).json({ message: 'Game started', game: formattedGame })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to start game' })
+  }
+})
+
+router.post('/games/:gameId/pause', async (req: Request, res: Response) => {
+  const { gameId } = req.params
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      select: { id: true },
+    })
+
+    if (!game) {
+      res.status(404).json({ error: 'Game not found' })
+      return
+    }
+
+    const updatedGame = await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        status: 'paused',
+      },
+      select: {
+        id: true,
+        name: true,
+        targetScore: true,
+        cardsPerPlayer: true,
+        status: true,
+        players: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    })
+
+    const formattedGame = {
+      ...updatedGame,
+      status: updatedGame.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
+    res.status(200).json({ message: 'Game paused', game: formattedGame })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to pause game' })
+  }
+})
+
+router.post('/games/:gameId/resume', async (req: Request, res: Response) => {
+  const { gameId } = req.params
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      select: { id: true },
+    })
+
+    if (!game) {
+      res.status(404).json({ error: 'Game not found' })
+      return
+    }
+
+    const updatedGame = await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        status: 'in_progress',
+      },
+      select: {
+        id: true,
+        name: true,
+        targetScore: true,
+        cardsPerPlayer: true,
+        status: true,
+        players: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    })
+
+    const formattedGame = {
+      ...updatedGame,
+      status: updatedGame.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
+    res.status(200).json({ message: 'Game resumed', game: formattedGame })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to resume game' })
   }
 })
 
@@ -222,7 +318,16 @@ router.post('/games/:gameId/leave', async (req: Request, res: Response) => {
       },
       select: {
         id: true,
-        players: true,
+        name: true,
+        targetScore: true,
+        cardsPerPlayer: true,
+        status: true,
+        players: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     })
 
@@ -237,7 +342,12 @@ router.post('/games/:gameId/leave', async (req: Request, res: Response) => {
       res.json({ message: `You have left the game ${game.name}` })
     }
 
-    // broadcast(updatedGame)
+    const formattedGame = {
+      ...updatedGame,
+      status: updatedGame.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to leave game' })

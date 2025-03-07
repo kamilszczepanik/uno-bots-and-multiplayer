@@ -4,7 +4,7 @@ import { showMessage } from '@/utils/helpers'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
-async function get(url: string): Promise<any> {
+async function get(url: string): Promise<unknown> {
   try {
     const response = await axiosInstance.get(url, { headers })
     return response.data
@@ -14,9 +14,9 @@ async function get(url: string): Promise<any> {
   }
 }
 
-async function post(url: string, body: {} = {}): Promise<any> {
+async function post(url: string, body: object = {}): Promise<unknown> {
   try {
-    const response = await axiosInstance.post(url, body, { headers }) // Pass body correctly
+    const response = await axiosInstance.post(url, body, { headers })
     return response.data
   } catch (error) {
     console.error(`POST ${url} failed:`, error)
@@ -26,7 +26,7 @@ async function post(url: string, body: {} = {}): Promise<any> {
 
 export async function games(): Promise<IndexedGame[]> {
   const response = await get('/api/games')
-  return response
+  return response as IndexedGame[]
 }
 
 export async function join(game: IndexedGameSpecs, player: User) {
@@ -47,28 +47,43 @@ export async function start(game: IndexedGameSpecs) {
     })
     .catch((error) => {
       console.error(error)
-      showMessage('Failed to join game')
+      showMessage('Failed to start game')
+    })
+}
+
+export async function pause(game: IndexedGameSpecs) {
+  return post(`/api/games/${game.id}/pause`)
+    .then(() => {
+      showMessage(`You have paused the game ${game.name}`)
+    })
+    .catch((error) => {
+      console.error(error)
+      showMessage('Failed to pause the game' + game.name)
+    })
+}
+
+export async function resume(game: IndexedGameSpecs) {
+  return post(`/api/games/${game.id}/resume`)
+    .then(() => {
+      showMessage(`You have resume the game ${game.name}`)
+    })
+    .catch((error) => {
+      console.error(error)
+      showMessage('Failed to resume the game' + game.name)
     })
 }
 
 export async function leave(game: IndexedGameSpecs, player: User) {
   return post(`/api/games/${game.id}/leave`, { userId: player.id })
-    .then(({ data }) => {
-      showMessage(data.message)
+    .then(() => {
+      showMessage('You have left the game ' + game.name)
     })
     .catch((error) => {
       console.error(error)
       showMessage('Failed to left the game')
     })
 }
-
-// export async function new_game(
-//   number_of_players: number,
-//   player: string,
-// ): Promise<IndexedYahtzeeSpecs | IndexedYahtzee> {
-//   return await post('http://localhost:8080/pending-games', { creator: player, number_of_players })
-// }
-
+// todo: handle game actions
 // async function perform_action(game: IndexedYahtzee, action: any) {
 //   return post(`http://localhost:8080/games/${game.id}/actions`, action)
 // }

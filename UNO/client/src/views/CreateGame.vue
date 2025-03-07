@@ -62,7 +62,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="p-2">
+  <div class="p-2 pb-12">
     <div class="flex items-center justify-end gap-2">
       <span class="font-bold">{{ userStore.userInfo.username }}</span>
       <div>
@@ -72,51 +72,66 @@ const handleSubmit = async () => {
       </div>
     </div>
     <h1 class="text-center text-7xl">UNO</h1>
-    <div class="flex w-full flex-col justify-around gap-4 pt-8">
-      <form @submit.prevent="handleSubmit" class="flex w-full items-center justify-around">
-        <h2 class="mb-6 text-center text-3xl font-semibold">Create new game</h2>
-        <div class="mb-4">
-          <label class="mb-2 block font-bold text-text" for="name">Game name</label>
+    <div class="flex w-full flex-col items-center gap-6 px-4 pt-8">
+      <form
+        @submit.prevent="handleSubmit"
+        class="flex w-full max-w-4xl flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <h2 class="text-center text-2xl font-semibold sm:mr-4 sm:w-auto sm:shrink-0 sm:text-left">
+          Create New Game
+        </h2>
+
+        <div class="w-full sm:flex-1">
+          <label class="mb-1 block font-bold text-text" for="name">Game Name</label>
           <input
             type="text"
             v-model="form.name"
             id="name"
             name="name"
-            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
-            placeholder="eg. bestgame123"
+            class="focus:ring-primary w-full rounded border bg-backgroundMute px-3 py-2 focus:outline-none focus:ring-2"
+            placeholder="e.g., bestgame123"
             required
             autofocus
           />
-          <p v-if="errors.name" class="text-red-500">{{ errors.name }}</p>
+          <p v-if="errors.name" class="text-sm text-red-500">{{ errors.name }}</p>
         </div>
-        <div class="mb-4">
-          <label class="mb-2 block font-bold text-text" for="targetScore">Target score</label>
+
+        <div class="w-full sm:flex-1">
+          <label class="mb-1 block font-bold text-text" for="targetScore">Target Score</label>
           <input
             type="number"
             v-model="form.targetScore"
             id="targetScore"
             name="targetScore"
-            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
+            class="focus:ring-primary w-full rounded border bg-backgroundMute px-3 py-2 focus:outline-none focus:ring-2"
           />
-          <p v-if="errors.targetScore" class="text-red-500">{{ errors.targetScore }}</p>
+          <p v-if="errors.targetScore" class="text-sm text-red-500">{{ errors.targetScore }}</p>
         </div>
-        <div class="mb-4">
-          <label class="mb-2 block font-bold text-text" for="cardsPerPlayer"
-            >Cards per player</label
+
+        <div class="w-full sm:flex-1">
+          <label class="mb-1 block font-bold text-text" for="cardsPerPlayer"
+            >Cards Per Player</label
           >
           <input
             type="number"
             v-model="form.cardsPerPlayer"
             id="cardsPerPlayer"
             name="cardsPerPlayer"
-            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
+            class="focus:ring-primary w-full rounded border bg-backgroundMute px-3 py-2 focus:outline-none focus:ring-2"
           />
-          <p v-if="errors.cardsPerPlayer" class="text-red-500">
+          <p v-if="errors.cardsPerPlayer" class="text-sm text-red-500">
             {{ errors.cardsPerPlayer }}
           </p>
         </div>
-        <div>
-          <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
+
+        <div class="flex w-full justify-center sm:w-auto">
+          <ControlButton
+            variant="primary"
+            type="submit"
+            class="w-full px-6 py-2 text-center sm:w-auto"
+          >
+            Create Game
+          </ControlButton>
         </div>
       </form>
     </div>

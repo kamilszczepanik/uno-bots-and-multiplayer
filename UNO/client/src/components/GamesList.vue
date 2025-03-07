@@ -30,6 +30,14 @@ const handleOpenGame = async (game: IndexedGameSpecs) => {
 const handleStartGame = async (game: IndexedGameSpecs) => {
   await api.start(game)
 }
+
+const handlePauseGame = async (game: IndexedGameSpecs) => {
+  await api.pause(game)
+}
+
+const handleResumeGame = async (game: IndexedGameSpecs) => {
+  await api.resume(game)
+}
 </script>
 
 <template>
@@ -68,7 +76,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               @click="handleJoinGame(game)"
               class="w-32"
             >
-              Join Game
+              Join
             </ControlButton>
             <ControlButton
               v-if="
@@ -80,7 +88,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               @click="handleStartGame(game)"
               class="w-32"
             >
-              Start Game
+              Start
             </ControlButton>
             <ControlButton
               v-if="
@@ -90,7 +98,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               @click="handleLeaveGame(game)"
               class="w-32"
             >
-              Leave Game
+              Leave
             </ControlButton>
             <ControlButton
               v-if="
@@ -101,7 +109,28 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               @click="handleOpenGame(game)"
               class="w-32"
             >
-              Open Game
+              Open
+            </ControlButton>
+            <ControlButton
+              v-if="
+                game.players.some((user) => user.id === currentUserId) &&
+                game.status === 'in_progress'
+              "
+              variant="cancel"
+              @click="handlePauseGame(game)"
+              class="w-32"
+            >
+              Pause
+            </ControlButton>
+            <ControlButton
+              v-if="
+                game.players.some((user) => user.id === currentUserId) && game.status === 'paused'
+              "
+              variant="secondary"
+              @click="handleResumeGame(game)"
+              class="w-32"
+            >
+              Resume
             </ControlButton>
           </div>
         </div>
