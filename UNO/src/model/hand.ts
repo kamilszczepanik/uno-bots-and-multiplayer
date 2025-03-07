@@ -10,7 +10,7 @@ export interface Props {
 
 export class Hand {
   private _winner: number | undefined;
-  private _score: number = 0;
+  private _score: number | undefined = undefined;
   private _ended: boolean = false;
   private _dealer: number;
   private _players: string[];
@@ -450,7 +450,26 @@ export class Hand {
   }
 
   score() {
+    if (this.hasEnded()) {
+      this.calculateScore();
+    }
+
     return this._score;
+  }
+
+  private calculateScore() {
+    this._score = this._players
+      .flatMap((_, index) =>
+        index === this._currentPlayerIndex ? [] : this.playerHand(index)
+      )
+      .reduce((score, card) => {
+        if (card.type === "NUMBERED") return score + card.number!;
+        if (card.type === "DRAW") return score + 20;
+        if (card.type === "REVERSE" || card.type === "SKIP") return score + 20;
+        if (card.type === "WILD" || card.type === "WILD DRAW")
+          return score + 50;
+        return score;
+      }, 0);
   }
 
   discardPile(): DiscardPile {

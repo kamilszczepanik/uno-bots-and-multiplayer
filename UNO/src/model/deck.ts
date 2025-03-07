@@ -92,13 +92,5 @@ export function createInitialDeck(): Props {
     cards.push({ type: "WILD DRAW" });
   }
 
-  // BLANK: 4 total
-  for (let i = 0; i < 4; i++) {
-    cards.push({ type: "BLANK" });
-  }
-
-  // Return the deck, but override the `size` getter to exclude blank cards
-  return new Deck(cards) as Props & { size: number } & {
-    get size(): number;
-  };
+  return new Deck(cards);
 }
