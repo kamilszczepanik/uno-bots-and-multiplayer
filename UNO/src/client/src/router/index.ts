@@ -5,6 +5,8 @@ import GameOver from '@/views/GameOver.vue'
 import HandOver from '@/views/HandOver.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import LoginView from '@/views/LoginView.vue'
+import JoinGame from '@/views/JoinGame.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 const routes = [
   {
@@ -13,6 +15,8 @@ const routes = [
     component: GameSetup,
   },
   { path: '/login', name: 'Login', component: LoginView },
+  { path: '/register', name: 'Register', component: RegisterView },
+  { path: '/join-game', name: 'Join Game', component: JoinGame },
   { path: '/playing-hand', name: 'Playing Hand', component: PlayingHand },
   { path: '/hand-over', name: 'Hand Over', component: HandOver },
   { path: '/game-over', name: 'Game Over', component: GameOver },

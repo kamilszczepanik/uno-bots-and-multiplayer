@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
+import ControlButton from '@/components/ControlButton.vue'
 
 const loginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -28,18 +29,15 @@ const handleSubmit = async () => {
 
     errors.value = {}
 
-    const response = await axiosInstance.post(
-      `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
-      {
-        username: form.value.username,
-        password: form.value.password,
-      },
-    )
+    const response = await axiosInstance.post(`/api/auth/login`, {
+      username: form.value.username,
+      password: form.value.password,
+    })
 
     const { token } = response.data
     localStorage.setItem('authToken', token)
 
-    router.push('/dashboard')
+    router.push('/join-game')
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<FormErrors>((acc, curr) => {
@@ -62,36 +60,42 @@ const handleSubmit = async () => {
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+        <label for="username" class="mb-2 block font-bold text-text">Username</label>
         <input
           id="username"
           type="text"
           v-model="form.username"
-          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
           placeholder="Enter your username"
         />
         <p v-if="errors.username" class="mt-1 text-sm text-red-500">{{ errors.username }}</p>
       </div>
 
       <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <label for="password" class="mb-2 block font-bold text-text">Password</label>
         <input
           id="password"
           type="password"
           v-model="form.password"
-          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
           placeholder="Enter your password"
         />
         <p v-if="errors.password" class="mt-1 text-sm text-red-500">{{ errors.password }}</p>
       </div>
 
       <div class="mt-6">
-        <button
+        <ControlButton
+          variant="primary"
           type="submit"
           class="w-full rounded bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Login
-        </button>
+        </ControlButton>
+
+        <p class="mt-4 text-center">
+          Don't have an account?
+          <RouterLink to="/register" class="text-primary-600">Register</RouterLink>
+        </p>
       </div>
     </form>
   </div>

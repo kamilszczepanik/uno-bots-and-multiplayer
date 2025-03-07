@@ -1,3 +1,4 @@
+import { type Router } from 'vue-router'
 import { toast } from 'vue3-toastify'
 
 export const showMessage = (message: string) => {
@@ -23,5 +24,28 @@ export function handleGameAction(
     } else {
       showMessage(options?.errorMessage || 'An unknown error occurred.')
     }
+  }
+}
+
+export const isAuthenticated = (): boolean => {
+  const token = localStorage.getItem('authToken')
+  return !!token
+}
+
+export const redirectIfNotAuthenticated = ({
+  router,
+  redirectPath = '/login',
+  message,
+}: {
+  router: Router
+  redirectPath?: string
+  message?: string
+}): void => {
+  if (!isAuthenticated()) {
+    router.push(redirectPath).then(() => {
+      if (message) {
+        showMessage(message)
+      }
+    })
   }
 }

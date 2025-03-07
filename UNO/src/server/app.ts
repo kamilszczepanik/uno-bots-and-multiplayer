@@ -6,7 +6,6 @@ import authRoutes from './routes/authRoutes'
 dotenv.config()
 
 const app: Application = express()
-
 app.use(
   cors({
     origin: 'http://localhost:3000',
