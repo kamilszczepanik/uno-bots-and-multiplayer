@@ -7,20 +7,6 @@ import { Card } from 'models/src/model/deck'
 class GameManager {
   private games = new Map<string, Game>()
 
-  async getGame(gameId: string): Promise<Game> {
-    console.log(this.games.get(gameId))
-    if (!this.games.has(gameId)) {
-      const gameData = await prisma.game.findUniqueOrThrow({
-        where: { id: gameId },
-        include: { players: true, hands: true },
-      })
-      console.log(gameData)
-      // const game = new Game(gameData)
-      // this.games.set(gameId, game)
-    }
-    return this.games.get(gameId)!
-  }
-
   async startGame({
     id,
     name,
@@ -131,6 +117,8 @@ class GameManager {
       {} as Record<string, (typeof allHands)[number]>,
     )
 
+    this.games.set(dbGame.id, game)
+
     return {
       dbGame,
       dbHands: handsMap,
@@ -138,7 +126,17 @@ class GameManager {
     }
   }
 
-  removeGame(gameId: string): void {
+  async getGame(gameId: string): Promise<Game> {
+    const game = this.games.get(gameId)
+    if (!game) {
+      throw new Error(
+        `Game ${gameId} not found in memory. It might not have started yet or has been cleared.`,
+      )
+    }
+    return game
+  }
+
+  clearGame(gameId: string): void {
     this.games.delete(gameId)
   }
 }

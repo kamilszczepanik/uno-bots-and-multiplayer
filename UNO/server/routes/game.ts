@@ -394,28 +394,57 @@ export async function resolveAction(action: Action) {
   if (!game) {
     throw new Error('Game not found')
   }
-
-  let updatedState
+  console.log('game before action', game)
 
   switch (action.type) {
     case 'draw': {
-      updatedState = game.currentHand()?.draw()
+      game.currentHand()?.draw()
       break
     }
     case 'play': {
-      updatedState = game.currentHand()?.play(action.cardIndex, action.color)
+      game.currentHand()?.play(action.cardIndex, action.color)
       break
     }
     default:
       throw new Error('Invalid action')
   }
 
-  await prisma.game.update({
+  console.log('game after action', game)
+
+  const serializedGame = serializeGame(game)
+  const serializedHand = serializeHand(game.currentHand()!)
+
+  const updatedGame = await prisma.game.update({
     where: { id: action.gameId },
-    data: {},
+    data: {
+      status: serializedGame.status,
+      scores: serializedGame.scores,
+      currentRound: serializedGame.currentRound,
+      winnerId: serializedGame.winnerId,
+    },
+    include: {
+      players: true,
+      hands: true,
+    },
   })
 
-  return updatedState
+  await prisma.hand.updateMany({
+    where: { gameId: action.gameId, status: 'in_progress' },
+    data: {
+      currentPlayerId: serializedHand.currentPlayerId,
+      dealerId: serializedHand.dealerId,
+      winnerId: serializedHand.winnerId,
+      playersWhoDrewCard: serializedHand.playersWhoDrewCard,
+      playersWhoSaidUno: serializedHand.playersWhoSaidUno,
+      newColor: serializedHand.newColor,
+      playingDirection: serializedHand.playingDirection,
+      discardPile: serializedHand.discardPile,
+      drawPile: serializedHand.drawPile,
+      playerHands: serializedHand.playerHands,
+    },
+  })
+
+  return updatedGame
 }
 interface TypedRequest<BodyType> extends Request {
   body: BodyType
@@ -429,6 +458,7 @@ router.post(
     try {
       const game = resolveAction(req.body)
       res.send(game)
+
       // broadcast(game)
     } catch (error: unknown) {
       console.log(error)
