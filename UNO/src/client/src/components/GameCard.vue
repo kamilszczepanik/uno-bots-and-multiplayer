@@ -24,11 +24,11 @@ const cardImageSrc = computed(() =>
 </script>
 
 <template>
-  <div :class="`w-32 h-48 rounded-lg shadow-md`">
+  <div :class="`h-44 w-28 rounded-lg shadow-md`">
     <img
       :src="cardImageSrc"
       :alt="`Card ${card?.type ?? 'Deck'}`"
-      class="w-full h-full object-cover rounded-lg"
+      class="h-full w-full rounded-lg object-cover"
     />
   </div>
 </template>

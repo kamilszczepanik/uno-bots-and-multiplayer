@@ -6,6 +6,7 @@ import type { Props } from '../../../model/uno'
 import { standardRandomizer } from '../../../utils/random_utils'
 import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
+import UserHand from '@/components/UserHand.vue'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -26,6 +27,7 @@ const gameStore = useGameStore()
 const playerCount = computed(() => gameStore.currentHand?.playerCount)
 const discardPile = computed(() => gameStore.currentHand?.discardPile())
 const drawPile = computed(() => gameStore.currentHand?.drawPile())
+const userHand = computed(() => gameStore.currentHand?.playerHand(0))
 
 onMounted(() => {
   const mockProps: Props = {
@@ -50,6 +52,6 @@ onMounted(() => {
       <DiscardPile :discardPile="discardPile" />
       <DrawPile :drawPile="drawPile" />
     </div>
-    <div>Player hand</div>
+    <UserHand :userHand="userHand" />
   </div>
 </template>
