@@ -185,16 +185,29 @@ export const leaveGame = async (req: Request, res: Response) => {
       return
     }
 
-    await prisma.game.update({
+    const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
         users: {
           disconnect: { id: userId },
         },
       },
+      select: {
+        id: true,
+        users: true,
+      },
     })
 
-    res.json({ message: `You have left the game ${game.name}` })
+    if (updatedGame.users.length === 0) {
+      await prisma.game.delete({
+        where: { id: updatedGame.id },
+      })
+      res.json({
+        message: `You have left the game ${game.name} and the game has been deleted, since there was no other users.`,
+      })
+    } else {
+      res.json({ message: `You have left the game ${game.name}` })
+    }
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to leave game' })
