@@ -152,12 +152,12 @@ export class Hand {
     const isPlayable = this.isCardPlayable(drawnCard, topCard);
 
     if (!isPlayable) {
-      this._currentPlayerIndex =
-        (this._currentPlayerIndex +
-          this._playingDirectionModifier +
-          this._players.length) %
-        this._players.length;
+      this._currentPlayerIndex = this.calculateNextPlayerIndex({
+        currentPlayerDrawn: true,
+      });
     }
+
+    console.log(this._playerHands, "sadfsadfasd");
   }
 
   private getCurrentPlayerHand(): deck.Card[] {
@@ -210,11 +210,9 @@ export class Hand {
 
     if (cardToPlay.type === "DRAW" || cardToPlay.type === "WILD DRAW") {
       const amountOfCardsToDraw = cardToPlay.type === "DRAW" ? 2 : 4;
-      const nextPlayerIndex =
-        (this._currentPlayerIndex +
-          this._playingDirectionModifier +
-          this._players.length) %
-        this._players.length;
+      const nextPlayerIndex = this.calculateNextPlayerIndex({
+        currentPlayerDrawn: true,
+      });
 
       this.giveCardsToPlayer({
         playerIndex: nextPlayerIndex,
@@ -239,7 +237,9 @@ export class Hand {
     }
 
     this._lastPlayerIndex = this._currentPlayerIndex;
-    this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
+    this._currentPlayerIndex = this.calculateNextPlayerIndex({
+      cardPlayed: cardToPlay,
+    });
 
     return cardToPlay;
   }
@@ -330,7 +330,22 @@ export class Hand {
     }
   }
 
-  private calculateNextPlayer(cardPlayed: deck.Card): number {
+  private calculateNextPlayerIndex({
+    cardPlayed = this._discardPile.top(),
+    currentPlayerDrawn = false,
+  }: {
+    cardPlayed?: deck.Card;
+    currentPlayerDrawn?: boolean;
+  }): number {
+    if (currentPlayerDrawn) {
+      return (
+        (this._currentPlayerIndex +
+          this._playingDirectionModifier +
+          this._players.length) %
+        this._players.length
+      );
+    }
+
     if (cardPlayed.type === "REVERSE") {
       if (this._players.length === 2) {
         return this._currentPlayerIndex;
