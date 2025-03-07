@@ -2,10 +2,9 @@
 import { defineEmits } from 'vue'
 import ControlButton from './ControlButton.vue'
 import { handleGameAction } from '@/utils/helpers'
-import { useGameStore } from '@/stores/gameStore'
 import { useRouter } from 'vue-router'
+import * as api from '@/model/api'
 
-const gameStore = useGameStore()
 const router = useRouter()
 const emit = defineEmits(['close'])
 
@@ -13,12 +12,16 @@ const closeModal = () => {
   emit('close')
 }
 
-const handleEndGame = () => {
-  handleGameAction(() => {
-    gameStore.endGame()
+handleGameAction(
+  async () => {
+    // todo: handle end game
+    await api.endGame({ gameId: game.id, handId: currentHand.value.id })
     router.push('/')
-  })
-}
+  },
+  {
+    errorMessage: 'Failed to draw a card.',
+  },
+)
 </script>
 <template>
   <div

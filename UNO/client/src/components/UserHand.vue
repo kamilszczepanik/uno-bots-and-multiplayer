@@ -2,10 +2,11 @@
 import { computed, ref } from 'vue'
 import GameCard from './GameCard.vue'
 import GameControls from './GameControls.vue'
-import { showMessage } from '@/utils/helpers'
+import { handleGameAction, showMessage } from '@/utils/helpers'
 import SelectColorModal from './SelectColorModal.vue'
 import type { IndexedGame } from '../../../shared/types'
 import PlayerInfo from './PlayerInfo.vue'
+import * as api from '@/model/api'
 
 const { game, userId } = defineProps<{
   game: IndexedGame
@@ -51,7 +52,18 @@ const handlePlayCard = (index: number) => {
     return
   }
 
-  // handleGameAction(() => currentHand.value?.play(index))
+  handleGameAction(
+    async () =>
+      await api.play({
+        gameId: game.id,
+        handId: currentHand.value.id,
+        cardIndex: index,
+        color: undefined,
+      }),
+    {
+      errorMessage: 'Failed to draw a card.',
+    },
+  )
 }
 
 const spacing = computed(() => {

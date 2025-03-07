@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { computed, defineEmits } from 'vue'
 import { handleGameAction, showMessage } from '@/utils/helpers'
-import { useGameStore } from '@/stores/gameStore'
 import { colors, type Color } from 'models/src/model/deck'
+import * as api from '@/model/api'
+import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
+import { useRoute } from 'vue-router'
 
-const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.game?.currentHand())
+const route = useRoute()
+const id = computed(() => route.params.id)
+const inProgressGamesStore = useInProgressGamesStore()
+const game = computed(() => inProgressGamesStore.game(id.value as string))
+const currentHand = computed(() => game.value?.hands[game.value.currentRound - 1])
 
 const emit = defineEmits(['close'])
 
@@ -20,9 +25,22 @@ const handleSelectColor = (color: Color) => {
     return showMessage('Select a WILD or WILD DRAW card first.')
   }
 
-  handleGameAction(() => {
-    handleGameAction(() => currentHand.value?.play(cardIndex, color))
-  })
+  if (!game.value || !currentHand.value) {
+    return showMessage('Game or current hand not found. Please refresh or try again.')
+  }
+
+  handleGameAction(
+    async () =>
+      await api.play({
+        gameId: game.value!.id,
+        handId: currentHand.value!.id,
+        cardIndex,
+        color,
+      }),
+    {
+      errorMessage: 'Failed to draw a card.',
+    },
+  )
 
   emit('close')
 }

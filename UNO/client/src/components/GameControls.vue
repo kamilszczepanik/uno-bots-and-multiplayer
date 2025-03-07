@@ -2,21 +2,27 @@
 import { computed, ref } from 'vue'
 import ControlButton from './ControlButton.vue'
 import { useGameStore } from '@/stores/gameStore'
-import { USER_INDEX } from '@/utils/constants'
 import { handleGameAction } from '@/utils/helpers'
 import EndGameModal from './EndGameModal.vue'
 import { useRouter } from 'vue-router'
+import * as api from '@/model/api'
 
 const router = useRouter()
 const gameStore = useGameStore()
 const showEndGameModal = ref(false)
 const currentHand = computed(() => gameStore.game?.currentHand())
 
-const handleSayUno = () => {
-  handleGameAction(() => currentHand.value?.sayUno(USER_INDEX), {
+handleGameAction(
+  async () => {
+    // todo: handle end game
+    await api.sayUno({ gameId: game.id, handId: currentHand.value.id, userId })
+    router.push('/')
+  },
+  {
     successMessage: 'You said UNO',
-  })
-}
+    errorMessage: 'Failed to say uno.',
+  },
+)
 
 const handleEndGame = () => {
   showEndGameModal.value = true
