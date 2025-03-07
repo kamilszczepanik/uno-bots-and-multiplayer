@@ -1,20 +1,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import ControlButton from './ControlButton.vue'
-
-interface User {
-  id: number
-  username: string
-}
-
-interface Game {
-  id: string
-  name: string
-  status: string
-  targetScore: number
-  cardsPerPlayer: number
-  players: User[]
-}
+import type { Game } from '../../../shared/types'
 
 defineProps<{
   games: Game[]

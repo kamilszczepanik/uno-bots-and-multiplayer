@@ -1,27 +1,31 @@
 import axiosInstance from '@/utils/axiosInstance'
-import type { IndexedYahtzee, IndexedYahtzeeSpecs } from './game'
+import type { IndexedGame } from '../../../shared/types'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
 async function get(url: string): Promise<any> {
-  const response: Response = await axiosInstance.get(url, {
-    headers,
-  })
-  return await response.json()
+  try {
+    const response = await axiosInstance.get(url, { headers })
+    return response.data
+  } catch (error) {
+    console.error(`GET ${url} failed:`, error)
+    throw error
+  }
 }
 
 async function post(url: string, body: {} = {}): Promise<any> {
-  const response: Response = await axiosInstance.post(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
-  })
-  return await response.json()
+  try {
+    const response = await axiosInstance.post(url, body, { headers }) // Pass body correctly
+    return response.data
+  } catch (error) {
+    console.error(`POST ${url} failed:`, error)
+    throw error
+  }
 }
 
-export async function games(): Promise<IndexedYahtzee[]> {
+export async function games(): Promise<IndexedGame[]> {
   const response = await get('/api/games')
-  return await response.json()
+  return response
 }
 
 // export async function join(game: IndexedYahtzeeSpecs, player: string) {

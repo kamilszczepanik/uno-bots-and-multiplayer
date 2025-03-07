@@ -2,21 +2,22 @@
 import { useUserStore } from '@/stores/userStore'
 import axiosInstance from '@/utils/axiosInstance'
 import { showMessage } from '@/utils/helpers'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import GamesList from './GamesList.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { useRouter } from 'vue-router'
+import { useWaitingGamesStore } from '@/stores/waitingGamesStore'
+import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
+import { usePausedGamesStore } from '@/stores/pausedGamesStore'
+import { useFinishedGamesStore } from '@/stores/finishedGamesStore'
 
 const router = useRouter()
 const userStore = useUserStore()
 const gameStore = useGameStore()
-const allGames = computed(() => gameStore.allGames)
-const waitingGames = computed(() => allGames.value.filter((game) => game.status === 'waiting'))
-const pausedGames = computed(() => allGames.value.filter((game) => game.status === 'paused'))
-const inProgressGames = computed(() =>
-  allGames.value.filter((game) => game.status === 'in progress'),
-)
-const finishedGames = computed(() => allGames.value.filter((game) => game.status === 'finished'))
+const waitingGames = useWaitingGamesStore().games
+const pausedGames = usePausedGamesStore().games
+const inProgressGames = useInProgressGamesStore().games
+const finishedGames = useFinishedGamesStore().games
 
 const loadingGames = ref(false)
 const errorLoadingGames = ref<string | null>(null)

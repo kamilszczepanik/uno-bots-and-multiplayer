@@ -1,4 +1,4 @@
-export interface Player {
+export interface User {
   id: number;
   username: string;
 }
@@ -21,11 +21,26 @@ export interface Hand {
 export interface Game {
   id: string;
   name: string;
-  status: "waiting" | "paused" | "in progress" | "finished";
+  status: GameStatus;
   targetScore: number;
   cardsPerPlayer: number;
   currentRound: number;
-  players: Player[];
+  players: User[];
   hands: Hand[];
   scores: Record<number, number>;
 }
+
+export interface GameSpecs {
+  players: string[];
+  targetScore: number;
+  cardsPerPlayer: number;
+}
+
+export type IndexedGame = Readonly<
+  Omit<Game, ""> & { id: number; status: GameStatus }
+>;
+export type IndexedGameSpecs = Readonly<
+  GameSpecs & { id: number; status: GameStatus }
+>;
+
+export type GameStatus = "waiting" | "in progress" | "paused" | "finished";

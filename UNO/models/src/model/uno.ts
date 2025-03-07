@@ -7,7 +7,7 @@ import {
 import { Card } from "./deck";
 import { Hand } from "./hand";
 
-export interface Props {
+export interface GameSpecs {
   players: string[];
   targetScore: number;
   randomizer: Randomizer;
@@ -33,7 +33,7 @@ export class Game {
     randomizer = standardRandomizer,
     shuffler = standardShuffler,
     cardsPerPlayer,
-  }: Props) {
+  }: GameSpecs) {
     if (players.length < 2 || players.length > 10)
       throw new Error(
         "A game requires at least 2 players and allows at most 10 players."
@@ -151,8 +151,8 @@ export class Game {
   }
 }
 
-export function createGame(props: Partial<Props>): Game {
-  const defaultProps: Props = {
+export function createGame(props: Partial<GameSpecs>): Game {
+  const defaultProps: GameSpecs = {
     players: ["A", "B"],
     targetScore: 500,
     randomizer: standardRandomizer,
