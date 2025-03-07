@@ -176,6 +176,10 @@ export class Hand {
     return playerHand;
   }
 
+  get playerHands(): Map<number, deck.Card[]> {
+    return this._playerHands;
+  }
+
   private replenishDrawPile(): void {
     const topCard = this._discardPile.top();
     const remainingDiscardPile = this._discardPile.cards.slice(0, -1);

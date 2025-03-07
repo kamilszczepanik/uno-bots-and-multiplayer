@@ -54,13 +54,14 @@ model Hand {
   playersWhoSaidUno  Json
   newColor           String
   playingDirection   String @default("clockwise")
-  status             String @default("in_progress")
+  status             String @default("in progress")
 
   gameId      String
   game        Game   @relation("GameHands", fields: [gameId], references: [id])
   players     User[]
   discardPile Json
   drawPile    Json
+  playerHands Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,3 +1,4 @@
+import { Card } from '../../model/deck'
 import { createGame } from '../../model/uno' // Your existing game logic
 import prisma from '../utils/db.server'
 
@@ -54,6 +55,16 @@ export const setupGame = async ({
     )
   }
 
+  const playerHands = JSON.stringify(
+    playerIds.reduce(
+      (acc, playerId, index) => {
+        acc[playerId] = hand.playerHand(index)
+        return acc
+      },
+      {} as Record<number, Card[]>,
+    ),
+  )
+
   const dbHand = await prisma.hand.create({
     data: {
       gameId: dbGame.id,
@@ -65,6 +76,7 @@ export const setupGame = async ({
       playingDirection: hand.playingDirection,
       discardPile: JSON.stringify(hand.discardPile()),
       drawPile: JSON.stringify(hand.drawPile()),
+      playerHands,
       players: {
         connect: playerIds.map((id) => ({ id })),
       },

@@ -11,6 +11,7 @@ export const listGames: RequestHandler = async (
       include: { players: true },
       orderBy: { createdAt: 'desc' },
     })
+    console.log(games)
 
     res.json(games)
   } catch (error) {
@@ -28,9 +29,23 @@ export const gameStatus: RequestHandler = async (
   try {
     const game = await prisma.game.findUniqueOrThrow({
       where: { id: gameId },
+      include: {
+        hands: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+        players: true,
+      },
     })
 
-    res.json(game)
+    if (!game) {
+      res.status(404).json({ error: `Game ${gameId} not found` })
+      return
+    }
+
+    const currentHand = game.hands.length > 0 ? game.hands[0] : null
+
+    res.json({ game, currentHand })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: `Failed to fetch game ${gameId}` })

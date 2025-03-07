@@ -1,20 +1,40 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import GameCard from './GameCard.vue'
 import PlayerInfo from './PlayerInfo.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 import GameControls from './GameControls.vue'
-import { handleGameAction, showMessage } from '@/utils/helpers'
+import { fetchUserInfo, redirectIfNotAuthenticated, showMessage } from '@/utils/helpers'
 import SelectColorModal from './SelectColorModal.vue'
+import { useUserStore } from '@/stores/userStore'
+import { useRouter } from 'vue-router'
 
 const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.game?.currentHand())
+const userStore = useUserStore()
+const router = useRouter()
+const currentHand = computed(() => gameStore.currentHand)
 const showSelectColorModal = ref(false)
 const selectedCardIndex = ref<number | null>(null)
-const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
-const userHand = computed(() => currentHand.value?.playerHand(USER_INDEX))
-const userIsCurrentPlayer = computed(() => currentPlayerIndex.value === USER_INDEX)
+const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
+const userIsCurrentPlayer = computed(() => currentPlayerId.value === userStore.userInfo.id)
+const userHand = computed(() => {
+  const playerHands = currentHand.value?.playerHands
+  const userId = userStore.userInfo.id
+
+  if (!playerHands) {
+    return []
+  }
+
+  if (!userId) {
+    throw new Error('User ID not found')
+  }
+
+  const parsedPlayerHands = JSON.parse(playerHands)
+  const userCards = parsedPlayerHands[userId]
+
+  return userCards || []
+})
 
 const handlePlayCard = (index: number) => {
   if (!userIsCurrentPlayer.value) {
@@ -32,8 +52,18 @@ const handlePlayCard = (index: number) => {
     return
   }
 
-  handleGameAction(() => currentHand.value?.play(index))
+  // handleGameAction(() => currentHand.value?.play(index))
 }
+
+onMounted(async () => {
+  const userInfo = await fetchUserInfo()
+  userStore.setUserInfo(userInfo)
+
+  await redirectIfNotAuthenticated({
+    router,
+    message: 'You must be logged in to create or join a game',
+  })
+})
 
 const spacing = computed(() => {
   if (!userHand.value) return 0
@@ -69,7 +99,6 @@ const spacing = computed(() => {
         </div>
       </div>
     </div>
-
     <GameControls class="pb-2" />
     <SelectColorModal
       :card-index="selectedCardIndex"

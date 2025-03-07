@@ -1,20 +1,13 @@
+import { type Hand, type Game } from './../../../shared/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axiosInstance from '@/utils/axiosInstance'
-
-interface Game {
-  id: string
-  name: string
-  status: 'waiting' | 'paused' | 'in progress' | 'finished'
-  targetScore: number
-  cardsPerPlayer: number
-  users: { id: number; username: string }[]
-}
 
 export const useGameStore = defineStore('game', {
   state: () => ({
     allGames: ref<Game[]>([]),
     game: ref<Game>(),
+    currentHand: ref<Hand>(),
     loading: ref(false),
     error: ref<string | null>(null),
   }),
@@ -40,7 +33,8 @@ export const useGameStore = defineStore('game', {
 
       try {
         const response = await axiosInstance.get(`/api/games/${gameId}`)
-        this.game = response.data
+        this.game = response.data.game
+        this.currentHand = response.data.currentHand
       } catch (err) {
         this.error = 'Failed to fetch game'
         console.error('Error fetching game:', err)

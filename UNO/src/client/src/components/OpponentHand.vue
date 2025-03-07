@@ -4,8 +4,8 @@ import GameCard from './GameCard.vue'
 import { useGameStore } from '@/stores/gameStore'
 import PlayerInfo from './PlayerInfo.vue'
 
-const { opponentIndex, placement } = defineProps({
-  opponentIndex: {
+const { opponentId, placement } = defineProps({
+  opponentId: {
     type: Number,
     required: true,
   },
@@ -16,8 +16,22 @@ const { opponentIndex, placement } = defineProps({
 })
 
 const gameStore = useGameStore()
+const currentHand = computed(() => gameStore.currentHand)
+const opponentHand = computed(() => {
+  const playerHands = currentHand.value?.playerHands
 
-const opponentHand = computed(() => gameStore.game?.currentHand()?.playerHand(opponentIndex) ?? [])
+  if (!playerHands) {
+    return []
+  }
+
+  try {
+    const parsedPlayerHands = JSON.parse(playerHands)
+    return parsedPlayerHands[opponentId] || []
+  } catch (error) {
+    console.error('Failed to parse playerHands:', error)
+    return []
+  }
+})
 
 const rotation = computed(() => {
   switch (placement) {
@@ -51,7 +65,7 @@ const spacing = computed(() => {
     v-if="opponentHand.length > 0"
     :class="`flex ${placement !== 'top' ? 'flex-col' : 'flex-row'} items-center`"
   >
-    <PlayerInfo :playerIndex="opponentIndex" />
+    <PlayerInfo :playerIndex="opponentId" />
 
     <div
       :class="`relative flex ${rotation} ${placement === 'top' ? 'h-32' : 'w-56'} px-6`"

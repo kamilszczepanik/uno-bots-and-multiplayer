@@ -3,23 +3,27 @@ import { computed } from 'vue'
 import GameCard from './GameCard.vue'
 
 import { useGameStore } from '@/stores/gameStore'
-import { USER_INDEX } from '@/utils/constants'
-import { handleGameAction, showMessage } from '@/utils/helpers'
+import { showMessage } from '@/utils/helpers'
+import { useUserStore } from '@/stores/userStore'
+import type { Card } from '../../../model/deck'
 
 const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.game?.currentHand())
-const drawPile = computed(() => gameStore.game?.currentHand()?.drawPile())
-const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
-const userIsCurrentPlayer = computed(() => {
-  return currentPlayerIndex.value === USER_INDEX
+const userStore = useUserStore()
+const currentHand = computed(() => gameStore.currentHand)
+const drawPile = computed(() => {
+  const pile = currentHand.value?.drawPile
+  return pile ? (JSON.parse(pile)._cards as Card[]) : []
 })
-
+const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
+const userIsCurrentPlayer = computed(() => {
+  return currentPlayerId.value === userStore.userInfo.id
+})
 const visibleCards = computed(() => {
   if (!drawPile.value) {
     return 0
   }
 
-  return Math.min(drawPile.value.size, 10)
+  return Math.min(drawPile.value.length, 10)
 })
 
 const onClick = () => {
@@ -28,7 +32,8 @@ const onClick = () => {
     return
   }
 
-  handleGameAction(() => currentHand.value?.draw())
+  // todo: handle game action
+  // handleGameAction(() => currentHand.value?.draw())
 }
 </script>
 
