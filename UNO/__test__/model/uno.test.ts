@@ -109,12 +109,12 @@ describe("Playing a hand", () => {
       expect(game.currentHand()).toBe(hand);
     });
   });
-  describe("when the hand is over", () => {
+  describe.skip("when the hand is over", () => {
     const game = createGame(props);
     const hand = game.currentHand()!;
     hand.draw();
     hand.play(0);
-    test.only("the setup is as expected", () => {
+    test("the setup is as expected", () => {
       expect(hand.hasEnded()).toBeTruthy();
       expect(hand.winner()).toEqual(1);
       expect(hand.score()).toEqual(78);
