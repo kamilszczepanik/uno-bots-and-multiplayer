@@ -1,6 +1,7 @@
 import axiosInstance from '@/utils/axiosInstance'
 import type { IndexedGame, IndexedGameSpecs, User } from '../../../shared/types'
 import { showMessage } from '@/utils/helpers'
+import type { Card } from 'models/src/model/deck'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
@@ -92,19 +93,15 @@ export async function leave(game: IndexedGameSpecs, player: User) {
       showMessage('Failed to left the game')
     })
 }
-// todo: handle game actions
-// async function perform_action(game: IndexedYahtzee, action: any) {
-//   return post(`http://localhost:8080/games/${game.id}/actions`, action)
-// }
 
-// export async function reroll(game: IndexedYahtzee, held: number[], player: string) {
-//   return perform_action(game, { type: 'reroll', held, player })
-// }
+async function perform_action(game: IndexedGame, action: any) {
+  return post(`http://localhost:8080/games/${game.id}/actions`, action)
+}
 
-// export async function register(
-//   game: IndexedYahtzee,
-//   slot: DieValue | LowerSectionKey,
-//   player: string,
-// ) {
-//   return perform_action(game, { type: 'register', slot, player })
-// }
+export async function draw(game: IndexedGame, held: number[], user: User) {
+  return perform_action(game, { type: 'draw', user })
+}
+
+export async function play(game: IndexedGame, card: Card, user: User) {
+  return perform_action(game, { type: 'play', user, card })
+}

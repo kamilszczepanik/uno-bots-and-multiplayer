@@ -3,7 +3,8 @@ import { Request, Response, Router } from 'express'
 import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
 import { broadcast } from '../websocket'
-import { GameStatus } from '../../shared/types'
+import { GameStatus, IndexedGame, User } from '../../shared/types'
+import { Card } from 'models/src/model/deck'
 
 const router = Router()
 
@@ -381,13 +382,42 @@ router.delete('/games/:gameId', async (req: Request, res: Response) => {
       where: { id: gameId },
     })
 
-    // broadcast(game)
-
     res.json({ message: 'Game deleted' })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to delete game' })
   }
 })
+
+interface TypedRequest<BodyType> extends Request {
+  body: BodyType
+}
+
+type RawAction = { type: 'draw' } | { type: 'play'; card: Card }
+type Action = RawAction & { user: User }
+
+function resolve_action(action: Action): IndexedGame {
+  switch (action.type) {
+    case 'draw':
+      // todo: draw functionality
+      return api.draw(id, action.user)
+    case 'play':
+      // todo: play functionality
+      return api.register(id, action.card, action.user)
+  }
+}
+
+router.post(
+  '/games/:id/actions',
+  async (req: TypedRequest<Action>, res: Response) => {
+    try {
+      const game = resolve_action(req.body)
+      res.send(game)
+      broadcast(game)
+    } catch (error: unknown) {
+      console.log(error)
+    }
+  },
+)
 
 export default router
