@@ -8,6 +8,7 @@ import { useWaitingGamesStore } from './stores/waitingGamesStore'
 import { usePausedGamesStore } from './stores/pausedGamesStore'
 import { useInProgressGamesStore } from './stores/inProgressGamesStore'
 import { useFinishedGamesStore } from './stores/finishedGamesStore'
+import * as api from './model/api'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -56,11 +57,19 @@ onMounted(async () => {
     ws.close()
   })
 
-  // const games = await api.games()
-  // games.forEach(ongoingGamesStore.upsert)
+  const allGames = await api.games()
 
-  // const pending_games = await api.pending_games()
-  // pending_games.forEach(pendingGamesStore.upsert)
+  const waitingGames = allGames.filter((game) => game.status === 'waiting')
+  waitingGames.forEach(waitingGamesStore.upsert)
+
+  const pausedGames = allGames.filter((game) => game.status === 'paused')
+  pausedGames.forEach(pausedGamesStore.upsert)
+
+  const inProgressGames = allGames.filter((game) => game.status === 'in progress')
+  inProgressGames.forEach(inProgressGamesStore.upsert)
+
+  const finishedGames = allGames.filter((game) => game.status === 'finished')
+  finishedGames.forEach(finishedGamesStore.upsert)
 })
 </script>
 

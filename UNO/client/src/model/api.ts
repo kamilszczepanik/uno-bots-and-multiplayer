@@ -1,9 +1,17 @@
+import axiosInstance from '@/utils/axiosInstance'
 import type { IndexedYahtzee, IndexedYahtzeeSpecs } from './game'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
+async function get(url: string): Promise<any> {
+  const response: Response = await axiosInstance.get(url, {
+    headers,
+  })
+  return await response.json()
+}
+
 async function post(url: string, body: {} = {}): Promise<any> {
-  const response: Response = await fetch(url, {
+  const response: Response = await axiosInstance.post(url, {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
@@ -12,25 +20,20 @@ async function post(url: string, body: {} = {}): Promise<any> {
 }
 
 export async function games(): Promise<IndexedYahtzee[]> {
-  const response = await fetch('http://localhost:8080/games', { headers })
+  const response = await get('/api/games')
   return await response.json()
 }
 
-export async function pending_games(): Promise<IndexedYahtzeeSpecs[]> {
-  const response = await fetch('http://localhost:8080/pending-games', { headers })
-  return await response.json()
-}
+// export async function join(game: IndexedYahtzeeSpecs, player: string) {
+//   return post(`http://localhost:8080/pending-games/${game.id}/players`, { player })
+// }
 
-export async function join(game: IndexedYahtzeeSpecs, player: string) {
-  return post(`http://localhost:8080/pending-games/${game.id}/players`, { player })
-}
-
-export async function new_game(
-  number_of_players: number,
-  player: string,
-): Promise<IndexedYahtzeeSpecs | IndexedYahtzee> {
-  return await post('http://localhost:8080/pending-games', { creator: player, number_of_players })
-}
+// export async function new_game(
+//   number_of_players: number,
+//   player: string,
+// ): Promise<IndexedYahtzeeSpecs | IndexedYahtzee> {
+//   return await post('http://localhost:8080/pending-games', { creator: player, number_of_players })
+// }
 
 // async function perform_action(game: IndexedYahtzee, action: any) {
 //   return post(`http://localhost:8080/games/${game.id}/actions`, action)
