@@ -5,6 +5,7 @@ import PlayerInfo from './PlayerInfo.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 import GameControls from './GameControls.vue'
+import { handleGameAction } from '@/utils/handleGameAction'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.currentHand)
@@ -17,11 +18,8 @@ function playCard(index: number) {
     alert("It's not your turn")
     return
   }
-  if (!currentHand.value?.canPlay(index)) {
-    alert("You can't play this card")
-    return
-  }
-  currentHand.value.play(index)
+
+  handleGameAction(() => currentHand.value?.play(index))
 }
 
 const spacing = computed(() => {
