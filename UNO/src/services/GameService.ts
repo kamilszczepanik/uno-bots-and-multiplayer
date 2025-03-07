@@ -16,16 +16,10 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .is({ color: "GREEN", number: 5 })
   .build();
 
-export const GameService = {
-  initializeGame() {
-    const props = {
-      players: ["a", "b", "c", "d"],
-      targetScore: 200,
-      randomizer: () => 3,
-      shuffler: firstShuffle,
-      cardsPerPlayer: 1,
-    };
+export type GameServiceProps = Omit<Props, "shuffler" | "randomizer">;
 
+export const GameService = {
+  initializeGame(props: GameServiceProps) {
     const game = createGame(props);
     const hand = game.currentHand()!;
 

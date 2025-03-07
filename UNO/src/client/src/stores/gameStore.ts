@@ -1,4 +1,4 @@
-import { GameService } from './../../../services/GameService'
+import { GameService, type GameServiceProps } from './../../../services/GameService'
 import { Game } from './../../../model/uno'
 import { defineStore } from 'pinia'
 
@@ -9,8 +9,8 @@ export const useGameStore = defineStore('game', {
   }),
 
   actions: {
-    initializeGame() {
-      const game = GameService.initializeGame()
+    initializeGame(props: GameServiceProps) {
+      const game = GameService.initializeGame(props)
       this.playerCount = GameService.getPlayerCount(game)
     },
   },
