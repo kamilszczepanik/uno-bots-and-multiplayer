@@ -510,8 +510,16 @@ export class Hand {
     return this._playersThatSaidUno;
   }
 
+  get players() {
+    return this._players;
+  }
+
   get newColor() {
     return this._newColor;
+  }
+
+  get lastPlayerIndex() {
+    return this._lastPlayerIndex;
   }
 
   onEnd(callback: (event: { winner: number }) => void): void {

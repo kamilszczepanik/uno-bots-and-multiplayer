@@ -41,15 +41,9 @@ const handleCatchUnoFailure = (playerIndex: number) => {
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     @click.self="closeModal"
   >
-    <div class="z-50 w-96 space-y-4 rounded-lg bg-white p-4">
+    <div class="bg-background z-50 w-96 space-y-4 rounded-lg p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold">Catch UNO Failure</h2>
-        <ControlButton
-          variant="destructive"
-          class="w-12 border border-red-600 bg-inherit text-red-600 hover:bg-inherit"
-          @click="closeModal"
-          >X</ControlButton
-        >
       </div>
       <p>Pick a player to catch the UNO failure</p>
       <div class="flex flex-col gap-1">
