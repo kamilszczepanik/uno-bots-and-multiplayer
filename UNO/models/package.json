@@ -1,7 +1,7 @@
 {
-  "name": "uno",
-  "version": "0.0.1",
-  "description": "Uno",
+  "name": "models",
+  "version": "1.0.0",
+  "description": "Object-oriented version of UNO",
   "main": "index.js",
   "scripts": {
     "test": "jest"
