@@ -7,6 +7,7 @@ import { standardRandomizer } from '../../../utils/random_utils'
 import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
+import GameStatus from '@/components/GameStatus.vue'
 
 const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .discard()
@@ -24,7 +25,6 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .build()
 
 const gameStore = useGameStore()
-const playerCount = computed(() => gameStore.currentHand?.playerCount)
 const discardPile = computed(() => gameStore.currentHand?.discardPile())
 const drawPile = computed(() => gameStore.currentHand?.drawPile())
 const userHand = computed(() => gameStore.currentHand?.playerHand(0))
@@ -44,9 +44,9 @@ onMounted(() => {
 
 <template>
   <div class="mx-auto flex h-screen w-full flex-col items-center justify-between p-2">
-    <div>
-      <h1 class="text-center text-7xl">UNO Game</h1>
-      <h2 class="mb-6 text-center text-2xl font-semibold">Number of Players: {{ playerCount }}</h2>
+    <div class="flex w-full">
+      <GameStatus />
+      <div class="flex flex-grow justify-center">Second player</div>
     </div>
     <div class="flex gap-16">
       <DiscardPile :discardPile="discardPile" />
