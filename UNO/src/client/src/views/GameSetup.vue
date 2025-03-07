@@ -80,13 +80,13 @@ const removeBot = (index: number) => {
       <h2 class="mb-6 text-center text-2xl font-semibold">Start new game</h2>
 
       <div class="mb-4">
-        <label class="text-text mb-2 block font-bold" for="name">Your name</label>
+        <label class="mb-2 block font-bold text-text" for="name">Your name</label>
         <input
           type="text"
           v-model="form.userName"
           id="name"
           name="name"
-          class="bg-backgroundMute mb-2 w-full rounded border px-3 py-2"
+          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
           placeholder="eg. bestplayer123"
           required
         />
@@ -94,25 +94,25 @@ const removeBot = (index: number) => {
       </div>
 
       <div class="mb-4">
-        <label class="text-text mb-2 block font-bold" for="targetScore">Target score</label>
+        <label class="mb-2 block font-bold text-text" for="targetScore">Target score</label>
         <input
           type="number"
           v-model="form.targetScore"
           id="targetScore"
           name="targetScore"
-          class="bg-backgroundMute mb-2 w-full rounded border px-3 py-2"
+          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
         />
         <p v-if="errors.targetScore" class="text-red-500">{{ errors.targetScore }}</p>
       </div>
 
       <div class="mb-4">
-        <label class="text-text mb-2 block font-bold" for="cardsPerPlayer">Cards per player</label>
+        <label class="mb-2 block font-bold text-text" for="cardsPerPlayer">Cards per player</label>
         <input
           type="number"
           v-model="form.cardsPerPlayer"
           id="cardsPerPlayer"
           name="cardsPerPlayer"
-          class="bg-backgroundMute mb-2 w-full rounded border px-3 py-2"
+          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
         />
         <p v-if="errors.cardsPerPlayer" class="text-red-500">
           {{ errors.cardsPerPlayer }}
@@ -120,7 +120,7 @@ const removeBot = (index: number) => {
       </div>
 
       <div class="mb-4">
-        <label class="text-text mb-2 block font-bold">Bots</label>
+        <label class="mb-2 block font-bold text-text">Bots</label>
         <div v-for="(bot, index) in form.bots" :key="index" class="mb-2">
           <div class="mb-2 flex items-center">
             <input
