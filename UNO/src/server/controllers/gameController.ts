@@ -9,11 +9,12 @@ export const listGames: RequestHandler = async (
     const games = await prisma.game.findMany({
       where: { status: 'waiting' },
       include: { users: true },
+      orderBy: { createdAt: 'desc' },
     })
 
     res.json(games)
   } catch (error) {
-    console.log(error)
+    console.error(error)
     res.status(500).json({ error: 'Failed to fetch games' })
   }
 }
@@ -23,8 +24,6 @@ export const createGame: RequestHandler = async (
   res: Response,
 ) => {
   const { name, creatorId, targetScore, cardsPerPlayer } = req.body
-  console.log('name', name)
-  console.log('creatorId', creatorId)
   if (!name || !creatorId) {
     res.status(400).json({ error: 'Name and creatorId are required' })
     return
@@ -47,7 +46,7 @@ export const createGame: RequestHandler = async (
     res.status(201).json(game)
     return
   } catch (error) {
-    console.log(error)
+    console.error(error)
     res.status(500).json({ error: 'Failed to create game' })
     return
   }
@@ -126,7 +125,7 @@ export const startGame: RequestHandler = async (
 
     res.json({ message: 'Game started' })
   } catch (error) {
-    console.log(error)
+    console.error(error)
     res.status(500).json({ error: 'Failed to start game' })
   }
 }
@@ -161,7 +160,7 @@ export const deleteGame: RequestHandler = async (
 
     res.json({ message: 'Game deleted' })
   } catch (error) {
-    console.log(error)
+    console.error(error)
     res.status(500).json({ error: 'Failed to delete game' })
   }
 }

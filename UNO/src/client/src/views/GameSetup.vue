@@ -2,7 +2,7 @@
 import ControlButton from '@/components/ControlButton.vue'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
 import axiosInstance from '@/utils/axiosInstance'
-import { fetchUserInfo, redirectIfNotAuthenticated } from '@/utils/helpers'
+import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated } from '@/utils/helpers'
 import { AxiosError } from 'axios'
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -44,6 +44,7 @@ const handleSubmit = async () => {
     name: form.name,
     targetScore: form.targetScore,
     cardsPerPlayer: form.cardsPerPlayer,
+    creatorId: userData.value.id,
   }
 
   try {
@@ -51,10 +52,10 @@ const handleSubmit = async () => {
     loadingGames.value = true
     errorLoadingGames.value = null
 
-    const response = await axiosInstance.post('/api/games', formData)
-    console.log(response.data)
+    await axiosInstance.post('/api/games', formData)
     errorCreatingGame.value = null
     errors.value = {}
+    await fetchWaitingGames()
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
@@ -103,9 +104,14 @@ onMounted(async () => {
 
 <template>
   <div class="p-2">
-    <div class="text-right">{{ userData.username }}</div>
+    <div class="flex items-center justify-end gap-2">
+      <span class="font-bold">{{ userData.username }}</span>
+      <ControlButton variant="cancel" @click="logoutUser" class="w-24 bg-background">
+        Logout
+      </ControlButton>
+    </div>
     <h1 class="text-center text-7xl">UNO</h1>
-    <div class="flex w-full justify-around pt-8">
+    <div class="flex w-full justify-around gap-4 pt-8">
       <form @submit.prevent="handleSubmit" class="w-96">
         <h2 class="mb-6 text-center text-3xl font-semibold">Create new game</h2>
         <div class="mb-4">

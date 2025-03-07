@@ -41,13 +41,11 @@ const handleEndGame = () => {
 }
 
 onMounted(() => {
-  console.log(gameWinner)
   if (gameWinner.value) {
     router.push('/game-over').then(() => {
       showMessage('The game is over!')
     })
   } else if (!currentHand.value) {
-    console.log('here')
     router.push('/').then(() => {
       showMessage('Provide details in the form to create a game.')
     })

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import axiosInstance from '@/utils/axiosInstance'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
 import ControlButton from '@/components/ControlButton.vue'
+import { fetchUserInfo } from '@/utils/helpers'
 
 const loginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -52,6 +53,13 @@ const handleSubmit = async () => {
     }
   }
 }
+
+onMounted(async () => {
+  const userInfo = await fetchUserInfo()
+  if (userInfo) {
+    router.push('/')
+  }
+})
 </script>
 
 <template>

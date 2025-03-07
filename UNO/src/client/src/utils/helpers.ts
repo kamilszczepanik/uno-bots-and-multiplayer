@@ -71,3 +71,12 @@ export const fetchUserInfo = async (): Promise<{ id: number; username: string } 
     return null
   }
 }
+
+export const logoutUser = async () => {
+  try {
+    localStorage.removeItem('authToken')
+    window.location.href = '/login'
+  } catch (error) {
+    console.error('Error logging out:', error)
+  }
+}

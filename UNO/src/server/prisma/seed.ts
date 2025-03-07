@@ -37,6 +37,8 @@ async function main() {
     data: {
       name: 'Test Game',
       creatorId: user1.id,
+      targetScore: 500,
+      cardsPerPlayer: 7,
       users: {
         connect: [{ id: user1.id }, { id: user2.id }],
       },
