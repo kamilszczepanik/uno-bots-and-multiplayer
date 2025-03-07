@@ -11,7 +11,6 @@ router.get('/games', async (req: Request, res: Response) => {
       include: { players: true },
       orderBy: { createdAt: 'desc' },
     })
-    console.log(games)
 
     res.json(games)
   } catch (error) {
@@ -91,7 +90,6 @@ router.post('/games/:gameId/join', async (req, res) => {
     })
 
     if (!game || game.status !== 'waiting') {
-      console.log(game)
       res.status(400).json({ error: 'Game is not available for joining' })
       return
     }

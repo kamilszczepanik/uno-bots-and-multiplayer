@@ -5,7 +5,7 @@ import GameCard from './GameCard.vue'
 import { useGameStore } from '@/stores/gameStore'
 import { showMessage } from '@/utils/helpers'
 import { useUserStore } from '@/stores/userStore'
-import type { Card } from '../../../model/deck'
+import type { Card } from 'models/src/model/deck'
 
 const gameStore = useGameStore()
 const userStore = useUserStore()

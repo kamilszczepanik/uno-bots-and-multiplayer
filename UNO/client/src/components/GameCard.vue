@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineProps } from 'vue'
-import type { Card } from '../../../model/deck'
-import { getCardImagePath } from '../../../utils/cardMapper'
+import type { Card } from 'models/src/model/deck'
+import { getCardImagePath } from 'models/src/utils/cardMapper'
 
 const { card, showBack } = defineProps({
   card: {

@@ -2,7 +2,7 @@
 import { computed, defineEmits } from 'vue'
 import { handleGameAction, showMessage } from '@/utils/helpers'
 import { useGameStore } from '@/stores/gameStore'
-import { colors, type Color } from '../../../model/deck'
+import { colors, type Color } from 'models/src/model/deck'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.game?.currentHand())

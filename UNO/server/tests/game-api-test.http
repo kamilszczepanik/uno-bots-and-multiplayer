@@ -1,3 +1,10 @@
+
+### List all games
+GET http://localhost:8000/api/games
+
+### Get game status
+GET http://localhost:8000/api/games/74b72b23-8c80-4ccd-b83c-cf391426249b
+
 ### Create a new game
 POST http://localhost:8000/api/games
 Content-Type: application/json
@@ -19,13 +26,6 @@ Content-Type: application/json
   "targetScore": 50,
   "cardsPerPlayer": 2
 }
-
-### List all games
-GET http://localhost:8000/api/games
-
-
-### Get game status
-GET http://localhost:8000/api/games/1bf83fc7-3348-4ebb-9f59-fc5e65e52845
 
 
 ### Join a game (replace {{gameId}})
