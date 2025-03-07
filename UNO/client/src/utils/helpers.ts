@@ -1,6 +1,7 @@
 import { type Router } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import axiosInstance from './axiosInstance'
+import type { User } from '../../../shared/types'
 
 export const showMessage = (message: string) => {
   toast(message, {
@@ -51,7 +52,7 @@ export const redirectIfNotAuthenticated = async ({
   }
 }
 
-export const fetchUserInfo = async (): Promise<{ id: number; username: string } | null> => {
+export const fetchUserInfo = async (): Promise<User | null> => {
   try {
     const token = localStorage.getItem('authToken')
     if (!token) {
@@ -65,7 +66,7 @@ export const fetchUserInfo = async (): Promise<{ id: number; username: string } 
       },
     })
 
-    return response.data as { id: number; username: string }
+    return response.data
   } catch (err) {
     console.error('Failed to fetch user info:', err)
     return null

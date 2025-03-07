@@ -1,26 +1,19 @@
 import { Card } from 'models/src/model/deck'
 import { createGame } from 'models/src/model/uno'
 import prisma from '../utils/db.server'
-
-interface StartGameProps {
-  gameId: string
-  name: string
-  playerIds: string[]
-  targetScore: number
-  cardsPerPlayer: number
-  currentRound: number
-  status: 'waiting' | 'paused' | 'in_progress' | 'finished'
-}
+import { IndexedGameSpecs } from '../../shared/types'
 
 export const setupGame = async ({
-  gameId,
+  id,
+  name,
   targetScore,
   cardsPerPlayer,
-  currentRound,
-  playerIds,
-}: StartGameProps) => {
+  players,
+}: IndexedGameSpecs) => {
+  const playerIds = players.map(({ id }) => id) as string[]
+
   const game = createGame({
-    players: playerIds.map((id) => id.toString()),
+    players: playerIds,
     targetScore,
     cardsPerPlayer,
   })
@@ -32,17 +25,30 @@ export const setupGame = async ({
   }
 
   const dbGame = await prisma.game.update({
-    where: { id: gameId },
+    where: { id },
     data: {
-      id: gameId,
-      name: `Game ${gameId}`,
+      id,
+      name: `Game ${name}`,
       status: 'in_progress',
+      currentRound: 1,
       targetScore,
       cardsPerPlayer,
-      currentRound,
       scores: Object.fromEntries(game.scores),
       players: {
-        connect: playerIds.map((id) => ({ id })),
+        connect: playerIds.map((id) => ({ id })), // Ensure IDs are correctly used
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      targetScore: true,
+      cardsPerPlayer: true,
+      status: true,
+      players: {
+        select: {
+          id: true,
+          username: true,
+        },
       },
     },
   })

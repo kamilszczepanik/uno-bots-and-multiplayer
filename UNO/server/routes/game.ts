@@ -2,7 +2,8 @@ import { Request, Response, Router } from 'express'
 
 import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
-// import { broadcast } from '../websocket'
+import { broadcast } from '../websocket'
+import { GameStatus } from '../../shared/types'
 
 const router = Router()
 
@@ -83,8 +84,12 @@ router.post('/games', async (req: Request, res: Response) => {
       },
     })
 
-    console.log('Game created:', game)
-    // broadcast(game)
+    const formattedGame = {
+      ...game,
+      status: game.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
     res.status(201).json(game)
     return
   } catch (error) {
@@ -129,7 +134,12 @@ router.post('/games/:gameId/join', async (req, res) => {
       include: { players: true },
     })
 
-    // broadcast(updatedGame)
+    const formattedGame = {
+      ...updatedGame,
+      status: updatedGame.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
     return
   } catch (error) {
     console.error(error)
@@ -157,17 +167,26 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
       return
     }
 
+    const playersForSetup = game.players.map(({ id, username }) => ({
+      id,
+      username,
+    }))
+
     const { dbGame } = await setupGame({
-      gameId,
+      id: gameId,
       name: game.name,
       targetScore: game.targetScore,
       cardsPerPlayer: game.cardsPerPlayer,
       status: game.status,
-      currentRound: game.currentRound,
-      playerIds: game.players.map((player) => player.id),
+      players: playersForSetup,
     })
 
-    // broadcast(dbGame)
+    const formattedGame = {
+      ...dbGame,
+      status: dbGame.status as GameStatus,
+    }
+
+    broadcast(formattedGame)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to start game' })

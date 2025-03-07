@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { isAxiosError } from 'axios'
 import ControlButton from '@/components/ControlButton.vue'
 import { fetchUserInfo, showMessage } from '@/utils/helpers'
+import { useUserStore } from '@/stores/userStore'
 
 const loginFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -20,9 +21,9 @@ const form = ref<LoginForm>({
   password: '',
 })
 
-const errors = ref<FormErrors>({})
-
 const router = useRouter()
+const errors = ref<FormErrors>({})
+const userStore = useUserStore()
 
 const handleSubmit = async () => {
   try {
@@ -37,6 +38,12 @@ const handleSubmit = async () => {
 
     const { token } = response.data
     localStorage.setItem('authToken', token)
+
+    const userInfo = await fetchUserInfo()
+
+    if (userInfo) {
+      userStore.setUserInfo(userInfo)
+    }
 
     router.push('/').then(() => {
       showMessage('You have successfully login.')
