@@ -22,6 +22,7 @@ export class Hand {
   private _startingPlayerIndex: number;
   private _playingDirection: "clockwise" | "counterclockwise";
   private _newColor: deck.Color | undefined;
+  private _shuffler: Shuffler<deck.Card>;
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -42,7 +43,8 @@ export class Hand {
     this._playingDirection = "clockwise";
 
     this._deck = deck.createInitialDeck();
-    this._deck.shuffle(shuffler);
+    this._shuffler = shuffler;
+    this._deck.shuffle(this._shuffler);
     this._playerHands = new Map(players.map((_, index) => [index, []]));
 
     for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
@@ -94,7 +96,35 @@ export class Hand {
     return this._players.length;
   }
 
-  draw() {}
+  draw(): void {
+    const playerHand = this.getCurrentPlayerHand();
+    const drawnCard = this._drawPile.deal();
+
+    if (this._drawPile.size === 0) {
+      const topCard = this._discardPile.top();
+      const remainingDiscardPile = this._discardPile.cards.slice(0, -1);
+
+      this._drawPile = new DrawPile(remainingDiscardPile);
+      this._drawPile.shuffle(this._shuffler);
+      this._discardPile = new DiscardPile([topCard]);
+    }
+
+    if (!drawnCard) {
+      throw new Error("Draw pile is still empty after shuffling.");
+    }
+
+    playerHand.push(drawnCard);
+
+    const topCard = this._discardPile.top();
+    const isPlayable = this.isCardPlayable(drawnCard, topCard);
+
+    if (!isPlayable) {
+      const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
+      this._currentPlayerIndex =
+        (this._currentPlayerIndex + directionModifier + this._players.length) %
+        this._players.length;
+    }
+  }
 
   private getCurrentPlayerHand(): deck.Card[] {
     const playerHand = this._playerHands.get(this._currentPlayerIndex);
@@ -110,6 +140,13 @@ export class Hand {
         `Invalid card index ${cardIndex} for player ${this._currentPlayerIndex}.`
       );
     }
+  }
+
+  canPlayAny(): boolean {
+    const playerHand = this.getCurrentPlayerHand();
+    const topCard = this._discardPile.top();
+
+    return playerHand.some((card) => this.isCardPlayable(card, topCard));
   }
 
   private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
@@ -252,17 +289,14 @@ export class Hand {
       throw new Error("Discard pile is empty.");
     }
 
-    if (topCard.type === "REVERSE") {
-      this._playingDirection =
-        this._playingDirection === "clockwise"
-          ? "counterclockwise"
-          : "clockwise";
-    }
-
     const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
 
     switch (topCard.type) {
       case "REVERSE":
+        this._playingDirection =
+          this._playingDirection === "clockwise"
+            ? "counterclockwise"
+            : "clockwise";
         return (
           (this._dealer + directionModifier + this._players.length) %
           this._players.length
@@ -328,5 +362,9 @@ class DrawPile {
 
   deal(): deck.Card | undefined {
     return this._cards.shift();
+  }
+
+  shuffle(shuffler: Shuffler<deck.Card>): void {
+    shuffler(this._cards);
   }
 }
