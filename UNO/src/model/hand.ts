@@ -1,5 +1,4 @@
 import { Shuffler, standardShuffler } from "../utils/random_utils";
-
 import * as deck from "./deck";
 
 export interface Props {
@@ -16,7 +15,7 @@ export class Hand {
   private _dealer: number;
   private _players: string[];
   private _deck: deck.Deck;
-  private _playerHands: deck.Card[][];
+  private _playerHands: Map<number, deck.Card[]>;
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -38,12 +37,13 @@ export class Hand {
     this._deck = deck.createInitialDeck();
     this._deck.shuffle(shuffler);
 
-    this._playerHands = players.map(() => []);
+    this._playerHands = new Map(players.map((_, index) => [index, []]));
+
     for (let i = 0; i < cardsPerPlayer; i++) {
-      for (let p = 0; p < players.length; p++) {
+      for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
         const card = this._deck.deal();
         if (card) {
-          this._playerHands[p].push(card);
+          this._playerHands.get(playerIndex)!.push(card);
         }
       }
     }
@@ -65,8 +65,9 @@ export class Hand {
   }
 
   player(playerNumber: number) {
-    if (playerNumber < 0 || playerNumber > this._players.length - 1)
+    if (playerNumber < 0 || playerNumber >= this._players.length) {
       throw new Error("Requested player is out of bounds.");
+    }
     return this._players[playerNumber];
   }
 
@@ -74,7 +75,8 @@ export class Hand {
     if (playerNumber < 0 || playerNumber >= this._players.length) {
       throw new Error("Requested player is out of bounds.");
     }
-    return this._playerHands[playerNumber];
+    console.log("Player hand", this._playerHands.get(playerNumber));
+    return this._playerHands.get(playerNumber)!;
   }
 
   hasEnded() {
