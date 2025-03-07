@@ -25,6 +25,7 @@ export class Hand {
   private _newColor: deck.Color | undefined = undefined;
   private _shuffler: Shuffler<deck.Card>;
   private _playersWhoDrewCard: Set<number> = new Set();
+  private _playersWhoSaidUno: Set<number> = new Set();
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -140,6 +141,9 @@ export class Hand {
 
     playerHand.push(drawnCard);
     this._playersWhoDrewCard.add(this._currentPlayerIndex);
+
+    this._playersWhoSaidUno.has(this._currentPlayerIndex) &&
+      this._playersWhoSaidUno.delete(this._currentPlayerIndex);
 
     const topCard = this._discardPile.top();
     const isPlayable = this.isCardPlayable(drawnCard, topCard);
@@ -365,7 +369,8 @@ export class Hand {
     if (
       accusedPlayerCards.length > 1 ||
       this._lastPlayerIndex !== accused ||
-      this._playersWhoDrewCard.size > 0
+      this._playersWhoDrewCard.size > 0 ||
+      this._playersWhoSaidUno.has(accused)
     ) {
       return false;
     }
@@ -376,6 +381,27 @@ export class Hand {
     });
 
     return true;
+  }
+
+  sayUno(playerNumber: number): void {
+    const playerHand = this.playerHand(playerNumber);
+    const topCard = this._discardPile.top();
+
+    if (playerHand.length > 2) {
+      throw new Error("Cannot say UNO! If player has more than two cards.");
+    }
+
+    const canPlayOneCard = playerHand.some((card) =>
+      this.isCardPlayable(card, topCard)
+    );
+
+    if (!canPlayOneCard) {
+      throw new Error(
+        "Cannot say UNO! if no playable card exists among the two cards."
+      );
+    }
+
+    this._playersWhoSaidUno.add(playerNumber);
   }
 
   hasEnded() {
