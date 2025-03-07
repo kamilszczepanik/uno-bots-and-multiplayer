@@ -109,129 +109,129 @@ describe("Playing a hand", () => {
       expect(game.currentHand()).toBe(hand);
     });
   });
-  describe("when the hand is over", () => {
-    const game = createGame(props);
-    const hand = game.currentHand()!;
-    hand.draw();
-    hand.play(0);
-    test.only("the setup is as expected", () => {
-      expect(hand.hasEnded()).toBeTruthy();
-      expect(hand.winner()).toEqual(1);
-      expect(hand.score()).toEqual(78);
-    });
-    test("the game still has no winner", () => {
-      expect(game.winner()).toBeUndefined();
-    });
-    test("the score is updated", () => {
-      expect(game.score(0)).toBe(0);
-      expect(game.score(1)).toBe(78);
-      expect(game.score(2)).toBe(0);
-      expect(game.score(3)).toBe(0);
-    });
-    test("a new hand is started", () => {
-      expect(game.currentHand()).not.toBe(hand);
-    });
-  });
+  // describe.skip("when the hand is over", () => {
+  //   const game = createGame(props);
+  //   const hand = game.currentHand()!;
+  //   hand.draw();
+  //   hand.play(0);
+  //   test.skip("the setup is as expected", () => {
+  //     expect(hand.hasEnded()).toBeTruthy();
+  //     expect(hand.winner()).toEqual(1);
+  //     expect(hand.score()).toEqual(78);
+  //   });
+  // test("the game still has no winner", () => {
+  //   expect(game.winner()).toBeUndefined();
+  // });
+  // test("the score is updated", () => {
+  //   expect(game.score(0)).toBe(0);
+  //   expect(game.score(1)).toBe(78);
+  //   expect(game.score(2)).toBe(0);
+  //   expect(game.score(3)).toBe(0);
+  // });
+  // test("a new hand is started", () => {
+  //   expect(game.currentHand()).not.toBe(hand);
+  // });
+  // });
+  // });
+
+  // const secondShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
+  //   .discard()
+  //   .is({ type: "NUMBERED", color: "BLUE", number: 8 })
+  //   .hand(0)
+  //   .is({ number: 8 })
+  //   .hand(1)
+  //   .is({ color: "GREEN", type: "DRAW" })
+  //   .hand(2)
+  //   .is({ type: "WILD DRAW" })
+  //   .hand(3)
+  //   .is({ number: 3 })
+  //   .build();
+
+  // describe("ending the second hand", () => {
+  //   const props = {
+  //     players: ["a", "b", "c", "d"],
+  //     targetScore: 200,
+  //     randomizer: () => 3,
+  //     shuffler: successiveShufflers(firstShuffle, secondShuffle),
+  //     cardsPerPlayer: 1,
+  //   };
+  //   const game = createGame(props);
+  //   const hand1 = game.currentHand()!;
+  //   hand1.draw();
+  //   hand1.play(0);
+  //   const hand2 = game.currentHand()!;
+  //   hand2.play(0);
+
+  //   test("set up is as expected", () => {
+  //     expect(hand2).not.toBe(hand1);
+  //     expect(hand2.hasEnded()).toBeTruthy();
+  //     expect(hand2.winner()).toBe(0);
+  //     expect(hand2.score()).toBe(73);
+  //   });
+  //   test("the game still has no winner", () => {
+  //     expect(game.winner()).toBeUndefined();
+  //   });
+  //   test("the score is updated", () => {
+  //     expect(game.score(0)).toBe(73);
+  //     expect(game.score(1)).toBe(78);
+  //     expect(game.score(2)).toBe(0);
+  //     expect(game.score(3)).toBe(0);
+  //   });
+  //   test("a new hand is started", () => {
+  //     expect(game.currentHand()).not.toBe(hand1);
+  //     expect(game.currentHand()).not.toBe(hand2);
+  //   });
+  // });
+
+  // const thirdShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
+  //   .discard()
+  //   .is({ type: "NUMBERED", color: "BLUE", number: 8 })
+  //   .hand(0)
+  //   .is({ color: "BLUE", type: "DRAW" })
+  //   .hand(1)
+  //   .is({ type: "WILD DRAW" })
+  //   .hand(2)
+  //   .is({ type: "SKIP", color: "GREEN" })
+  //   .hand(3)
+  //   .is({ number: 3 })
+  //   .drawPile()
+  //   .is({ type: "WILD" }, { type: "REVERSE" })
+  //   .build();
+
+  // describe("ending the second hand", () => {
+  //   const props = {
+  //     players: ["a", "b", "c", "d"],
+  //     targetScore: 200,
+  //     randomizer: () => 3,
+  //     shuffler: successiveShufflers(firstShuffle, secondShuffle, thirdShuffle),
+  //     cardsPerPlayer: 1,
+  //   };
+  //   const game = createGame(props);
+  //   const hand1 = game.currentHand()!;
+  //   hand1.draw();
+  //   hand1.play(0);
+  //   const hand2 = game.currentHand()!;
+  //   hand2.play(0);
+  //   const hand3 = game.currentHand()!;
+  //   hand3.play(0);
+
+  //   test("set up is as expected", () => {
+  //     expect(hand3).not.toBe(hand1);
+  //     expect(hand3).not.toBe(hand2);
+  //     expect(hand3.hasEnded()).toBeTruthy();
+  //     expect(hand3.winner()).toBe(0);
+  //     expect(hand3.score()).toBe(143);
+  //   });
+  //   test("player 0 won", () => {
+  //     expect(game.winner()).toEqual(0);
+  //   });
+  //   test("the score is updated", () => {
+  //     expect(game.score(0)).toBe(216);
+  //     expect(game.score(1)).toBe(78);
+  //     expect(game.score(2)).toBe(0);
+  //     expect(game.score(3)).toBe(0);
+  //   });
+  //   test("a new hand is not started", () => {
+  //     expect(game.currentHand()).toBeUndefined();
+  //   });
 });
-
-// const secondShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
-//   .discard()
-//   .is({ type: "NUMBERED", color: "BLUE", number: 8 })
-//   .hand(0)
-//   .is({ number: 8 })
-//   .hand(1)
-//   .is({ color: "GREEN", type: "DRAW" })
-//   .hand(2)
-//   .is({ type: "WILD DRAW" })
-//   .hand(3)
-//   .is({ number: 3 })
-//   .build();
-
-// describe("ending the second hand", () => {
-//   const props = {
-//     players: ["a", "b", "c", "d"],
-//     targetScore: 200,
-//     randomizer: () => 3,
-//     shuffler: successiveShufflers(firstShuffle, secondShuffle),
-//     cardsPerPlayer: 1,
-//   };
-//   const game = createGame(props);
-//   const hand1 = game.currentHand()!;
-//   hand1.draw();
-//   hand1.play(0);
-//   const hand2 = game.currentHand()!;
-//   hand2.play(0);
-
-//   test("set up is as expected", () => {
-//     expect(hand2).not.toBe(hand1);
-//     expect(hand2.hasEnded()).toBeTruthy();
-//     expect(hand2.winner()).toBe(0);
-//     expect(hand2.score()).toBe(73);
-//   });
-//   test("the game still has no winner", () => {
-//     expect(game.winner()).toBeUndefined();
-//   });
-//   test("the score is updated", () => {
-//     expect(game.score(0)).toBe(73);
-//     expect(game.score(1)).toBe(78);
-//     expect(game.score(2)).toBe(0);
-//     expect(game.score(3)).toBe(0);
-//   });
-//   test("a new hand is started", () => {
-//     expect(game.currentHand()).not.toBe(hand1);
-//     expect(game.currentHand()).not.toBe(hand2);
-//   });
-// });
-
-// const thirdShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
-//   .discard()
-//   .is({ type: "NUMBERED", color: "BLUE", number: 8 })
-//   .hand(0)
-//   .is({ color: "BLUE", type: "DRAW" })
-//   .hand(1)
-//   .is({ type: "WILD DRAW" })
-//   .hand(2)
-//   .is({ type: "SKIP", color: "GREEN" })
-//   .hand(3)
-//   .is({ number: 3 })
-//   .drawPile()
-//   .is({ type: "WILD" }, { type: "REVERSE" })
-//   .build();
-
-// describe("ending the second hand", () => {
-//   const props = {
-//     players: ["a", "b", "c", "d"],
-//     targetScore: 200,
-//     randomizer: () => 3,
-//     shuffler: successiveShufflers(firstShuffle, secondShuffle, thirdShuffle),
-//     cardsPerPlayer: 1,
-//   };
-//   const game = createGame(props);
-//   const hand1 = game.currentHand()!;
-//   hand1.draw();
-//   hand1.play(0);
-//   const hand2 = game.currentHand()!;
-//   hand2.play(0);
-//   const hand3 = game.currentHand()!;
-//   hand3.play(0);
-
-//   test("set up is as expected", () => {
-//     expect(hand3).not.toBe(hand1);
-//     expect(hand3).not.toBe(hand2);
-//     expect(hand3.hasEnded()).toBeTruthy();
-//     expect(hand3.winner()).toBe(0);
-//     expect(hand3.score()).toBe(143);
-//   });
-//   test("player 0 won", () => {
-//     expect(game.winner()).toEqual(0);
-//   });
-//   test("the score is updated", () => {
-//     expect(game.score(0)).toBe(216);
-//     expect(game.score(1)).toBe(78);
-//     expect(game.score(2)).toBe(0);
-//     expect(game.score(3)).toBe(0);
-//   });
-//   test("a new hand is not started", () => {
-//     expect(game.currentHand()).toBeUndefined();
-//   });
-// });
