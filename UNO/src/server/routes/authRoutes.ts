@@ -1,36 +1,35 @@
-import express from "express";
-import { registerUser, loginUser } from "../services/authService";
-import { authenticate } from "../utils/authMiddleware";
+import express from 'express'
+import { registerUser, loginUser } from '../services/authService'
 
-const router = express.Router();
+const router = express.Router()
 
-router.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const newUser = await registerUser(username, password);
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body
 
   try {
-    const result = await loginUser(username, password);
-    res.status(200).json(result);
-  } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    const newUser = await registerUser(username, password)
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: newUser,
+    })
+  } catch (error) {
+    // todo: return specific error message to frontend
+    console.error('Error logging in:', error)
+    res.status(400).json({ error: 'Error registering user' })
   }
-});
+})
 
-//* example of the protected route
-router.get("/protected", authenticate, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
-});
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body
 
-export default router;
+  try {
+    const result = await loginUser(username, password)
+    res.status(200).json(result)
+  } catch (error) {
+    // todo: return specific error message to frontend
+    console.error('Error logging in:', error)
+    res.status(400).json({ error: 'Error logging user' })
+  }
+})
+
+export default router
