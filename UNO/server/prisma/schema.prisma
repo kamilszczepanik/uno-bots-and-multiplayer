@@ -54,7 +54,7 @@ model Hand {
   playersWhoSaidUno  Json
   newColor           String
   playingDirection   String @default("clockwise")
-  status             String @default("in progress")
+  status             String @default("in_progress")
 
   gameId      String
   game        Game   @relation("GameHands", fields: [gameId], references: [id])

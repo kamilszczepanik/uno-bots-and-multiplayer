@@ -36,7 +36,7 @@ export const setupGame = async ({
     data: {
       id: gameId,
       name: `Game ${gameId}`,
-      status: 'in progress',
+      status: 'in_progress',
       targetScore,
       cardsPerPlayer,
       currentRound,

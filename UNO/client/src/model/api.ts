@@ -1,5 +1,6 @@
 import axiosInstance from '@/utils/axiosInstance'
-import type { IndexedGame } from '../../../shared/types'
+import type { IndexedGame, IndexedGameSpecs, User } from '../../../shared/types'
+import { showMessage } from '@/utils/helpers'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
@@ -28,9 +29,38 @@ export async function games(): Promise<IndexedGame[]> {
   return response
 }
 
-// export async function join(game: IndexedYahtzeeSpecs, player: string) {
-//   return post(`http://localhost:8080/pending-games/${game.id}/players`, { player })
-// }
+export async function join(game: IndexedGameSpecs, player: User) {
+  return post(`/api/games/${game.id}/join`, { userId: player.id })
+    .then(() => {
+      showMessage(`You have joined the game ${game.name}`)
+    })
+    .catch((error) => {
+      console.error(error)
+      showMessage('Failed to join game')
+    })
+}
+
+export async function start(game: IndexedGameSpecs) {
+  return post(`/api/games/${game.id}/start`)
+    .then(() => {
+      showMessage(`You have started the game ${game.name}`)
+    })
+    .catch((error) => {
+      console.error(error)
+      showMessage('Failed to join game')
+    })
+}
+
+export async function leave(game: IndexedGameSpecs, player: User) {
+  return post(`/api/games/${game.id}/leave`, { userId: player.id })
+    .then(({ data }) => {
+      showMessage(data.message)
+    })
+    .catch((error) => {
+      console.error(error)
+      showMessage('Failed to left the game')
+    })
+}
 
 // export async function new_game(
 //   number_of_players: number,

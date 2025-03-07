@@ -1,6 +1,6 @@
 export interface User {
-  id: number;
-  username: string;
+  id: number | null;
+  username: string | null;
 }
 
 export interface Hand {
@@ -14,7 +14,7 @@ export interface Hand {
   playingDirection: "Clockwise" | "counterclockwise";
   discardPile: string;
   drawPile: string;
-  status: "in progress" | "ended";
+  status: "in_progress" | "ended";
   playerHands: string;
 }
 
@@ -31,7 +31,8 @@ export interface Game {
 }
 
 export interface GameSpecs {
-  players: string[];
+  name: string;
+  players: User[];
   targetScore: number;
   cardsPerPlayer: number;
 }
@@ -43,4 +44,4 @@ export type IndexedGameSpecs = Readonly<
   GameSpecs & { id: number; status: GameStatus }
 >;
 
-export type GameStatus = "waiting" | "in progress" | "paused" | "finished";
+export type GameStatus = "waiting" | "in_progress" | "paused" | "finished";

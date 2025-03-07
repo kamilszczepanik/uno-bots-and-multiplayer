@@ -1,17 +1,37 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, onMounted } from 'vue'
 import ControlButton from './ControlButton.vue'
-import type { Game } from '../../../shared/types'
+import type { IndexedGame, IndexedGameSpecs } from '../../../shared/types'
+import * as api from '@/model/api'
+import { useUserStore } from '@/stores/userStore'
+import { useRouter } from 'vue-router'
 
-defineProps<{
-  games: Game[]
+const { games } = defineProps<{
+  games: Readonly<IndexedGame[]>
   title: string
   userId: number | null
-  onJoinGame?: (gameId: string) => void
-  onStartGame?: (gameId: string) => void
-  onLeaveGame?: (gameId: string) => void
-  onOpenGame?: (gameId: string) => void
 }>()
+
+const router = useRouter()
+const userInfo = useUserStore().userInfo
+onMounted(() => {
+  console.log()
+})
+const handleJoinGame = async (game: IndexedGameSpecs) => {
+  await api.join(game, userInfo)
+}
+
+const handleLeaveGame = async (game: IndexedGameSpecs) => {
+  await api.leave(game, userInfo)
+}
+
+const handleOpenGame = async (game: IndexedGameSpecs) => {
+  router.push(`/game/${game.id}`)
+}
+
+const handleStartGame = async (game: IndexedGameSpecs) => {
+  await api.start(game)
+}
 </script>
 
 <template>
@@ -47,7 +67,7 @@ defineProps<{
                 !game.players.some((user) => user.id === userId)
               "
               variant="secondary"
-              @click="() => onJoinGame && onJoinGame(game.id)"
+              @click="handleJoinGame(game)"
               class="w-32"
             >
               Join Game
@@ -59,7 +79,7 @@ defineProps<{
                 game.players.some((user) => user.id === userId)
               "
               variant="primary"
-              @click="onStartGame?.(game.id)"
+              @click="handleStartGame(game)"
               class="w-32"
             >
               Start Game
@@ -67,17 +87,17 @@ defineProps<{
             <ControlButton
               v-if="game.players.some((user) => user.id === userId) && game.status === 'waiting'"
               variant="cancel"
-              @click="onLeaveGame?.(game.id)"
+              @click="handleLeaveGame(game)"
               class="w-32"
             >
               Leave Game
             </ControlButton>
             <ControlButton
               v-if="
-                game.players.some((user) => user.id === userId) && game.status === 'in progress'
+                game.players.some((user) => user.id === userId) && game.status === 'in_progress'
               "
               variant="secondary"
-              @click="onOpenGame?.(game.id)"
+              @click="handleOpenGame(game)"
               class="w-32"
             >
               Open Game

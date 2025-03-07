@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router'
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { fetchUserInfo, redirectIfNotAuthenticated } from './utils/helpers'
 import { useUserStore } from './stores/userStore'
-import GamesDashboard from './components/GamesDashboard.vue'
 import { useWaitingGamesStore } from './stores/waitingGamesStore'
 import { usePausedGamesStore } from './stores/pausedGamesStore'
 import { useInProgressGamesStore } from './stores/inProgressGamesStore'
 import { useFinishedGamesStore } from './stores/finishedGamesStore'
 import * as api from './model/api'
+import GamesList from './components/GamesList.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -16,6 +16,11 @@ const waitingGamesStore = useWaitingGamesStore()
 const pausedGamesStore = usePausedGamesStore()
 const inProgressGamesStore = useInProgressGamesStore()
 const finishedGamesStore = useFinishedGamesStore()
+
+const waitingGames = computed(() => waitingGamesStore.games)
+const pausedGames = computed(() => pausedGamesStore.games)
+const inProgressGames = computed(() => inProgressGamesStore.games)
+const finishedGames = computed(() => finishedGamesStore.games)
 
 onMounted(async () => {
   const userInfo = await fetchUserInfo()
@@ -25,7 +30,7 @@ onMounted(async () => {
     router,
     message: 'You must be logged in to create or join a game',
   })
-
+  console.log('test')
   const ws = new WebSocket('ws://localhost:9090/publish')
   ws.onopen = () => ws.send(JSON.stringify({ type: 'subscribe' }))
   ws.onmessage = ({ data: gameJSON }) => {
@@ -58,22 +63,28 @@ onMounted(async () => {
   })
 
   const allGames = await api.games()
-
   const waitingGames = allGames.filter((game) => game.status === 'waiting')
-  waitingGames.forEach(waitingGamesStore.upsert)
+  waitingGames.forEach((game) => waitingGamesStore.upsert(game))
 
   const pausedGames = allGames.filter((game) => game.status === 'paused')
-  pausedGames.forEach(pausedGamesStore.upsert)
+  pausedGames.forEach((game) => pausedGamesStore.upsert(game))
 
-  const inProgressGames = allGames.filter((game) => game.status === 'in progress')
-  inProgressGames.forEach(inProgressGamesStore.upsert)
+  const inProgressGames = allGames.filter((game) => game.status === 'in_progress')
+  inProgressGames.forEach((game) => inProgressGamesStore.upsert(game))
 
   const finishedGames = allGames.filter((game) => game.status === 'finished')
-  finishedGames.forEach(finishedGamesStore.upsert)
+  finishedGames.forEach((game) => finishedGamesStore.upsert(game))
 })
 </script>
 
 <template>
   <RouterView />
-  <GamesDashboard />
+  <div>
+    <div class="grid w-full grid-cols-4 gap-2">
+      <GamesList :games="waitingGames" title="WAITING" :userId="userStore.userInfo.id" />
+      <GamesList :games="pausedGames" title="PAUSED" :userId="userStore.userInfo.id" />
+      <GamesList :games="inProgressGames" title="IN PROGRESS" :userId="userStore.userInfo.id" />
+      <GamesList :games="finishedGames" title="FINISHED" :userId="userStore.userInfo.id" />
+    </div>
+  </div>
 </template>

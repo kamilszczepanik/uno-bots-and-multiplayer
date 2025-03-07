@@ -1,25 +1,25 @@
 import { defineStore } from 'pinia'
+import type { User } from '../../../shared/types'
+import { reactive, ref } from 'vue'
 
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    userInfo: {
-      id: null as number | null,
-      username: null as string | null,
-    },
-    isAuthenticated: false,
-  }),
+export const useUserStore = defineStore('ongoing games', () => {
+  const userInfo = reactive<User>({
+    id: null,
+    username: null,
+  })
+  const isAuthenticated = ref(false)
 
-  actions: {
-    setUserInfo(userInfo: { id: number; username: string } | null) {
-      if (userInfo) {
-        this.userInfo.id = userInfo.id
-        this.userInfo.username = userInfo.username
-        this.isAuthenticated = true
-      } else {
-        this.userInfo.id = null
-        this.userInfo.username = null
-        this.isAuthenticated = false
-      }
-    },
-  },
+  const setUserInfo = (userData: User | null) => {
+    if (userData) {
+      userInfo.id = userData.id
+      userInfo.username = userData.username
+      isAuthenticated.value = true
+    } else {
+      userInfo.id = null
+      userInfo.username = null
+      isAuthenticated.value = false
+    }
+  }
+
+  return { userInfo, isAuthenticated, setUserInfo }
 })
