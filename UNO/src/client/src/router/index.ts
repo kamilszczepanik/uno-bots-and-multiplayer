@@ -10,7 +10,7 @@ const routes = [
     name: 'Game Setup',
     component: GameSetup,
   },
-  { path: '/hand', name: 'Playing Hand', component: PlayingHand },
+  { path: '/playing-hand', name: 'Playing Hand', component: PlayingHand },
   { path: '/hand-over', name: 'Hand Over', component: HandOver },
   { path: '/game-over', name: 'Game Over', component: GameOver },
 ]

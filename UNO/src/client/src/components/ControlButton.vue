@@ -3,8 +3,9 @@ import { defineProps } from 'vue'
 
 type Button = 'primary' | 'secondary' | 'link' | 'warning' | 'destructive'
 
-const { variant } = defineProps<{
+const { variant, class: additionalClasses } = defineProps<{
   variant: Button
+  class?: string
 }>()
 
 const buttonClasses: Record<Button, string> = {
@@ -21,7 +22,7 @@ const buttonClasses: Record<Button, string> = {
 </script>
 
 <template>
-  <button :class="`rounded px-4 py-2 transition ${buttonClasses[variant]}`">
+  <button :class="['rounded px-4 py-2 transition', additionalClasses, buttonClasses[variant]]">
     <slot />
   </button>
 </template>
