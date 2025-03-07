@@ -1,17 +1,18 @@
-<!-- <script setup lang="ts">
+<script setup lang="ts">
 import { defineProps } from 'vue'
-import { DrawPile } from '../../../model/hand'
+import GameCard from './GameCard.vue'
+import type { DrawPile } from '../../../model/hand'
 
-defineProps({
+const { drawPile } = defineProps({
   drawPile: {
-    type: Object as () => (() => DrawPile) | undefined,
-    required: true,
+    type: Object as () => DrawPile,
   },
 })
+console.log(drawPile)
 </script>
 
 <template>
-  <div class="bg-red-500">
-    <p v-if="drawPile" class="card-count">Cards Left: {{ drawPile.size }}</p>
+  <div>
+    <GameCard :show-back="true" />
   </div>
-</template> -->
+</template>
