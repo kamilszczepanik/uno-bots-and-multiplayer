@@ -3,8 +3,6 @@ import ControlButton from '@/components/ControlButton.vue'
 import GamesList from '@/components/GamesList.vue'
 import { useUserStore } from '@/stores/userStore'
 import { logoutUser } from '@/utils/helpers'
-import { onMounted } from 'vue'
-import * as api from '@/model/api'
 import { useWaitingGamesStore } from '@/stores/waitingGamesStore'
 import { usePausedGamesStore } from '@/stores/pausedGamesStore'
 import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
@@ -16,26 +14,6 @@ const waitingGamesStore = useWaitingGamesStore()
 const pausedGamesStore = usePausedGamesStore()
 const inProgressGamesStore = useInProgressGamesStore()
 const finishedGamesStore = useFinishedGamesStore()
-
-onMounted(async () => {
-  const allGames = await api.games()
-
-  allGames
-    .filter((game) => game.status === 'waiting')
-    .forEach((game) => waitingGamesStore.upsert(game))
-
-  allGames
-    .filter((game) => game.status === 'paused')
-    .forEach((game) => pausedGamesStore.upsert(game))
-
-  allGames
-    .filter((game) => game.status === 'in_progress')
-    .forEach((game) => inProgressGamesStore.upsert(game))
-
-  allGames
-    .filter((game) => game.status === 'finished')
-    .forEach((game) => finishedGamesStore.upsert(game))
-})
 </script>
 
 <template>

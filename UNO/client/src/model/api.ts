@@ -81,7 +81,11 @@ export async function resume(game: IndexedGameSpecs) {
 export async function leave(game: IndexedGameSpecs, player: User) {
   return post(`/api/games/${game.id}/leave`, { userId: player.id })
     .then(() => {
-      showMessage('You have left the game ' + game.name)
+      if (game.players.length === 1)
+        showMessage(
+          `You have left the game ${game.name}, the game has been deleted since there were no players.`,
+        )
+      else showMessage('You have left the game ' + game.name)
     })
     .catch((error) => {
       console.error(error)

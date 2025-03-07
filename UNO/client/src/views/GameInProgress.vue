@@ -34,24 +34,22 @@ onMounted(async () => {
       <div class="flex w-1/4 justify-start">
         <GameStatus :game="game" />
       </div>
+      <div class="flex w-1/2 justify-center">
+        <OpponentHand
+          :game="game"
+          v-if="opponents.length === 1 && opponents[0].id"
+          :placement="'top'"
+          :opponent-id="opponents[0].id"
+        />
+        <OpponentHand
+          :game="game"
+          v-else-if="opponents.length > 1 && opponents[1].id"
+          :placement="'top'"
+          :opponent-id="opponents[1].id"
+        />
+      </div>
+      <div class="w-1/4"></div>
     </div>
-
-    <div class="flex w-1/2 justify-center">
-      <OpponentHand
-        :game="game"
-        v-if="opponents.length === 1 && opponents[0].id"
-        :placement="'top'"
-        :opponent-id="opponents[0].id"
-      />
-      <OpponentHand
-        :game="game"
-        v-else-if="opponents.length > 1 && opponents[1].id"
-        :placement="'top'"
-        :opponent-id="opponents[1].id"
-      />
-    </div>
-    <div class="w-1/4"></div>
-
     <div class="flex flex-grow">
       <div class="flex w-1/4 items-center justify-center">
         <OpponentHand
