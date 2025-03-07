@@ -1,7 +1,7 @@
 import prisma from '../utils/db.server'
 import { Request, RequestHandler, Response } from 'express'
 
-export const listWaitingGames: RequestHandler = async (
+export const listGames: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
@@ -22,8 +22,9 @@ export const createGame: RequestHandler = async (
   req: Request,
   res: Response,
 ) => {
-  const { name, creatorId } = req.body
-
+  const { name, creatorId, targetScore, cardsPerPlayer } = req.body
+  console.log('name', name)
+  console.log('creatorId', creatorId)
   if (!name || !creatorId) {
     res.status(400).json({ error: 'Name and creatorId are required' })
     return
@@ -34,6 +35,8 @@ export const createGame: RequestHandler = async (
       data: {
         name,
         creatorId,
+        targetScore,
+        cardsPerPlayer,
         users: {
           connect: { id: creatorId },
         },

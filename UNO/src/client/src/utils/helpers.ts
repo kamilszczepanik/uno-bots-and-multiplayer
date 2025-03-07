@@ -1,5 +1,6 @@
 import { type Router } from 'vue-router'
 import { toast } from 'vue3-toastify'
+import axiosInstance from './axiosInstance'
 
 export const showMessage = (message: string) => {
   toast(message, {
@@ -27,12 +28,12 @@ export function handleGameAction(
   }
 }
 
-export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('authToken')
-  return !!token
+export const isAuthenticated = async (): Promise<boolean> => {
+  const userInfo = await fetchUserInfo()
+  return userInfo !== null
 }
 
-export const redirectIfNotAuthenticated = ({
+export const redirectIfNotAuthenticated = async ({
   router,
   redirectPath = '/login',
   message,
@@ -40,12 +41,33 @@ export const redirectIfNotAuthenticated = ({
   router: Router
   redirectPath?: string
   message?: string
-}): void => {
-  if (!isAuthenticated()) {
-    router.push(redirectPath).then(() => {
-      if (message) {
-        showMessage(message)
-      }
+}): Promise<void> => {
+  const authenticated = await isAuthenticated()
+  if (!authenticated) {
+    await router.push(redirectPath)
+    if (message) {
+      showMessage(message)
+    }
+  }
+}
+
+export const fetchUserInfo = async (): Promise<{ id: number; username: string } | null> => {
+  try {
+    const token = localStorage.getItem('authToken')
+    if (!token) {
+      console.error('No token found')
+      return null
+    }
+
+    const response = await axiosInstance.get('/api/auth/user-info', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
+
+    return response.data as { id: number; username: string }
+  } catch (err) {
+    console.error('Failed to fetch user info:', err)
+    return null
   }
 }

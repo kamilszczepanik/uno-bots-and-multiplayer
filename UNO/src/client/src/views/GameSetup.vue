@@ -1,55 +1,60 @@
 <script setup lang="ts">
 import ControlButton from '@/components/ControlButton.vue'
-import router from '@/router'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
-import { useGameStore } from '@/stores/gameStore'
-import { reactive, ref } from 'vue'
+import axiosInstance from '@/utils/axiosInstance'
+import { fetchUserInfo, redirectIfNotAuthenticated } from '@/utils/helpers'
+import { AxiosError } from 'axios'
+import { onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { z } from 'zod'
 
 type FormData = z.infer<typeof startGameFormSchema>
 type FormErrors = Partial<Record<keyof FormData, string>>
 
-const gameStore = useGameStore()
-
-const form = reactive<{
-  userName: string
+interface Game {
+  id: string
+  name: string
+  status: string
   targetScore: number
   cardsPerPlayer: number
-  bots: { name: string }[]
+  users: { id: number; username: string }[]
+}
+
+const router = useRouter()
+
+const form = reactive<{
+  name: string
+  targetScore: number
+  cardsPerPlayer: number
 }>({
-  userName: '',
+  name: '',
   targetScore: 500,
   cardsPerPlayer: 7,
-  bots: [],
 })
 
 const errors = ref<FormErrors>({})
+const loadingCreatingGame = ref(false)
+const errorCreatingGame = ref<string | null>(null)
+const waitingGames = ref<Game[]>([])
+const loadingGames = ref(false)
+const errorLoadingGames = ref<string | null>(null)
 
 const handleSubmit = async () => {
   const formData = {
-    userName: form.userName,
+    name: form.name,
     targetScore: form.targetScore,
     cardsPerPlayer: form.cardsPerPlayer,
-    bots: form.bots,
   }
 
   try {
     startGameFormSchema.parse(formData)
+    loadingGames.value = true
+    errorLoadingGames.value = null
 
+    const response = await axiosInstance.post('/api/games', formData)
+    console.log(response.data)
+    errorCreatingGame.value = null
     errors.value = {}
-
-    const players = [formData.userName, ...formData.bots.map((bot) => bot.name)].filter(
-      (name) => name !== '',
-    )
-
-    const props = {
-      players,
-      targetScore: formData.targetScore,
-      cardsPerPlayer: formData.cardsPerPlayer,
-    }
-    gameStore.setGameSettings(props)
-    gameStore.initializeGame(props)
-    router.push('/playing-hand')
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
@@ -58,102 +63,127 @@ const handleSubmit = async () => {
         return acc
       }, {})
     }
+    if (error instanceof AxiosError) {
+      console.error(error)
+      errorCreatingGame.value = 'Failed to create new game'
+    }
+  } finally {
+    loadingCreatingGame.value = false
   }
 }
 
-const addBot = () => {
-  if (form.bots.length < 3) {
-    form.bots.push({ name: '' })
+const fetchWaitingGames = async () => {
+  loadingGames.value = true
+  errorLoadingGames.value = null
+  try {
+    const response = await axiosInstance.get('/api/games')
+    waitingGames.value = response.data
+  } catch (err) {
+    errorLoadingGames.value = 'Failed to fetch waiting games'
+    console.error(err)
+  } finally {
+    loadingGames.value = false
   }
 }
 
-const removeBot = (index: number) => {
-  form.bots.splice(index, 1)
-}
+const userData = ref<{ id?: number; username?: string }>({})
+
+onMounted(async () => {
+  const userInfo = await fetchUserInfo()
+  if (userInfo) {
+    userData.value = userInfo
+  }
+  await redirectIfNotAuthenticated({
+    router,
+    message: 'You must be logged in to create or join a game',
+  })
+  fetchWaitingGames()
+})
 </script>
 
 <template>
-  <div class="mx-auto w-96 p-2">
+  <div class="p-2">
+    <div class="text-right">{{ userData.username }}</div>
     <h1 class="text-center text-7xl">UNO</h1>
-
-    <form @submit.prevent="handleSubmit">
-      <h2 class="mb-6 text-center text-2xl font-semibold">Start new game</h2>
-
-      <div class="mb-4">
-        <label class="mb-2 block font-bold text-text" for="name">Your name</label>
-        <input
-          type="text"
-          v-model="form.userName"
-          id="name"
-          name="name"
-          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
-          placeholder="eg. bestplayer123"
-          required
-          autofocus
-        />
-        <p v-if="errors.userName" class="text-red-500">{{ errors.userName }}</p>
-      </div>
-
-      <div class="mb-4">
-        <label class="mb-2 block font-bold text-text" for="targetScore">Target score</label>
-        <input
-          type="number"
-          v-model="form.targetScore"
-          id="targetScore"
-          name="targetScore"
-          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
-        />
-        <p v-if="errors.targetScore" class="text-red-500">{{ errors.targetScore }}</p>
-      </div>
-
-      <div class="mb-4">
-        <label class="mb-2 block font-bold text-text" for="cardsPerPlayer">Cards per player</label>
-        <input
-          type="number"
-          v-model="form.cardsPerPlayer"
-          id="cardsPerPlayer"
-          name="cardsPerPlayer"
-          class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
-        />
-        <p v-if="errors.cardsPerPlayer" class="text-red-500">
-          {{ errors.cardsPerPlayer }}
-        </p>
-      </div>
-
-      <div class="mb-4">
-        <label class="mb-2 block font-bold text-text">Bots</label>
-        <div v-for="(bot, index) in form.bots" :key="index" class="mb-2">
-          <div class="mb-2 flex items-center">
-            <input
-              type="text"
-              v-model="bot.name"
-              class="mr-2 w-full rounded border bg-backgroundMute px-3 py-2"
-              :placeholder="'Bot ' + (index + 1) + ' name'"
-              required
-            />
-
-            <button
-              type="button"
-              class="focus:shadow-outline rounded-full bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600 focus:outline-none"
-              @click="removeBot(index)"
-            >
-              Delete
-            </button>
-          </div>
-          <p v-if="(errors as any)[`bots.${index}.name`]" class="text-red-500">
-            {{ (errors as any)[`bots.${index}.name`] }}
+    <div class="flex w-full justify-around pt-8">
+      <form @submit.prevent="handleSubmit" class="w-96">
+        <h2 class="mb-6 text-center text-3xl font-semibold">Create new game</h2>
+        <div class="mb-4">
+          <label class="mb-2 block font-bold text-text" for="name">Game name</label>
+          <input
+            type="text"
+            v-model="form.name"
+            id="name"
+            name="name"
+            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
+            placeholder="eg. bestgame123"
+            required
+            autofocus
+          />
+          <p v-if="errors.name" class="text-red-500">{{ errors.name }}</p>
+        </div>
+        <div class="mb-4">
+          <label class="mb-2 block font-bold text-text" for="targetScore">Target score</label>
+          <input
+            type="number"
+            v-model="form.targetScore"
+            id="targetScore"
+            name="targetScore"
+            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
+          />
+          <p v-if="errors.targetScore" class="text-red-500">{{ errors.targetScore }}</p>
+        </div>
+        <div class="mb-4">
+          <label class="mb-2 block font-bold text-text" for="cardsPerPlayer"
+            >Cards per player</label
+          >
+          <input
+            type="number"
+            v-model="form.cardsPerPlayer"
+            id="cardsPerPlayer"
+            name="cardsPerPlayer"
+            class="mb-2 w-full rounded border bg-backgroundMute px-3 py-2"
+          />
+          <p v-if="errors.cardsPerPlayer" class="text-red-500">
+            {{ errors.cardsPerPlayer }}
           </p>
         </div>
-        <p v-if="errors.bots" class="text-red-500">{{ errors.bots }}</p>
-
-        <ControlButton variant="secondary" @click="addBot" :disabled="form.bots.length >= 3">
-          Add Bot
-        </ControlButton>
+        <div>
+          <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
+        </div>
+      </form>
+      <div class="w-96">
+        <h2 class="mb-6 text-center text-3xl font-semibold">Join existing game</h2>
+        <div v-if="loadingGames" class="text-gray-500">loading games...</div>
+        <div v-else-if="errorLoadingGames" class="text-red-500">{{ errorLoadingGames }}</div>
+        <div v-else>
+          <ul>
+            <li
+              v-for="game in waitingGames"
+              :key="game.id"
+              class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
+            >
+              <div>
+                <div class="text-lg font-bold">{{ game.name }}</div>
+                <div class="text-sm text-gray-600">
+                  {{ game.users.length }}
+                  {{ game.users.length ? 'Players' : 'Player' }}:
+                  {{ game.users.map((u) => u.username).join(', ') || 'None' }}
+                </div>
+                <p class="text-sm text-gray-600">
+                  Target score: <span class="font-bold">{{ game.targetScore }}</span>
+                </p>
+                <p class="text-sm text-gray-600">
+                  Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
+                </p>
+              </div>
+              <div>
+                <ControlButton variant="secondary"> Join Game </ControlButton>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-
-      <div>
-        <ControlButton variant="primary" type="submit"> Start Game </ControlButton>
-      </div>
-    </form>
+    </div>
   </div>
 </template>

@@ -37,7 +37,7 @@ const handleSubmit = async () => {
     const { token } = response.data
     localStorage.setItem('authToken', token)
 
-    router.push('/join-game')
+    router.push('/')
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<FormErrors>((acc, curr) => {

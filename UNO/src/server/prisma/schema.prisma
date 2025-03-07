@@ -25,12 +25,14 @@ model User {
 }
 
 model Game {
-  id        String @id @default(uuid())
-  name      String
-  status    String @default("waiting")
-  users     User[] @relation("GameUsers")
-  creatorId Int
-  creator   User   @relation("GameCreator", fields: [creatorId], references: [id])
+  id             String @id @default(uuid())
+  name           String
+  status         String @default("waiting")
+  users          User[] @relation("GameUsers")
+  creatorId      Int
+  creator        User   @relation("GameCreator", fields: [creatorId], references: [id])
+  targetScore    Int
+  cardsPerPlayer Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

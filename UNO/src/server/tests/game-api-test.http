@@ -3,8 +3,10 @@ POST http://localhost:8000/api/games
 Content-Type: application/json
 
 {
-  "name": "Game 1",
-  "creatorId": 1
+  "name": "First game",
+  "creatorId": 1,
+  "targetScore": 500,
+  "cardsPerPlayer": 7
 }
 
 ### Create another game
@@ -12,8 +14,10 @@ POST http://localhost:8000/api/games
 Content-Type: application/json
 
 {
-  "name": "Game 2",
-  "creatorId": 2
+  "name": "Another game",
+  "creatorId": 2,
+  "targetScore": 50,
+  "cardsPerPlayer": 2
 }
 
 ### List all games
