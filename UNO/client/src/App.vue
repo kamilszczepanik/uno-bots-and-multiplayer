@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { fetchUserInfo, redirectIfNotAuthenticated } from './utils/helpers'
 import { useUserStore } from './stores/userStore'
 import { useWaitingGamesStore } from './stores/waitingGamesStore'
@@ -30,16 +30,16 @@ onMounted(async () => {
     router,
     message: 'You must be logged in to create or join a game',
   })
-  console.log('test')
+
   const ws = new WebSocket('ws://localhost:9090/publish')
   ws.onopen = () => ws.send(JSON.stringify({ type: 'subscribe' }))
   ws.onmessage = ({ data: gameJSON }) => {
     const game = JSON.parse(gameJSON)
+    console.log(game)
 
     waitingGamesStore.remove(game)
     pausedGamesStore.remove(game)
     inProgressGamesStore.remove(game)
-
     switch (game.status) {
       case 'waiting':
         waitingGamesStore.upsert(game)
@@ -80,11 +80,11 @@ onMounted(async () => {
 <template>
   <RouterView />
   <div>
-    <div class="grid w-full grid-cols-4 gap-2">
-      <GamesList :games="waitingGames" title="WAITING" :userId="userStore.userInfo.id" />
-      <GamesList :games="pausedGames" title="PAUSED" :userId="userStore.userInfo.id" />
-      <GamesList :games="inProgressGames" title="IN PROGRESS" :userId="userStore.userInfo.id" />
-      <GamesList :games="finishedGames" title="FINISHED" :userId="userStore.userInfo.id" />
+    <div v-if="userStore.userInfo.id" class="grid w-full grid-cols-4 gap-2">
+      <GamesList :games="waitingGames" title="WAITING" />
+      <GamesList :games="pausedGames" title="PAUSED" />
+      <GamesList :games="inProgressGames" title="IN PROGRESS" />
+      <GamesList :games="finishedGames" title="FINISHED" />
     </div>
   </div>
 </template>

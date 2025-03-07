@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid())
   username String @unique
   password String
   games    Game[] @relation("GameUsers")
@@ -38,23 +38,23 @@ model Game {
   players User[] @relation("GameUsers")
   hands   Hand[] @relation("GameHands")
 
-  winnerId Int?
-  winner   User? @relation(fields: [winnerId], references: [id])
+  winnerId String?
+  winner   User?   @relation(fields: [winnerId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Hand {
-  id                 String @id @default(uuid())
-  currentPlayerId    Int
-  dealerId           Int
-  winnerId           Int?
+  id                 String  @id @default(uuid())
+  currentPlayerId    String
+  dealerId           String
+  winnerId           String?
   playersWhoDrewCard Json
   playersWhoSaidUno  Json
   newColor           String
-  playingDirection   String @default("clockwise")
-  status             String @default("in_progress")
+  playingDirection   String  @default("clockwise")
+  status             String  @default("in_progress")
 
   gameId      String
   game        Game   @relation("GameHands", fields: [gameId], references: [id])

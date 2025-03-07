@@ -9,11 +9,11 @@ import { useRouter } from 'vue-router'
 const { games } = defineProps<{
   games: Readonly<IndexedGame[]>
   title: string
-  userId: number | null
 }>()
 
 const router = useRouter()
 const userInfo = useUserStore().userInfo
+const currentUserId = userInfo.id
 onMounted(() => {
   console.log()
 })
@@ -37,7 +37,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
 <template>
   <div>
     <h2 class="font-bold text-gray-600">{{ title }}</h2>
-    <ul v-if="games.length > 0">
+    <ul v-if="games && games.length > 0">
       <li
         v-for="game in games"
         :key="game.id"
@@ -64,7 +64,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               v-if="
                 game.status === 'waiting' &&
                 game.players.length < 4 &&
-                !game.players.some((user) => user.id === userId)
+                !game.players.some((user) => user.id === currentUserId)
               "
               variant="secondary"
               @click="handleJoinGame(game)"
@@ -76,7 +76,7 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               v-if="
                 game.status === 'waiting' &&
                 game.players.length > 1 &&
-                game.players.some((user) => user.id === userId)
+                game.players.some((user) => user.id === currentUserId)
               "
               variant="primary"
               @click="handleStartGame(game)"
@@ -85,7 +85,9 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
               Start Game
             </ControlButton>
             <ControlButton
-              v-if="game.players.some((user) => user.id === userId) && game.status === 'waiting'"
+              v-if="
+                game.players.some((user) => user.id === currentUserId) && game.status === 'waiting'
+              "
               variant="cancel"
               @click="handleLeaveGame(game)"
               class="w-32"
@@ -94,7 +96,8 @@ const handleStartGame = async (game: IndexedGameSpecs) => {
             </ControlButton>
             <ControlButton
               v-if="
-                game.players.some((user) => user.id === userId) && game.status === 'in_progress'
+                game.players.some((user) => user.id === currentUserId) &&
+                game.status === 'in_progress'
               "
               variant="secondary"
               @click="handleOpenGame(game)"

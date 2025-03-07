@@ -5,7 +5,7 @@ import prisma from '../utils/db.server'
 interface StartGameProps {
   gameId: string
   name: string
-  playerIds: number[]
+  playerIds: string[]
   targetScore: number
   cardsPerPlayer: number
   currentRound: number
@@ -47,13 +47,17 @@ export const setupGame = async ({
     },
   })
 
-  const currentPlayerId = hand.playerInTurn()
+  const currentPlayerIndex = hand.playerInTurn()
 
-  if (currentPlayerId === undefined) {
-    throw new Error(
-      'Current player is not set. Ensure the hand is initialized properly.',
-    )
+  if (
+    currentPlayerIndex === undefined ||
+    currentPlayerIndex < 0 ||
+    currentPlayerIndex >= playerIds.length
+  ) {
+    throw new Error('Current player index is out of range or not set properly.')
   }
+
+  const currentPlayerId = playerIds[currentPlayerIndex]
 
   const playerHands = JSON.stringify(
     playerIds.reduce(
@@ -61,7 +65,7 @@ export const setupGame = async ({
         acc[playerId] = hand.playerHand(index)
         return acc
       },
-      {} as Record<number, Card[]>,
+      {} as Record<string, Card[]>,
     ),
   )
 

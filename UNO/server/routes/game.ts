@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express'
 
 import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
+// import { broadcast } from '../websocket'
 
 const router = Router()
 
@@ -67,9 +68,23 @@ router.post('/games', async (req: Request, res: Response) => {
           connect: { id: creatorId },
         },
       },
-      include: { players: true },
+      select: {
+        id: true,
+        name: true,
+        targetScore: true,
+        cardsPerPlayer: true,
+        status: true,
+        players: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     })
 
+    console.log('Game created:', game)
+    // broadcast(game)
     res.status(201).json(game)
     return
   } catch (error) {
@@ -114,7 +129,7 @@ router.post('/games/:gameId/join', async (req, res) => {
       include: { players: true },
     })
 
-    res.json(updatedGame)
+    // broadcast(updatedGame)
     return
   } catch (error) {
     console.error(error)
@@ -142,7 +157,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
       return
     }
 
-    await setupGame({
+    const { dbGame } = await setupGame({
       gameId,
       name: game.name,
       targetScore: game.targetScore,
@@ -152,7 +167,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
       playerIds: game.players.map((player) => player.id),
     })
 
-    res.json({ message: 'Game started' })
+    // broadcast(dbGame)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to start game' })
@@ -202,6 +217,8 @@ router.post('/games/:gameId/leave', async (req: Request, res: Response) => {
     } else {
       res.json({ message: `You have left the game ${game.name}` })
     }
+
+    // broadcast(updatedGame)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Failed to leave game' })
@@ -232,6 +249,8 @@ router.delete('/games/:gameId', async (req: Request, res: Response) => {
     await prisma.game.delete({
       where: { id: gameId },
     })
+
+    // broadcast(game)
 
     res.json({ message: 'Game deleted' })
   } catch (error) {

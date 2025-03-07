@@ -1,5 +1,5 @@
 export interface User {
-  id: number | null;
+  id: string | null;
   username: string | null;
 }
 
@@ -38,10 +38,10 @@ export interface GameSpecs {
 }
 
 export type IndexedGame = Readonly<
-  Omit<Game, ""> & { id: number; status: GameStatus }
+  Omit<Game, ""> & { id: string; status: GameStatus }
 >;
 export type IndexedGameSpecs = Readonly<
-  GameSpecs & { id: number; status: GameStatus }
+  GameSpecs & { id: string; status: GameStatus }
 >;
 
 export type GameStatus = "waiting" | "in_progress" | "paused" | "finished";
