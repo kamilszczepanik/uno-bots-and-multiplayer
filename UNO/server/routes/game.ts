@@ -1,10 +1,10 @@
+import { gameManager } from './../services/GameManager'
 import { Request, Response, Router } from 'express'
 
-import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
 import { broadcast } from '../websocket'
-import { GameStatus, IndexedGame, User } from '../../shared/types'
-import { Card } from 'models/src/model/deck'
+import { GameStatus } from '../../shared/types'
+import { Color } from 'models/src/model/deck'
 
 const router = Router()
 
@@ -175,7 +175,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
       username,
     }))
 
-    const { dbGame, hands } = await setupGame({
+    const { dbGame, dbHands } = await gameManager.startGame({
       id: gameId,
       name: game.name,
       targetScore: game.targetScore,
@@ -186,7 +186,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
 
     const formattedGame = {
       ...dbGame,
-      hands,
+      hands: dbHands,
       status: dbGame.status as GameStatus,
     }
 
@@ -393,27 +393,50 @@ interface TypedRequest<BodyType> extends Request {
   body: BodyType
 }
 
-type RawAction = { type: 'draw' } | { type: 'play'; card: Card }
-type Action = RawAction & { user: User }
+type RawAction =
+  | { type: 'draw' }
+  | { type: 'play'; cardIndex: number; color: Color | undefined }
+type Action = RawAction & { gameId: string }
 
-function resolve_action(action: Action): IndexedGame {
-  switch (action.type) {
-    case 'draw':
-      // todo: draw functionality
-      return api.draw(id, action.user)
-    case 'play':
-      // todo: play functionality
-      return api.register(id, action.card, action.user)
+export async function resolveAction(action: Action) {
+  const game = await gameManager.getGame(action.gameId)
+
+  if (!game) {
+    throw new Error('Game not found')
   }
+
+  let updatedState
+
+  switch (action.type) {
+    case 'draw': {
+      updatedState = game.currentHand()?.draw()
+      break
+    }
+    case 'play': {
+      updatedState = game.currentHand()?.play(action.cardIndex, action.color)
+      break
+    }
+    default:
+      throw new Error('Invalid action')
+  }
+
+  await prisma.game.update({
+    where: { id: action.gameId },
+    data: {},
+  })
+
+  return updatedState
 }
+
+type Body = Action & { gameId: string }
 
 router.post(
   '/games/:id/actions',
-  async (req: TypedRequest<Action>, res: Response) => {
+  async (req: TypedRequest<Body>, res: Response) => {
     try {
-      const game = resolve_action(req.body)
+      const game = resolveAction(req.body)
       res.send(game)
-      broadcast(game)
+      // broadcast(game)
     } catch (error: unknown) {
       console.log(error)
     }

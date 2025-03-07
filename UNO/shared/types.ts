@@ -38,7 +38,12 @@ export interface GameSpecs {
 }
 
 export type IndexedGame = Readonly<
-  Omit<Game, ""> & { id: string; status: GameStatus }
+  Omit<Game, ""> & {
+    id: string;
+    status: GameStatus;
+    hands: Hand[];
+    players: User[];
+  }
 >;
 export type IndexedGameSpecs = Readonly<
   GameSpecs & { id: string; status: GameStatus }
