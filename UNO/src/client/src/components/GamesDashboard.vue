@@ -4,19 +4,11 @@ import axiosInstance from '@/utils/axiosInstance'
 import { showMessage } from '@/utils/helpers'
 import { computed, onMounted, ref } from 'vue'
 import GamesList from './GamesList.vue'
-import { fetchGames } from '@/utils/gameApi'
-
-interface Game {
-  id: string
-  name: string
-  status: 'waiting' | 'paused' | 'in progress' | 'finished'
-  targetScore: number
-  cardsPerPlayer: number
-  users: { id: number; username: string }[]
-}
+import { useGameStore } from '@/stores/gameStore'
 
 const userStore = useUserStore()
-const allGames = ref<Game[]>([])
+const gameStore = useGameStore()
+const allGames = computed(() => gameStore.allGames)
 const waitingGames = computed(() => allGames.value.filter((game) => game.status === 'waiting'))
 const pausedGames = computed(() => allGames.value.filter((game) => game.status === 'paused'))
 const inProgressGames = computed(() =>
@@ -33,7 +25,7 @@ const handleJoinGame = async (gameId: string) => {
       userId: userStore.userInfo.id,
     })
     showMessage(`You have joined the game ${response.data.name}`)
-    allGames.value = await fetchGames()
+    gameStore.fetchGames()
   } catch (error) {
     showMessage('Failed to join game')
     console.error(error)
@@ -44,7 +36,7 @@ const handleStartGame = async (gameId: string) => {
   try {
     const response = await axiosInstance.post(`/api/games/${gameId}/start`)
     showMessage(response.data.message)
-    allGames.value = await fetchGames()
+    gameStore.fetchGames()
   } catch (error) {
     showMessage('Failed to left the game')
     console.error(error)
@@ -56,7 +48,7 @@ const handleLeaveGame = async (gameId: string) => {
       userId: userStore.userInfo.id,
     })
     showMessage(response.data.message)
-    allGames.value = await fetchGames()
+    gameStore.fetchGames()
   } catch (error) {
     showMessage('Failed to left the game')
     console.error(error)
@@ -66,7 +58,7 @@ const handleLeaveGame = async (gameId: string) => {
 }
 
 onMounted(async () => {
-  allGames.value = await fetchGames()
+  gameStore.fetchGames()
 })
 </script>
 <template>

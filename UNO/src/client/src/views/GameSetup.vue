@@ -2,9 +2,9 @@
 import ControlButton from '@/components/ControlButton.vue'
 import GamesDashboard from '@/components/GamesDashboard.vue'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
+import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import axiosInstance from '@/utils/axiosInstance'
-import { fetchGames } from '@/utils/gameApi'
 import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated } from '@/utils/helpers'
 import { AxiosError } from 'axios'
 import { onMounted, reactive, ref } from 'vue'
@@ -15,6 +15,7 @@ type FormData = z.infer<typeof startGameFormSchema>
 type FormErrors = Partial<Record<keyof FormData, string>>
 
 const router = useRouter()
+const gameStore = useGameStore()
 const userStore = useUserStore()
 
 const form = reactive<{
@@ -41,11 +42,10 @@ const handleSubmit = async () => {
 
   try {
     startGameFormSchema.parse(formData)
-
     await axiosInstance.post('/api/games', formData)
     errorCreatingGame.value = null
     errors.value = {}
-    fetchGames()
+    gameStore.fetchGames()
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {

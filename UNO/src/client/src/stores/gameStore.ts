@@ -1,51 +1,37 @@
-import { GameService, type GameServiceProps } from './../../../services/GameService'
-import { Game } from './../../../model/uno'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import axiosInstance from '@/utils/axiosInstance'
 
-interface GameSettings {
-  players: string[]
+interface Game {
+  id: string
+  name: string
+  status: 'waiting' | 'paused' | 'in progress' | 'finished'
   targetScore: number
   cardsPerPlayer: number
+  users: { id: number; username: string }[]
 }
 
 export const useGameStore = defineStore('game', {
   state: () => ({
-    game: null as Game | null,
-    gameSettings: null as GameSettings | null,
+    allGames: ref<Game[]>([]),
+    loading: ref(false),
+    error: ref<string | null>(null),
   }),
 
   actions: {
-    initializeGame(props: GameServiceProps) {
-      this.game = GameService.initializeGame(props)
+    async fetchGames() {
+      this.loading = true
+      this.error = null
 
-      this.setGameSettings({
-        players: props.players,
-        targetScore: props.targetScore,
-        cardsPerPlayer: props.cardsPerPlayer,
-      })
-    },
-
-    setGameSettings(settings: GameSettings | null) {
-      this.gameSettings = settings
-    },
-
-    clearGameSettings() {
-      this.gameSettings = null
-    },
-
-    restartGame() {
-      if (!this.gameSettings) {
-        throw new Error('Game settings are not available to restart the game.')
+      try {
+        const response = await axiosInstance.get('/api/games')
+        this.allGames = response.data
+      } catch (err) {
+        this.error = 'Failed to fetch games'
+        console.error('Error fetching games:', err)
+      } finally {
+        this.loading = false
       }
-
-      this.initializeGame({
-        ...this.gameSettings,
-      })
-    },
-
-    endGame() {
-      this.clearGameSettings()
-      this.game = null
     },
   },
 })
