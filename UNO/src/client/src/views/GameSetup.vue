@@ -14,7 +14,7 @@ type FormErrors = Partial<Record<keyof FormData, string>>
 interface Game {
   id: string
   name: string
-  status: 'waiting' | 'paused' | 'playing' | 'finished'
+  status: 'waiting' | 'paused' | 'in progress' | 'finished'
   targetScore: number
   cardsPerPlayer: number
   users: { id: number; username: string }[]
@@ -90,7 +90,9 @@ const fetchGames = async () => {
 
 const waitingGames = computed(() => allGames.value.filter((game) => game.status === 'waiting'))
 const pausedGames = computed(() => allGames.value.filter((game) => game.status === 'paused'))
-const playingGames = computed(() => allGames.value.filter((game) => game.status === 'playing'))
+const inProgressGames = computed(() =>
+  allGames.value.filter((game) => game.status === 'in progress'),
+)
 const finishedGames = computed(() => allGames.value.filter((game) => game.status === 'finished'))
 
 const handleJoinGame = async (gameId: string) => {
@@ -103,13 +105,18 @@ const handleJoinGame = async (gameId: string) => {
   } catch (error) {
     showMessage('Failed to join game')
     console.error(error)
-  } finally {
-    loadingGames.value = false
   }
 }
 
 const handleStartGame = async (gameId: string) => {
-  console.log(gameId)
+  try {
+    const response = await axiosInstance.post(`/api/games/${gameId}/start`)
+    showMessage(response.data.message)
+    fetchGames()
+  } catch (error) {
+    showMessage('Failed to left the game')
+    console.error(error)
+  }
 }
 const handleLeaveGame = async (gameId: string) => {
   try {
@@ -151,7 +158,7 @@ onMounted(async () => {
     </div>
     <h1 class="text-center text-7xl">UNO</h1>
     <div class="flex w-full flex-col justify-around gap-4 pt-8">
-      <form @submit.prevent="handleSubmit" class="w-96">
+      <form @submit.prevent="handleSubmit" class="flex w-full items-center justify-around">
         <h2 class="mb-6 text-center text-3xl font-semibold">Create new game</h2>
         <div class="mb-4">
           <label class="mb-2 block font-bold text-text" for="name">Game name</label>
@@ -197,75 +204,121 @@ onMounted(async () => {
           <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
         </div>
       </form>
-      <div class="w-96">
+      <div>
         <h2 class="mb-6 text-center text-3xl font-semibold">Games</h2>
-        <div>
-          <!-- Error or Loading State -->
+        <div class="grid grid-cols-4 gap-4">
           <div v-if="loadingGames" class="text-gray-500">Loading games...</div>
           <div v-else-if="errorLoadingGames" class="text-red-500">{{ errorLoadingGames }}</div>
 
-          <!-- Waiting Games -->
           <div v-if="waitingGames.length > 0">
-            <h2 class="text-xsm font-semibold text-gray-600">WAITING GAMES</h2>
+            <h2 class="font-bold text-gray-600">WAITING</h2>
             <ul>
               <li
                 v-for="game in waitingGames"
                 :key="game.id"
-                class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
+                class="mb-4 flex w-full items-center justify-between rounded border border-border p-1 shadow"
               >
-                <div>
-                  <div class="text-lg font-bold">{{ game.name }}</div>
-                  <div class="text-sm text-gray-600">
-                    {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                    <span class="font-bold">
-                      {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                    </span>
+                <div class="flex w-full items-center justify-between">
+                  <div>
+                    <div class="text-lg font-bold">{{ game.name }}</div>
+                    <div class="text-sm text-gray-600">
+                      {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
+                      <span class="font-bold">
+                        {{ game.users.map((u) => u.username).join(', ') || 'None' }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                      Target score: <span class="font-bold">{{ game.targetScore }}</span>
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
+                    </p>
                   </div>
-                  <p class="text-sm text-gray-600">
-                    Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                  </p>
+                  <div class="flex flex-col gap-2">
+                    <ControlButton
+                      v-if="
+                        game.status === 'waiting' &&
+                        game.users.length < 4 &&
+                        !game.users.some((user) => user.id === userData.id)
+                      "
+                      variant="secondary"
+                      @click="handleJoinGame(game.id)"
+                      class="w-32"
+                    >
+                      Join Game
+                    </ControlButton>
+                    <ControlButton
+                      v-if="
+                        game.status === 'waiting' &&
+                        game.users.length > 1 &&
+                        game.users.some((user) => user.id === userData.id)
+                      "
+                      variant="primary"
+                      @click="handleStartGame(game.id)"
+                      class="w-32"
+                    >
+                      Start Game
+                    </ControlButton>
+                    <ControlButton
+                      v-if="
+                        game.status === 'waiting' &&
+                        game.users.some((user) => user.id === userData.id)
+                      "
+                      variant="cancel"
+                      @click="handleLeaveGame(game.id)"
+                      class="w-32"
+                    >
+                      Leave Game
+                    </ControlButton>
+                  </div>
                 </div>
               </li>
             </ul>
           </div>
 
-          <!-- Paused Games -->
           <div v-if="pausedGames.length > 0">
-            <h2 class="mb-4 text-2xl font-semibold">Paused Games</h2>
+            <h2 class="font-bold text-gray-600">PAUSED</h2>
             <ul>
               <li
                 v-for="game in pausedGames"
                 :key="game.id"
                 class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
               >
-                <div>
-                  <div class="text-lg font-bold">{{ game.name }}</div>
-                  <div class="text-sm text-gray-600">
-                    {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                    <span class="font-bold">
-                      {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                    </span>
+                <div class="flex">
+                  <div>
+                    <div class="text-lg font-bold">{{ game.name }}</div>
+                    <div class="text-sm text-gray-600">
+                      {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
+                      <span class="font-bold">
+                        {{ game.users.map((u) => u.username).join(', ') || 'None' }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                      Target score: <span class="font-bold">{{ game.targetScore }}</span>
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
+                    </p>
                   </div>
-                  <p class="text-sm text-gray-600">
-                    Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                  </p>
+                  <div>
+                    <ControlButton
+                      variant="secondary"
+                      @click="handleLeaveGame(game.id)"
+                      class="w-32"
+                    >
+                      Resume Game(todo)
+                    </ControlButton>
+                  </div>
                 </div>
               </li>
             </ul>
           </div>
 
-          <!-- Playing Games -->
-          <div v-if="playingGames.length > 0">
-            <h2 class="mb-4 text-2xl font-semibold">Playing Games</h2>
+          <div v-if="inProgressGames.length > 0">
+            <h2 class="font-bold text-gray-600">IN PROGRESS</h2>
             <ul>
               <li
-                v-for="game in playingGames"
+                v-for="game in inProgressGames"
                 :key="game.id"
                 class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
               >
@@ -287,10 +340,8 @@ onMounted(async () => {
               </li>
             </ul>
           </div>
-
-          <!-- Finished Games -->
           <div v-if="finishedGames.length > 0">
-            <h2 class="mb-4 text-2xl font-semibold">Finished Games</h2>
+            <h2 class="font-bold text-gray-600">FINISHED</h2>
             <ul>
               <li
                 v-for="game in finishedGames"

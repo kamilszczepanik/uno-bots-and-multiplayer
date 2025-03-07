@@ -120,7 +120,7 @@ export const startGame: RequestHandler = async (
 
     await prisma.game.update({
       where: { id: gameId },
-      data: { status: 'started' },
+      data: { status: 'in progress' },
     })
 
     res.json({ message: 'Game started' })
