@@ -252,6 +252,7 @@ export class Hand {
   private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
     if (cardToPlay.type === "WILD DRAW") {
       const playerHand = this.getCurrentPlayerHand();
+
       return !playerHand.some((card) => card.color === topCard.color);
     }
 
@@ -268,12 +269,18 @@ export class Hand {
       cardToPlay.type === "DRAW" ||
       cardToPlay.type === "REVERSE"
     ) {
-      return cardToPlay.color === topCard.color;
+      return (
+        cardToPlay.color === topCard.color || cardToPlay.type === topCard.type
+      );
+    }
+
+    if (cardToPlay.type === "NUMBERED") {
+      cardToPlay.color === topCard.color ||
+        cardToPlay.number === topCard.number;
     }
 
     return (
-      cardToPlay.color === topCard?.color ||
-      cardToPlay.number === topCard?.number
+      cardToPlay.color === topCard.color || cardToPlay.number === topCard.number
     );
   }
 

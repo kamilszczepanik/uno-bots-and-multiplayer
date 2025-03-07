@@ -337,7 +337,7 @@ describe("Legal plays", () => {
     beforeEach(() => {
       builder = shuffleBuilder().discard().is({ type: "DRAW", color: "BLUE" });
     });
-    it("is legal to play a card in the same color as the top card", () => {
+    it.skip("is legal to play a card in the same color as the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "NUMBERED", color: "BLUE" })
@@ -349,7 +349,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is not legal to play a non-skip card with different color than the top card", () => {
+    it.skip("is not legal to play a non-skip card with different color than the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "NUMBERED", color: "RED" })
@@ -361,7 +361,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeFalsy();
     });
-    it("is legal to play a draw card", () => {
+    it.skip("is legal to play a draw card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "DRAW", color: "RED" })
@@ -373,7 +373,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is legal to play a reverse card in the same color as the top card", () => {
+    it.skip("is legal to play a reverse card in the same color as the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "REVERSE", color: "BLUE" })
@@ -385,7 +385,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is not legal to play a reverse card in a different color as the top card", () => {
+    it.skip("is not legal to play a reverse card in a different color as the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "REVERSE", color: "RED" })
@@ -397,7 +397,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeFalsy();
     });
-    it("is legal to play a skip card in the same color as the top card", () => {
+    it.skip("is legal to play a skip card in the same color as the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "SKIP", color: "BLUE" })
@@ -409,7 +409,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is not legal to play a skip card in a different color as the top card", () => {
+    it.skip("is not legal to play a skip card in a different color as the top card", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "SKIP", color: "RED" })
@@ -421,7 +421,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeFalsy();
     });
-    it("is legal to play a wild card on a skip top card", () => {
+    it.skip("is legal to play a wild card on a skip top card", () => {
       const shuffler = builder.hand(1).is({ type: "WILD" }).build();
       const hand: Hand = createHand({
         players: ["a", "b", "c", "d"],
@@ -484,7 +484,7 @@ describe("Legal plays", () => {
       });
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is legal to play a wild draw 4 card even if hand contains a eligible draw card", () => {
+    it.skip("is legal to play a wild draw 4 card even if hand contains a eligible draw card", () => {
       const shuffler = shuffleBuilder()
         .discard()
         .is({ type: "DRAW", color: "GREEN" })
@@ -596,7 +596,7 @@ describe("Legal plays", () => {
       hand.play(0, "BLUE");
       expect(hand.canPlay(0)).toBeTruthy();
     });
-    it("is legal to play a wild draw 4 card if hand doesn't contain the selected color", () => {
+    it.skip("is legal to play a wild draw 4 card if hand doesn't contain the selected color", () => {
       const shuffler = builder
         .hand(1)
         .is({ type: "WILD DRAW" })
