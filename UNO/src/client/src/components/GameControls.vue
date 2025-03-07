@@ -1,28 +1,43 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import ControlButton from './ControlButton.vue'
+import CatchUnoFailureModal from './CatchUnoFailureModal.vue'
+import { useGameStore } from '@/stores/gameStore'
+import { USER_INDEX } from '@/utils/constants'
+import { handleGameAction } from '@/utils/handleGameAction'
 
-const sayUno = () => {
-  console.log('Say UNO triggered')
+const gameStore = useGameStore()
+const showCatchUnoFailureModal = ref(false)
+
+const handleSayUno = () => {
+  handleGameAction(() => gameStore.currentHand?.sayUno(USER_INDEX))
 }
 
-const catchUnoFailure = () => {
-  console.log('Catch UNO Failure triggered')
+const handleCatchUnoFailure = () => {
+  showCatchUnoFailureModal.value = true
 }
 
-const endHand = () => {
+const handleEndHand = () => {
   console.log('End Hand triggered')
 }
 
-const endGame = () => {
+const handleEndGame = () => {
   console.log('End Game triggered')
 }
 </script>
 
 <template>
   <div class="flex flex-col items-center space-y-2">
-    <ControlButton variant="primary" @click="sayUno"> Say UNO </ControlButton>
-    <ControlButton variant="secondary" @click="catchUnoFailure"> Catch UNO Failure </ControlButton>
-    <ControlButton variant="warning" @click="endHand"> End Hand </ControlButton>
-    <ControlButton variant="destructive" @click="endGame"> End Game </ControlButton>
+    <ControlButton variant="primary" @click="handleSayUno"> Say UNO </ControlButton>
+    <ControlButton variant="secondary" @click="handleCatchUnoFailure">
+      Catch UNO Failure
+    </ControlButton>
+    <ControlButton variant="warning" @click="handleEndHand"> End Hand </ControlButton>
+    <ControlButton variant="destructive" @click="handleEndGame"> End Game </ControlButton>
+
+    <CatchUnoFailureModal
+      v-if="showCatchUnoFailureModal"
+      @close="showCatchUnoFailureModal = false"
+    />
   </div>
 </template>
