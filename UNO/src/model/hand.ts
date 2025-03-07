@@ -146,6 +146,21 @@ export class Hand {
 
     const cardToPlay = playerHand.splice(cardIndex, 1)[0]; // Remove the card from the hand
     this._discardPile.add(cardToPlay);
+
+    if (cardToPlay.type === "DRAW") {
+      const directionModifier = this._playingDirection === "clockwise" ? 1 : -1;
+      const nextPlayerIndex =
+        (this._currentPlayerIndex + directionModifier + this._players.length) %
+        this._players.length;
+
+      for (let i = 0; i < 2; i++) {
+        const drawnCard = this._drawPile.deal();
+        if (drawnCard) {
+          this._playerHands.get(nextPlayerIndex)!.push(drawnCard);
+        }
+      }
+    }
+
     this._currentPlayerIndex = this.calculateNextPlayer(cardToPlay);
 
     return cardToPlay;
@@ -203,7 +218,7 @@ export class Hand {
       (this._currentPlayerIndex + directionModifier + this._players.length) %
       this._players.length;
 
-    return cardPlayed.type === "SKIP"
+    return cardPlayed.type === "SKIP" || cardPlayed.type === "DRAW"
       ? (baseNextPlayerIndex + directionModifier + this._players.length) %
           this._players.length
       : baseNextPlayerIndex;
