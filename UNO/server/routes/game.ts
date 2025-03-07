@@ -1,11 +1,11 @@
+import { Request, Response, Router } from 'express'
+
 import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
-import { Request, RequestHandler, Response } from 'express'
 
-export const listGames: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+const router = Router()
+
+router.get('/games', async (req: Request, res: Response) => {
   try {
     const games = await prisma.game.findMany({
       include: { players: true },
@@ -18,12 +18,8 @@ export const listGames: RequestHandler = async (
     console.error(error)
     res.status(500).json({ error: 'Failed to fetch games' })
   }
-}
-
-export const gameStatus: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+})
+router.get('/games/:gameId', async (req: Request, res: Response) => {
   const { gameId } = req.params
 
   try {
@@ -50,12 +46,9 @@ export const gameStatus: RequestHandler = async (
     console.error(error)
     res.status(500).json({ error: `Failed to fetch game ${gameId}` })
   }
-}
+})
 
-export const createGame: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+router.post('/games', async (req: Request, res: Response) => {
   const { name, creatorId, targetScore, cardsPerPlayer } = req.body
   if (!name || !creatorId) {
     res.status(400).json({ error: 'Name and creatorId are required' })
@@ -85,9 +78,9 @@ export const createGame: RequestHandler = async (
     res.status(500).json({ error: 'Failed to create game' })
     return
   }
-}
+})
 
-export const joinGame: RequestHandler = async (req, res) => {
+router.post('/games/:gameId/join', async (req, res) => {
   const { gameId } = req.params
   const { userId } = req.body
 
@@ -130,12 +123,9 @@ export const joinGame: RequestHandler = async (req, res) => {
     res.status(500).json({ error: 'Failed to join game' })
     return
   }
-}
+})
 
-export const startGame: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
+router.post('/games/:gameId/start', async (req: Request, res: Response) => {
   const { gameId } = req.params
 
   try {
@@ -169,44 +159,9 @@ export const startGame: RequestHandler = async (
     console.error(error)
     res.status(500).json({ error: 'Failed to start game' })
   }
-}
+})
 
-export const deleteGame: RequestHandler = async (
-  req: Request,
-  res: Response,
-) => {
-  const { gameId } = req.params
-
-  try {
-    const game = await prisma.game.findUnique({
-      where: { id: gameId },
-      include: { players: true },
-    })
-
-    if (!game) {
-      res.status(404).json({ error: 'Game not found' })
-      return
-    }
-
-    if (game.players.length > 1) {
-      res
-        .status(400)
-        .json({ error: 'Cannot delete a game with more than one player' })
-      return
-    }
-
-    await prisma.game.delete({
-      where: { id: gameId },
-    })
-
-    res.json({ message: 'Game deleted' })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Failed to delete game' })
-  }
-}
-
-export const leaveGame = async (req: Request, res: Response) => {
+router.post('/games/:gameId/leave', async (req: Request, res: Response) => {
   const { gameId } = req.params
   const { userId } = req.body
 
@@ -253,4 +208,38 @@ export const leaveGame = async (req: Request, res: Response) => {
     console.error(error)
     res.status(500).json({ error: 'Failed to leave game' })
   }
-}
+})
+
+router.delete('/games/:gameId', async (req: Request, res: Response) => {
+  const { gameId } = req.params
+
+  try {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { players: true },
+    })
+
+    if (!game) {
+      res.status(404).json({ error: 'Game not found' })
+      return
+    }
+
+    if (game.players.length > 1) {
+      res
+        .status(400)
+        .json({ error: 'Cannot delete a game with more than one player' })
+      return
+    }
+
+    await prisma.game.delete({
+      where: { id: gameId },
+    })
+
+    res.json({ message: 'Game deleted' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Failed to delete game' })
+  }
+})
+
+export default router

@@ -16,7 +16,6 @@ router.post('/register', async (req, res) => {
       user: newUser,
     })
   } catch (error) {
-    // todo: return specific error message to frontend
     console.error('Error logging in:', error)
     res.status(400).json({ error: 'Error registering user' })
   }
@@ -29,7 +28,6 @@ router.post('/login', async (req, res) => {
     const result = await loginUser(username, password)
     res.status(200).json(result)
   } catch (error) {
-    // todo: return specific error message to frontend
     console.error('Error logging in:', error)
     res.status(400).json({ error: 'Error logging user' })
   }

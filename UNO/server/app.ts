@@ -1,8 +1,8 @@
 import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import authRoutes from './routes/authRoutes'
-import gameRoutes from './routes/gameRoutes'
+import authRoutes from './routes/auth'
+import gameRoutes from './routes/game'
 
 dotenv.config()
 
