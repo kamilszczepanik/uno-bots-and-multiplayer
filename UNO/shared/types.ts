@@ -55,5 +55,8 @@ export type GameStatus = "waiting" | "in_progress" | "paused" | "finished";
 
 type RawAction =
   | { type: "draw" }
-  | { type: "play"; cardIndex: number; color: Color | undefined };
+  | { type: "play"; cardIndex: number; color: Color | undefined }
+  | { type: "say_uno"; playerIndex: number }
+  | { type: "catch_uno_failure"; accuser: number; accused: number }
+  | { type: "end_game" };
 export type Action = RawAction & { gameId: string; handId: string };

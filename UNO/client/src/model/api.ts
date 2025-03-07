@@ -115,3 +115,29 @@ export async function play({
 }) {
   return perform_action({ gameId, handId, type: 'play', cardIndex, color })
 }
+
+export async function sayUno({
+  gameId,
+  handId,
+  playerIndex,
+}: {
+  gameId: string
+  handId: string
+  playerIndex: number
+}) {
+  return perform_action({ gameId, handId, type: 'say_uno', playerIndex })
+}
+
+export async function catchUnoFailure({
+  gameId,
+  handId,
+  accused,
+  accuser,
+}: {
+  gameId: string
+  handId: string
+  accused: number
+  accuser: number
+}) {
+  return perform_action({ gameId, handId, type: 'catch_uno_failure', accused, accuser })
+}

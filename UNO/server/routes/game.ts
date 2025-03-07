@@ -404,6 +404,20 @@ export async function resolveAction(action: Action) {
       gameInstance.currentHand()?.play(action.cardIndex, action.color)
       break
     }
+    case 'say_uno': {
+      gameInstance.currentHand()?.sayUno(action.playerIndex)
+      break
+    }
+    case 'catch_uno_failure': {
+      gameInstance
+        .currentHand()
+        ?.catchUnoFailure({ accused: action.accused, accuser: action.accuser })
+      break
+    }
+    case 'end_game': {
+      console.log('end game')
+      break
+    }
     default:
       throw new Error('Invalid action')
   }

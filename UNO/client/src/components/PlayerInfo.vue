@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import ControlButton from './ControlButton.vue'
 import type { IndexedGame } from '../../../shared/types'
 import { useUserStore } from '@/stores/userStore'
+import { handleGameAction, showMessage } from '@/utils/helpers'
+import * as api from '@/model/api'
 
 const { game, playerId } = defineProps<{
   game: IndexedGame
@@ -13,7 +15,6 @@ const userId = useUserStore().userInfo.id
 const playerIndexMap = computed(() => {
   return Object.fromEntries(game.players.map((player, index) => [player.id, index]))
 })
-
 const score = computed(() => game.scores[playerIndexMap.value[playerId] ?? -1])
 const name = computed(() => {
   const player = game.players.find((p) => p.id === playerId)
@@ -28,20 +29,39 @@ const playerSaidUno = computed(() => {
 })
 const isOpponent = computed(() => playerId !== userId)
 
-// const handleCatchUnoFailure = () => {
-//   handleGameAction(() => {
-//     const isSuccess = currentHand.value?.catchUnoFailure({
-//       accuser: currentHand.value?.playerInTurn() || 0,
-//       accused: playerIndex,
-//     })
+const handleCatchUnoFailure = () =>
+  handleGameAction(
+    async () => {
+      if (!game || !currentHand.value) {
+        showMessage('Game or current hand not found. Please refresh or try again.')
+        return
+      }
 
-//     if (!isSuccess) {
-//       showMessage('Failed to catch UNO failure.')
-//     } else {
-//       showMessage(`Successfully caught UNO failure! ${name.value} has to take 4 cards.`)
-//     }
-//   })
-// }
+      if (!userId) {
+        showMessage('User ID not found. Please refresh or try again.')
+        return
+      }
+
+      const accuserIndex = playerIndexMap.value[userId] ?? -1
+      const accusedIndex = playerIndexMap.value[playerId] ?? -1
+
+      if (accuserIndex === -1 || accusedIndex === -1) {
+        showMessage('Could not determine accuser or accused player.')
+        return
+      }
+
+      await api.catchUnoFailure({
+        gameId: game.id,
+        handId: currentHand.value.id,
+        accuser: accuserIndex,
+        accused: accusedIndex,
+      })
+    },
+    {
+      successMessage: 'Failed to catch UNO failure',
+      errorMessage: 'Successfully caught UNO failure! ${name.value} has to take 4 cards.',
+    },
+  )
 </script>
 
 <template>
@@ -52,7 +72,12 @@ const isOpponent = computed(() => playerId !== userId)
     <p v-if="playerSaidUno" class="text-primary-500">SAID UNO</p>
     <h3 class="text-lg font-bold">{{ name }}</h3>
     <p class="text-sm text-gray-600">Score: {{ score }}</p>
-    <ControlButton v-if="isOpponent" variant="secondary" class="text-xs">
+    <ControlButton
+      v-if="isOpponent"
+      variant="secondary"
+      class="text-xs"
+      @click="handleCatchUnoFailure"
+    >
       Catch UNO Failure
     </ControlButton>
   </div>
