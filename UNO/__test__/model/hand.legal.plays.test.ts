@@ -3,7 +3,7 @@ import { createHand } from "../utils/test_adapter";
 import { Hand } from "../../src/model/hand";
 import { shuffleBuilder } from "../utils/shuffling";
 
-describe.skip("Legal plays", () => {
+describe("Legal plays", () => {
   describe("Legal plays on a numbered card", () => {
     let builder = shuffleBuilder();
     beforeEach(() => {

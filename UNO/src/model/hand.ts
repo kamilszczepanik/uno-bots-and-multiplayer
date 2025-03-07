@@ -169,31 +169,14 @@ export class Hand {
     this._discardPile = new DiscardPile([topCard]);
   }
 
-  canPlayAny(): boolean {
-    const playerHand = this.getCurrentPlayerHand();
-    const topCard = this._discardPile.top();
-
-    return playerHand.some((card) => this.isCardPlayable(card, topCard));
-  }
-
-  private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
-    if (cardToPlay.type === "WILD" || cardToPlay.type === "WILD DRAW") {
-      return true;
-    }
-
-    if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
-      return this._newColor === cardToPlay.color;
-    }
-
-    return (
-      cardToPlay.color === topCard?.color ||
-      cardToPlay.number === topCard?.number
-    );
-  }
-
   play(cardIndex: number, newColor?: deck.Color): deck.Card {
     const playerHand = this.getCurrentPlayerHand();
-    this.validateCardIndex(cardIndex, playerHand);
+
+    if (!this.isValidCardIndex(cardIndex, playerHand)) {
+      throw new Error(
+        "Requested card index is out of bounds for the player's hand."
+      );
+    }
 
     if (playerHand[cardIndex].color && newColor) {
       throw new Error("It is illegal to name a color on a colored card");
@@ -248,11 +231,50 @@ export class Hand {
 
   canPlay(cardIndex: number): boolean {
     const playerHand = this.getCurrentPlayerHand();
-    this.validateCardIndex(cardIndex, playerHand);
+
+    if (!this.isValidCardIndex(cardIndex, playerHand)) {
+      return false;
+    }
 
     const cardToPlay = playerHand[cardIndex];
     const topCard = this._discardPile.top();
+
     return this.isCardPlayable(cardToPlay, topCard);
+  }
+
+  canPlayAny(): boolean {
+    const playerHand = this.getCurrentPlayerHand();
+    const topCard = this._discardPile.top();
+
+    return playerHand.some((card) => this.isCardPlayable(card, topCard));
+  }
+
+  private isCardPlayable(cardToPlay: deck.Card, topCard: deck.Card): boolean {
+    if (cardToPlay.type === "WILD DRAW") {
+      const playerHand = this.getCurrentPlayerHand();
+      return !playerHand.some((card) => card.color === topCard.color);
+    }
+
+    if (cardToPlay.type === "WILD") {
+      return true;
+    }
+
+    if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
+      return this._newColor === cardToPlay.color;
+    }
+
+    if (
+      cardToPlay.type === "SKIP" ||
+      cardToPlay.type === "DRAW" ||
+      cardToPlay.type === "REVERSE"
+    ) {
+      return cardToPlay.color === topCard.color;
+    }
+
+    return (
+      cardToPlay.color === topCard?.color ||
+      cardToPlay.number === topCard?.number
+    );
   }
 
   private calculateNextPlayer(cardPlayed: deck.Card): number {
@@ -280,12 +302,11 @@ export class Hand {
       : baseNextPlayerIndex;
   }
 
-  private validateCardIndex(cardIndex: number, playerHand: deck.Card[]): void {
-    if (cardIndex < 0 || cardIndex >= playerHand.length) {
-      throw new Error(
-        `Invalid card index ${cardIndex} for player ${this._currentPlayerIndex}.`
-      );
-    }
+  private isValidCardIndex(
+    cardIndex: number,
+    playerHand: deck.Card[]
+  ): boolean {
+    return cardIndex >= 0 && cardIndex < playerHand.length;
   }
 
   player(playerNumber: number) {
