@@ -3,15 +3,41 @@ import { computed } from 'vue'
 import GameCard from './GameCard.vue'
 import PlayerInfo from './PlayerInfo.vue'
 import { useGameStore } from '@/stores/gameStore'
+import { USER_INDEX } from '@/utils/constants'
 
 const gameStore = useGameStore()
-const userHand = computed(() => gameStore.currentHand?.playerHand(0))
+const currentHand = computed(() => gameStore.currentHand)
+const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
+const userHand = computed(() => gameStore.currentHand?.playerHand(USER_INDEX))
+const userIsCurrentPlayer = computed(() => currentPlayerIndex.value === USER_INDEX)
+
+const playCard = (index: number) => {
+  if (!userIsCurrentPlayer.value) {
+    alert("It's not your turn")
+    return
+  }
+
+  if (!currentHand.value?.canPlay(index)) {
+    alert("You can't play this card")
+    return
+  }
+
+  currentHand.value?.play(index)
+}
 </script>
 
 <template>
-  <div class="flex">
-    <PlayerInfo :player-index="0" />
-    <div v-for="(card, index) in userHand" :key="index" class="">
+  <div class="flex pb-2">
+    <PlayerInfo :player-index="USER_INDEX" />
+    <div
+      v-for="(card, index) in userHand"
+      :key="index"
+      :class="[
+        'transition-transform',
+        userIsCurrentPlayer ? 'cursor-pointer hover:scale-105' : 'cursor-not-allowed',
+      ]"
+      @click="userIsCurrentPlayer ? playCard(index) : null"
+    >
       <GameCard :card="card" />
     </div>
   </div>
