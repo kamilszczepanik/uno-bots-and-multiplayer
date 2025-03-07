@@ -36,11 +36,13 @@ onMounted(async () => {
 
     <div class="flex w-1/2 justify-center">
       <OpponentHand
+        :game="game"
         v-if="opponents.length === 1 && opponents[0].id"
         :placement="'top'"
         :opponent-id="opponents[0].id"
       />
       <OpponentHand
+        :game="game"
         v-else-if="opponents.length > 1 && opponents[1].id"
         :placement="'top'"
         :opponent-id="opponents[1].id"
@@ -51,6 +53,7 @@ onMounted(async () => {
     <div class="flex flex-grow">
       <div class="flex w-1/4 items-center justify-center">
         <OpponentHand
+          :game="game"
           v-if="opponents.length > 1 && opponents[0].id"
           :placement="'left'"
           :opponent-id="opponents[0].id"
@@ -59,13 +62,14 @@ onMounted(async () => {
 
       <div class="flex w-1/2 flex-col items-center justify-center">
         <div class="flex gap-12">
-          <DiscardPile />
-          <DrawPile />
+          <!-- <DiscardPile />
+          <DrawPile /> -->
         </div>
       </div>
 
       <div class="flex w-1/4 items-center justify-center">
         <OpponentHand
+          :game="game"
           v-if="opponents.length > 2 && opponents[2].id"
           :placement="'right'"
           :opponent-id="opponents[2].id"

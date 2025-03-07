@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { computed, defineProps } from 'vue'
 import GameCard from './GameCard.vue'
-import { useGameStore } from '@/stores/gameStore'
 import PlayerInfo from './PlayerInfo.vue'
+import type { IndexedGame } from '../../../shared/types'
 
-const { opponentId, placement } = defineProps({
-  opponentId: {
-    type: String,
-    required: true,
-  },
-  placement: {
-    type: String as () => 'top' | 'left' | 'right',
-    required: true,
-  },
-})
+const { game, opponentId, placement } = defineProps<{
+  game: IndexedGame
+  opponentId: string
+  placement: 'top' | 'left' | 'right'
+}>()
 
-const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.currentHand)
+const currentHand = computed(() => game.hands[game.currentRound - 1])
 const opponentHand = computed(() => {
   const playerHands = currentHand.value?.playerHands
 
@@ -65,7 +59,7 @@ const spacing = computed(() => {
     v-if="opponentHand.length > 0"
     :class="`flex ${placement !== 'top' ? 'flex-col' : 'flex-row'} items-center`"
   >
-    <PlayerInfo :playerIndex="opponentId" />
+    <PlayerInfo :game="game" :player-id="opponentId" />
 
     <div
       :class="`relative flex ${rotation} ${placement === 'top' ? 'h-32' : 'w-56'} px-6`"
