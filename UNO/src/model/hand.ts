@@ -30,70 +30,100 @@ export class Hand {
     shuffler = standardShuffler,
     cardsPerPlayer = 7,
   }: Props) {
-    if (players.length < 2 || players.length > 10) {
-      throw new Error(
-        "A game requires at least 2 players and allows at most 10 players."
-      );
-    }
-
+    this.constrainNumberOfPlayers(players);
     this._players = players;
+    this._playerHands = new Map(players.map((_, index) => [index, []]));
     this._score = 0;
     this._ended = false;
     this._dealer = dealer;
     this._playingDirectionModifier = 1;
-
-    this._deck = deck.createInitialDeck();
     this._shuffler = shuffler;
+    this._deck = deck.createInitialDeck();
     this._deck.shuffle(this._shuffler);
-    this._playerHands = new Map(players.map((_, index) => [index, []]));
-
-    for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
-      for (let i = 0; i < cardsPerPlayer; i++) {
-        const card = this._deck.deal();
-        if (card) {
-          this._playerHands.get(playerIndex)!.push(card);
-        }
-      }
-    }
-
-    const initializeDiscardPile = (): DiscardPile => {
-      const topCard = this._deck.deal();
-      if (!topCard) {
-        throw new Error("Deck is empty; cannot initialize discard pile.");
-      }
-
-      if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
-        this._deck.cards.push(topCard);
-        this._deck.shuffle(shuffler);
-
-        return initializeDiscardPile();
-      }
-
-      if (topCard.type === "DRAW") {
-        const nextPlayer = (this._dealer + 1) % this._players.length;
-        for (let i = 0; i < 2; i++) {
-          const card = this._deck.deal();
-          if (card) {
-            this._playerHands.get(nextPlayer)!.push(card);
-          }
-        }
-      }
-
-      return new DiscardPile([topCard]);
-    };
-
-    this._discardPile = initializeDiscardPile();
+    this.distributeCardsToPlayers(players, cardsPerPlayer);
+    this._discardPile = this.initializeDiscardPile();
     this._drawPile = new DrawPile(this._deck.cards);
     this._startingPlayerIndex = this.calculateStartingPlayer();
     this._currentPlayerIndex = this._startingPlayerIndex;
   }
 
-  get dealer() {
-    return this._dealer;
+  private constrainNumberOfPlayers(players: string[]) {
+    if (players.length < 2 || players.length > 10) {
+      throw new Error(
+        "A game requires at least 2 players and allows at most 10 players."
+      );
+    }
   }
 
-  get playerCount() {
-    return this._players.length;
+  private distributeCardsToPlayers(players: string[], cardsPerPlayer: number) {
+    for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+      for (let i = 0; i < cardsPerPlayer; i++) {
+        const card = this._deck.deal();
+        card && this._playerHands.get(playerIndex)!.push(card);
+      }
+    }
+  }
+
+  private initializeDiscardPile = (): DiscardPile => {
+    const topCard = this._deck.deal();
+    if (!topCard) {
+      throw new Error("Deck is empty; cannot initialize discard pile.");
+    }
+
+    if (topCard.type === "WILD" || topCard.type === "WILD DRAW") {
+      this._deck.cards.push(topCard);
+      this._deck.shuffle(this._shuffler);
+
+      return this.initializeDiscardPile();
+    }
+
+    if (topCard.type === "DRAW") {
+      const nextPlayer = (this._dealer + 1) % this._players.length;
+      for (let i = 0; i < 2; i++) {
+        const card = this._deck.deal();
+        if (card) {
+          this._playerHands.get(nextPlayer)!.push(card);
+        }
+      }
+    }
+
+    return new DiscardPile([topCard]);
+  };
+
+  private calculateStartingPlayer(): number {
+    const topCard = this._discardPile.top();
+
+    if (!topCard) {
+      throw new Error("Discard pile is empty.");
+    }
+
+    switch (topCard.type) {
+      case "REVERSE":
+        this._playingDirectionModifier *= -1;
+
+        return (
+          (this._dealer +
+            this._playingDirectionModifier +
+            this._players.length) %
+          this._players.length
+        );
+
+      case "SKIP":
+        return (
+          (this._dealer +
+            2 * this._playingDirectionModifier +
+            this._players.length) %
+          this._players.length
+        );
+
+      default:
+        return (
+          (this._dealer +
+            this._playingDirectionModifier +
+            this._players.length) %
+          this._players.length
+        );
+    }
   }
 
   draw(): void {
@@ -122,15 +152,6 @@ export class Hand {
     }
   }
 
-  private replenishDrawPile(): void {
-    const topCard = this._discardPile.top();
-    const remainingDiscardPile = this._discardPile.cards.slice(0, -1);
-
-    this._drawPile = new DrawPile(remainingDiscardPile);
-    this._drawPile.shuffle(this._shuffler);
-    this._discardPile = new DiscardPile([topCard]);
-  }
-
   private getCurrentPlayerHand(): deck.Card[] {
     const playerHand = this._playerHands.get(this._currentPlayerIndex);
     if (!playerHand) {
@@ -139,12 +160,13 @@ export class Hand {
     return playerHand;
   }
 
-  private validateCardIndex(cardIndex: number, playerHand: deck.Card[]): void {
-    if (cardIndex < 0 || cardIndex >= playerHand.length) {
-      throw new Error(
-        `Invalid card index ${cardIndex} for player ${this._currentPlayerIndex}.`
-      );
-    }
+  private replenishDrawPile(): void {
+    const topCard = this._discardPile.top();
+    const remainingDiscardPile = this._discardPile.cards.slice(0, -1);
+
+    this._drawPile = new DrawPile(remainingDiscardPile);
+    this._drawPile.shuffle(this._shuffler);
+    this._discardPile = new DiscardPile([topCard]);
   }
 
   canPlayAny(): boolean {
@@ -167,15 +189,6 @@ export class Hand {
       cardToPlay.color === topCard?.color ||
       cardToPlay.number === topCard?.number
     );
-  }
-
-  canPlay(cardIndex: number): boolean {
-    const playerHand = this.getCurrentPlayerHand();
-    this.validateCardIndex(cardIndex, playerHand);
-
-    const cardToPlay = playerHand[cardIndex];
-    const topCard = this._discardPile.top();
-    return this.isCardPlayable(cardToPlay, topCard);
   }
 
   play(cardIndex: number, newColor?: deck.Color): deck.Card {
@@ -233,6 +246,48 @@ export class Hand {
     return cardToPlay;
   }
 
+  canPlay(cardIndex: number): boolean {
+    const playerHand = this.getCurrentPlayerHand();
+    this.validateCardIndex(cardIndex, playerHand);
+
+    const cardToPlay = playerHand[cardIndex];
+    const topCard = this._discardPile.top();
+    return this.isCardPlayable(cardToPlay, topCard);
+  }
+
+  private calculateNextPlayer(cardPlayed: deck.Card): number {
+    if (cardPlayed.type === "REVERSE") {
+      if (this._players.length === 2) {
+        return this._currentPlayerIndex;
+      }
+
+      this._playingDirectionModifier *= -1;
+    }
+
+    const baseNextPlayerIndex =
+      (this._currentPlayerIndex +
+        this._playingDirectionModifier +
+        this._players.length) %
+      this._players.length;
+
+    return cardPlayed.type === "SKIP" ||
+      cardPlayed.type === "DRAW" ||
+      cardPlayed.type === "WILD DRAW"
+      ? (baseNextPlayerIndex +
+          this._playingDirectionModifier +
+          this._players.length) %
+          this._players.length
+      : baseNextPlayerIndex;
+  }
+
+  private validateCardIndex(cardIndex: number, playerHand: deck.Card[]): void {
+    if (cardIndex < 0 || cardIndex >= playerHand.length) {
+      throw new Error(
+        `Invalid card index ${cardIndex} for player ${this._currentPlayerIndex}.`
+      );
+    }
+  }
+
   player(playerNumber: number) {
     if (playerNumber < 0 || playerNumber >= this._players.length) {
       throw new Error("Requested player is out of bounds.");
@@ -271,65 +326,12 @@ export class Hand {
     return this._currentPlayerIndex;
   }
 
-  calculateNextPlayer(cardPlayed: deck.Card): number {
-    if (cardPlayed.type === "REVERSE") {
-      if (this._players.length === 2) {
-        return this._currentPlayerIndex;
-      }
-
-      this._playingDirectionModifier *= -1;
-    }
-
-    const baseNextPlayerIndex =
-      (this._currentPlayerIndex +
-        this._playingDirectionModifier +
-        this._players.length) %
-      this._players.length;
-
-    return cardPlayed.type === "SKIP" ||
-      cardPlayed.type === "DRAW" ||
-      cardPlayed.type === "WILD DRAW"
-      ? (baseNextPlayerIndex +
-          this._playingDirectionModifier +
-          this._players.length) %
-          this._players.length
-      : baseNextPlayerIndex;
+  get dealer() {
+    return this._dealer;
   }
 
-  calculateStartingPlayer(): number {
-    const topCard = this._discardPile.top();
-
-    if (!topCard) {
-      throw new Error("Discard pile is empty.");
-    }
-
-    switch (topCard.type) {
-      case "REVERSE":
-        this._playingDirectionModifier *= -1;
-
-        return (
-          (this._dealer +
-            this._playingDirectionModifier +
-            this._players.length) %
-          this._players.length
-        );
-
-      case "SKIP":
-        return (
-          (this._dealer +
-            2 * this._playingDirectionModifier +
-            this._players.length) %
-          this._players.length
-        );
-
-      default:
-        return (
-          (this._dealer +
-            this._playingDirectionModifier +
-            this._players.length) %
-          this._players.length
-        );
-    }
+  get playerCount() {
+    return this._players.length;
   }
 }
 
