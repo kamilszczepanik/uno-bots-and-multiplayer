@@ -109,30 +109,29 @@ describe("Playing a hand", () => {
       expect(game.currentHand()).toBe(hand);
     });
   });
-  // describe.skip("when the hand is over", () => {
-  //   const game = createGame(props);
-  //   const hand = game.currentHand()!;
-  //   hand.draw();
-  //   hand.play(0);
-  //   test.skip("the setup is as expected", () => {
-  //     expect(hand.hasEnded()).toBeTruthy();
-  //     expect(hand.winner()).toEqual(1);
-  //     expect(hand.score()).toEqual(78);
-  //   });
-  // test("the game still has no winner", () => {
-  //   expect(game.winner()).toBeUndefined();
-  // });
-  // test("the score is updated", () => {
-  //   expect(game.score(0)).toBe(0);
-  //   expect(game.score(1)).toBe(78);
-  //   expect(game.score(2)).toBe(0);
-  //   expect(game.score(3)).toBe(0);
-  // });
-  // test("a new hand is started", () => {
-  //   expect(game.currentHand()).not.toBe(hand);
-  // });
-  // });
-  // });
+  describe("when the hand is over", () => {
+    const game = createGame(props);
+    const hand = game.currentHand()!;
+    hand.draw();
+    hand.play(0);
+    test("the setup is as expected", () => {
+      expect(hand.hasEnded()).toBeTruthy();
+      // expect(hand.winner()).toEqual(1); todo: fix this test case
+      expect(hand.score()).toEqual(78);
+    });
+    test("the game still has no winner", () => {
+      expect(game.winner()).toBeUndefined();
+    });
+    test("the score is updated", () => {
+      expect(game.score(0)).toBe(0);
+      expect(game.score(1)).toBe(78);
+      expect(game.score(2)).toBe(0);
+      expect(game.score(3)).toBe(0);
+    });
+    test("a new hand is started", () => {
+      expect(game.currentHand()).not.toBe(hand);
+    });
+  });
 
   // const secondShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   //   .discard()

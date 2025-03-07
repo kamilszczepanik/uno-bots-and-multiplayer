@@ -1,21 +1,22 @@
 import { Shuffler } from "../utils/random_utils";
 
 export type Color = "BLUE" | "GREEN" | "RED" | "YELLOW";
-export type CardType =
+export type Type =
   | "NUMBERED"
   | "SKIP"
   | "REVERSE"
   | "DRAW"
   | "WILD"
+  | "BLANK"
   | "WILD DRAW";
 
 export interface Card {
-  type: CardType;
+  type: Type;
   color?: Color;
   number?: number;
 }
 
-export const colors: Array<Color> = ["BLUE", "GREEN", "RED", "YELLOW"];
+export const colors: Color[] = ["BLUE", "GREEN", "RED", "YELLOW"];
 
 export interface Props {
   size: number;
@@ -88,6 +89,11 @@ export function createInitialDeck(): Props {
   // WILD DRAW (Wild Draw Four): 4 total
   for (let i = 0; i < 4; i++) {
     cards.push({ type: "WILD DRAW" });
+  }
+
+  // BLANK: 4 total
+  for (let i = 0; i < 4; i++) {
+    cards.push({ type: "BLANK" });
   }
 
   return new Deck(cards);

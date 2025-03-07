@@ -24,7 +24,7 @@ export function createHand({
   shuffler = standardShuffler,
   cardsPerPlayer = 7,
 }: HandProps): hand.Hand {
-  return hand.createHand(players, dealer, shuffler, cardsPerPlayer);
+  return hand.createHand({ players, dealer, shuffler, cardsPerPlayer });
 }
 
 export function createGame(props: Partial<uno.Props>): uno.Game {

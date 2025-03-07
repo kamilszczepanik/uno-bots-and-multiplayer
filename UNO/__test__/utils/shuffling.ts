@@ -2,7 +2,7 @@ import { Card } from "../../src/model/deck";
 import { Hand } from "../../src/model/hand";
 import { Shuffler, standardShuffler } from "../../src/utils/random_utils";
 import { CardPredicate, CardSpec, is, not } from "./predicates";
-import { HandProps, createHand, createInitialDeck } from "./test_adapter";
+import { HandProps, createHand } from "./test_adapter";
 
 export function constrainedShuffler(
   ...constraints: [number, CardPredicate][]
