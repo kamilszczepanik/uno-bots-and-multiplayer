@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import ControlButton from '@/components/ControlButton.vue'
-import UnoGames from '@/components/UnoGames.vue'
+import GamesDashboard from '@/components/GamesDashboard.vue'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
 import { useUserStore } from '@/stores/userStore'
 import axiosInstance from '@/utils/axiosInstance'
+import { fetchGames } from '@/utils/gameApi'
 import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated } from '@/utils/helpers'
 import { AxiosError } from 'axios'
 import { onMounted, reactive, ref } from 'vue'
@@ -44,6 +45,7 @@ const handleSubmit = async () => {
     await axiosInstance.post('/api/games', formData)
     errorCreatingGame.value = null
     errors.value = {}
+    fetchGames()
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
@@ -128,7 +130,7 @@ onMounted(async () => {
           <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
         </div>
       </form>
-      <UnoGames />
+      <GamesDashboard />
     </div>
   </div>
 </template>
