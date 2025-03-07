@@ -10,7 +10,7 @@ const router = Router()
 router.get('/games', async (req: Request, res: Response) => {
   try {
     const games = await prisma.game.findMany({
-      include: { players: true },
+      include: { players: true, hands: true },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -28,11 +28,13 @@ router.get('/games/:gameId', async (req: Request, res: Response) => {
     const game = await prisma.game.findUniqueOrThrow({
       where: { id: gameId },
       include: {
-        hands: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
+        players: {
+          select: {
+            id: true,
+            username: true,
+          },
         },
-        players: true,
+        hands: true,
       },
     })
 

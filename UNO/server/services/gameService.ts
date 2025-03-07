@@ -103,10 +103,10 @@ export const setupGame = async ({
 
   const handsMap = allHands.reduce(
     (acc, hand, index) => {
-      acc[index] = hand
+      acc[(index + 1).toString()] = hand
       return acc
     },
-    {} as Record<number, (typeof allHands)[number]>,
+    {} as Record<string, (typeof allHands)[number]>,
   )
 
   return {

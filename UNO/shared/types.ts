@@ -5,17 +5,17 @@ export interface User {
 
 export interface Hand {
   id: string;
-  gameId: string;
-  dealerId: number;
-  currentPlayerId: number;
-  newColor: string | null;
-  playersWhoDrewCard: number[];
-  playersWhoSaidUno: number[];
+  dealerId: string;
+  currentPlayerId: string;
+  newColor: string | undefined;
+  playersWhoDrewCard: string[];
+  playersWhoSaidUno: string[];
   playingDirection: "Clockwise" | "counterclockwise";
   discardPile: string;
   drawPile: string;
   status: "in_progress" | "ended";
   playerHands: string;
+  winnerId: string | null;
 }
 
 export interface Game {

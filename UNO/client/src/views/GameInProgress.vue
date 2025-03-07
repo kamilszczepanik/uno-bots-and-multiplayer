@@ -22,24 +22,6 @@ onMounted(async () => {
     router.push(`/login?game=${id.value}`)
     return
   }
-
-  if (game.value === undefined) {
-    try {
-      const fetchedGame = await api.game(id.value as string)
-      if (fetchedGame) {
-        inProgressGamesStore.upsert(fetchedGame)
-      } else {
-        router.push('/').then(() => {
-          showMessage('Game not found.')
-        })
-      }
-    } catch (error) {
-      console.error(error)
-      router.push('/').then(() => {
-        showMessage('Failed to fetch game.')
-      })
-    }
-  }
 })
 </script>
 <template>
