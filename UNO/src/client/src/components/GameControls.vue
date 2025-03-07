@@ -8,7 +8,7 @@ import EndGameModal from './EndGameModal.vue'
 
 const gameStore = useGameStore()
 const showEndGameModal = ref(false)
-const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const currentHand = computed(() => gameStore.game?.currentHand())
 
 const handleSayUno = () => {
   handleGameAction(() => currentHand.value?.sayUno(USER_INDEX), {

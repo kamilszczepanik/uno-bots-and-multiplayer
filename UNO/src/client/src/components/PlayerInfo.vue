@@ -13,9 +13,9 @@ const { playerIndex } = defineProps({
 })
 
 const gameStore = useGameStore()
-const score = computed(() => gameStore.gameInstance?.score(playerIndex))
-const name = computed(() => gameStore.gameInstance?.player(playerIndex))
-const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const score = computed(() => gameStore.game?.score(playerIndex))
+const name = computed(() => gameStore.game?.player(playerIndex))
+const currentHand = computed(() => gameStore.game?.currentHand())
 const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
 const playersThatSaidUno = computed(() => currentHand.value?.playersThatSaidUno)
 const playerSaidUno = computed(() => playersThatSaidUno.value?.has(playerIndex))

@@ -5,9 +5,9 @@ import { computed } from 'vue'
 const gameStore = useGameStore()
 
 const scores = computed(() =>
-  gameStore.gameInstance?.players.map((player, index) => ({
+  gameStore.game?.players.map((player, index) => ({
     name: player,
-    score: gameStore.gameInstance?.score(index),
+    score: gameStore.game?.score(index),
   })),
 )
 </script>

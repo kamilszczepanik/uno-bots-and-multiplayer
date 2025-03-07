@@ -13,8 +13,8 @@ import { USER_INDEX } from '@/utils/constants'
 
 const gameStore = useGameStore()
 const router = useRouter()
-const players = computed(() => gameStore.gameInstance?.players || [])
-const currentHand = computed(() => gameStore.gameInstance?.currentHand())
+const players = computed(() => gameStore.game?.players || [])
+const currentHand = computed(() => gameStore.game?.currentHand())
 const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
 
 watch(currentPlayerIndex, (newIndex) => {
@@ -25,7 +25,7 @@ watch(currentPlayerIndex, (newIndex) => {
 
 const handleBotTurn = (botIndex: number) => {
   setTimeout(() => {
-    BotService.takeTurn(gameStore.gameInstance?.currentHand(), botIndex)
+    BotService.takeTurn(gameStore.game?.currentHand(), botIndex)
   }, DELAY_TO_MAKE_MOVE_MS)
 }
 

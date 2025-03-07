@@ -5,9 +5,9 @@ import { useGameStore } from '@/stores/gameStore'
 import { computed } from 'vue'
 
 const gameStore = useGameStore()
-const targetScore = computed(() => gameStore.gameInstance?.targetScore)
-const currentRound = computed(() => gameStore.gameInstance?.currentRound)
-const playingDirection = computed(() => gameStore.gameInstance?.currentHand()?.playingDirection)
+const targetScore = computed(() => gameStore.game?.targetScore)
+const currentRound = computed(() => gameStore.game?.currentRound)
+const playingDirection = computed(() => gameStore.game?.currentHand()?.playingDirection)
 </script>
 
 <template>

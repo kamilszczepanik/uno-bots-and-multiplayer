@@ -10,13 +10,13 @@ interface GameSettings {
 
 export const useGameStore = defineStore('game', {
   state: () => ({
-    gameInstance: null as Game | null,
+    game: null as Game | null,
     gameSettings: null as GameSettings | null,
   }),
 
   actions: {
     initializeGame(props: GameServiceProps) {
-      this.gameInstance = GameService.initializeGame(props)
+      this.game = GameService.initializeGame(props)
 
       // Store settings for restarting later
       this.setGameSettings({
@@ -47,7 +47,7 @@ export const useGameStore = defineStore('game', {
 
     endGame() {
       this.clearGameSettings()
-      this.gameInstance = null
+      this.game = null
     },
   },
 })
