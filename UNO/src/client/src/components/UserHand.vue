@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-import type { Card } from '../../../model/deck'
 import PlayerInfo from './PlayerInfo.vue'
+import { useGameStore } from '@/stores/gameStore'
 
-const { userHand } = defineProps({
-  userHand: {
-    type: Object as () => Card[],
-  },
-})
-
-console.log(userHand)
+const gameStore = useGameStore()
+const userHand = computed(() => gameStore.currentHand?.playerHand(0))
 </script>
 
 <template>

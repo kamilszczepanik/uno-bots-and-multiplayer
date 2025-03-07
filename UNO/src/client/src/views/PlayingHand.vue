@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
@@ -26,9 +26,6 @@ const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
   .build()
 
 const gameStore = useGameStore()
-const discardPile = computed(() => gameStore.currentHand?.discardPile())
-const drawPile = computed(() => gameStore.currentHand?.drawPile())
-const userHand = computed(() => gameStore.currentHand?.playerHand(0))
 
 onMounted(() => {
   const mockProps: Props = {
@@ -56,11 +53,11 @@ onMounted(() => {
     <div class="flex w-screen justify-between">
       <OpponentHand :placement="'left'" :opponent-index="2" />
       <div class="flex gap-16 pt-12">
-        <DiscardPile :discardPile="discardPile" />
-        <DrawPile :drawPile="drawPile" />
+        <DiscardPile />
+        <DrawPile />
       </div>
       <OpponentHand :opponent-index="3" :placement="'right'" />
     </div>
-    <UserHand :userHand="userHand" />
+    <UserHand />
   </div>
 </template>

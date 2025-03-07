@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-import type { DrawPile } from '../../../model/hand'
 
-const { drawPile } = defineProps({
-  drawPile: {
-    type: Object as () => DrawPile,
-  },
-})
+import { useGameStore } from '@/stores/gameStore'
+
+const gameStore = useGameStore()
+const drawPile = computed(() => gameStore.gameInstance?.currentHand()?.drawPile())
+const currentHand = computed(() => gameStore.currentHand)
 
 const visibleCards = computed(() => {
-  if (!drawPile) return 0
-  return Math.min(drawPile.size, 10)
+  if (!drawPile.value) return 0
+  return Math.min(drawPile.value.size, 10)
 })
+
+const onClick = () => {
+  currentHand.value?.draw()
+}
 </script>
 
 <template>
@@ -23,7 +26,7 @@ const visibleCards = computed(() => {
       class="card-stack absolute left-0 top-0"
       :style="{ zIndex: i, transform: `translateY(-${i}px)` }"
     >
-      <GameCard :showBack="true" />
+      <GameCard :showBack="true" @click="onClick" />
     </div>
   </div>
 </template>
