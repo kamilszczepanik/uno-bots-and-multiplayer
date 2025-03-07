@@ -41,10 +41,7 @@ const spacing = computed(() => {
 </script>
 
 <template>
-  <div
-    :class="`relative flex ${rotation}`"
-    :style="placement === 'top' ? 'height: 100px;' : 'width: 100px;'"
-  >
+  <div :class="`relative flex ${rotation} ${placement === 'top' ? 'h-32' : 'w-56'} px-6`">
     <div
       v-for="(card, index) in opponentHand"
       :key="index"

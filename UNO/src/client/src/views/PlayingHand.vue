@@ -56,7 +56,7 @@ onMounted(() => {
         :placement="'top'"
       />
     </div>
-    <div class="flex w-full justify-between">
+    <div class="flex w-screen justify-between">
       <OpponentHand :opponent-hand="thirdOpponentHand" :placement="'left'" />
       <div class="flex gap-16 pt-12">
         <DiscardPile :discardPile="discardPile" />
