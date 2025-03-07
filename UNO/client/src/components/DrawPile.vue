@@ -5,6 +5,7 @@ import { showMessage } from '@/utils/helpers'
 import { useUserStore } from '@/stores/userStore'
 import type { Card } from 'models/src/model/deck'
 import type { IndexedGame } from '../../../shared/types'
+import * as api from '@/model/api'
 
 const { game } = defineProps<{
   game: IndexedGame
@@ -29,14 +30,13 @@ const visibleCards = computed(() => {
   return Math.min(drawPile.value.length, 10)
 })
 
-const onClick = () => {
+const onClick = async () => {
   if (!userIsCurrentPlayer.value) {
     showMessage('Not your turn')
     return
   }
 
-  // todo: handle game action
-  // handleGameAction(() => currentHand.value?.draw())
+  await api.draw(game)
 }
 </script>
 

@@ -1,3 +1,5 @@
+import { Color } from "models/src/model/deck";
+
 export interface User {
   id: string | null;
   username: string | null;
@@ -50,3 +52,8 @@ export type IndexedGameSpecs = Readonly<
 >;
 
 export type GameStatus = "waiting" | "in_progress" | "paused" | "finished";
+
+type RawAction =
+  | { type: "draw" }
+  | { type: "play"; cardIndex: number; color: Color | undefined };
+export type Action = RawAction & { gameId: string };

@@ -3,8 +3,7 @@ import { Request, Response, Router } from 'express'
 
 import prisma from '../utils/db.server'
 import { broadcast } from '../websocket'
-import { GameStatus } from '../../shared/types'
-import { Color } from 'models/src/model/deck'
+import { Action, GameStatus } from '../../shared/types'
 
 const router = Router()
 
@@ -389,15 +388,6 @@ router.delete('/games/:gameId', async (req: Request, res: Response) => {
   }
 })
 
-interface TypedRequest<BodyType> extends Request {
-  body: BodyType
-}
-
-type RawAction =
-  | { type: 'draw' }
-  | { type: 'play'; cardIndex: number; color: Color | undefined }
-type Action = RawAction & { gameId: string }
-
 export async function resolveAction(action: Action) {
   const game = await gameManager.getGame(action.gameId)
 
@@ -426,6 +416,9 @@ export async function resolveAction(action: Action) {
   })
 
   return updatedState
+}
+interface TypedRequest<BodyType> extends Request {
+  body: BodyType
 }
 
 type Body = Action & { gameId: string }

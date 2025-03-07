@@ -1,7 +1,7 @@
 import axiosInstance from '@/utils/axiosInstance'
-import type { IndexedGame, IndexedGameSpecs, User } from '../../../shared/types'
+import type { Action, IndexedGame, IndexedGameSpecs, User } from '../../../shared/types'
 import { showMessage } from '@/utils/helpers'
-import type { Card } from 'models/src/model/deck'
+import type { Color } from 'models/src/model/deck'
 
 const headers = { Accept: 'application/json', 'Content-Type': 'application/json' }
 
@@ -94,14 +94,14 @@ export async function leave(game: IndexedGameSpecs, player: User) {
     })
 }
 
-async function perform_action(game: IndexedGame, action: any) {
-  return post(`http://localhost:8080/games/${game.id}/actions`, action)
+async function perform_action(action: Action) {
+  return post(`http://localhost:8080/games/${action.gameId}/actions`, action)
 }
 
-export async function draw(game: IndexedGame, held: number[], user: User) {
-  return perform_action(game, { type: 'draw', user })
+export async function draw(game: IndexedGame) {
+  return perform_action({ gameId: game.id, type: 'draw' })
 }
 
-export async function play(game: IndexedGame, card: Card, user: User) {
-  return perform_action(game, { type: 'play', user, card })
+export async function play(game: IndexedGame, cardIndex: number, color?: Color) {
+  return perform_action({ gameId: game.id, type: 'play', cardIndex, color })
 }
