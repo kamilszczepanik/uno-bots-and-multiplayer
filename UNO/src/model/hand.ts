@@ -132,6 +132,10 @@ export class Hand {
   draw(): void {
     this.throwErrorIfHandHasEnded();
 
+    if (this._playersWhoDrewCard.has(this._currentPlayerIndex)) {
+      throw new Error("You can only draw one card per turn.");
+    }
+
     const playerHand = this.getCurrentPlayerHand();
     const drawnCard = this._drawPile.deal();
 
