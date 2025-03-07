@@ -13,7 +13,7 @@ const normalShuffle = shuffleBuilder()
   .isnt({ type: ["DRAW", "REVERSE", "SKIP", "WILD", "WILD DRAW"] })
   .build();
 
-describe.only("Hand set up", () => {
+describe("Hand set up", () => {
   const dealtCardsCount = 4 * 7;
   let hand: Hand = undefined as any;
   let cards: Readonly<Card[]> = [];
@@ -62,7 +62,7 @@ describe.only("Hand set up", () => {
     expect(hand.playerHand(2).length).toBe(7);
     expect(hand.playerHand(3).length).toBe(7);
   });
-  it.only("deals 7 cards to each player from the top of the deck", () => {
+  it("deals 7 cards to each player from the top of the deck", () => {
     [hand, cards] = createHandWithShuffledCards({
       dealer: 3,
       shuffler: normalShuffle,
@@ -80,6 +80,7 @@ describe.only("Hand set up", () => {
   });
   it("creates a discard pile with the top card", () => {
     const undealtCards = cards.slice(dealtCardsCount);
+
     expect(hand.discardPile().size).toEqual(1);
     expect(hand.discardPile().top()).toEqual(undealtCards[0]);
   });
