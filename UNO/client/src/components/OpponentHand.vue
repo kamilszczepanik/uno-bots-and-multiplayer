@@ -6,7 +6,7 @@ import PlayerInfo from './PlayerInfo.vue'
 
 const { opponentId, placement } = defineProps({
   opponentId: {
-    type: Number,
+    type: String,
     required: true,
   },
   placement: {

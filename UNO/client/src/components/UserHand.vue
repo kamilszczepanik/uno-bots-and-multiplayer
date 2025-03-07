@@ -4,20 +4,17 @@ import GameCard from './GameCard.vue'
 import GameControls from './GameControls.vue'
 import { showMessage } from '@/utils/helpers'
 import SelectColorModal from './SelectColorModal.vue'
-import { useRouter } from 'vue-router'
 import type { IndexedGame } from '../../../shared/types'
+import PlayerInfo from './PlayerInfo.vue'
 
 const { game, userId } = defineProps<{
   game: IndexedGame
   userId: string
 }>()
 
-const router = useRouter()
-
 const showSelectColorModal = ref(false)
 const selectedCardIndex = ref<number | null>(null)
 const currentHand = computed(() => game.hands[game.currentRound - 1])
-
 const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
 const userIsCurrentPlayer = computed(() => currentPlayerId.value === userId)
 
@@ -69,7 +66,7 @@ const spacing = computed(() => {
   <div class="flex w-full items-center justify-between px-4">
     <div class="mr-64 flex max-w-7xl flex-grow flex-col items-center">
       <div class="flex items-start space-x-4 pb-2">
-        <!-- <PlayerInfo :player-index="USER_INDEX" class="w-96" /> -->
+        <PlayerInfo :game="game" :player-id="userId" class="w-96" />
         <div class="relative h-48 w-full overflow-visible">
           <div
             v-for="(card, index) in userHand"

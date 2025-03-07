@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import ControlButton from './ControlButton.vue'
 import type { IndexedGame } from '../../../shared/types'
+import { useUserStore } from '@/stores/userStore'
 
 const { game, playerId } = defineProps<{
   game: IndexedGame
   playerId: string
 }>()
 
+const userId = useUserStore().userInfo.id
 const playerIndexMap = computed(() => {
   return Object.fromEntries(game.players.map((player, index) => [player.id, index]))
 })
@@ -20,9 +22,11 @@ const name = computed(() => {
 const currentHand = computed(() => game.hands[game.currentRound - 1])
 const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
 const isCurrentPlayer = computed(() => playerId === currentPlayerId.value)
-const playersWhoSaidUno = computed(() => currentHand.value?.playersWhoSaidUno || new Set())
-const playerSaidUno = computed(() => playersWhoSaidUno.value.find(playerIndexMap.value[playerId]))
-const isOpponent = computed(() => game.players.some((p) => p.id !== playerId))
+const playersWhoSaidUno = computed(() => currentHand.value.playersWhoSaidUno)
+const playerSaidUno = computed(() => {
+  return playersWhoSaidUno.value.includes(playerIndexMap.value[playerId])
+})
+const isOpponent = computed(() => playerId !== userId)
 
 // const handleCatchUnoFailure = () => {
 //   handleGameAction(() => {

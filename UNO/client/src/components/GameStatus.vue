@@ -24,8 +24,7 @@ defineProps<{
     <div class="flex items-center space-x-2">
       <span>Playing direction:</span>
       <div class="flex items-center space-x-1">
-        <!-- todo: fix direction -->
-        <!-- <span class="font-bold">{{ game.hands[game.currentRound - 1].playingDirection }}</span>
+        <span class="font-bold">{{ game.hands[game.currentRound - 1].playingDirection }}</span>
         <span
           :class="[
             'transform font-bold transition-transform duration-300',
@@ -35,7 +34,7 @@ defineProps<{
           ]"
         >
           ⟳
-        </span> -->
+        </span>
       </div>
     </div>
   </div>
