@@ -11,7 +11,7 @@
     "oo",
     "functional"
   ],
-  "author": "Ole Ildsgaard Hougaard",
+  "author": "Tomasz Grzesiak",
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.24.6",

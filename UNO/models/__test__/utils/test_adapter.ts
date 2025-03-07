@@ -3,9 +3,9 @@ import {
   Shuffler,
   standardShuffler,
 } from "../../src/utils/random_utils";
-import * as deck from "../../src/model/deck";
-import * as hand from "../../src/model/hand";
-import * as uno from "../../src/model/uno";
+import * as deck from "../../../src/model/deck";
+import * as hand from "../../../src/model/hand";
+import * as uno from "../../../src/model/uno";
 
 export function createInitialDeck(): deck.Props {
   return deck.createInitialDeck();
