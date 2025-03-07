@@ -1,6 +1,10 @@
+import { Randomizer, standardRandomizer } from "./../utils/random_utils";
+import { Hand } from "./hand";
+
 export interface Props {
   players: string[];
   targetScore: number;
+  randomizer: Randomizer;
 }
 
 export class Game {
@@ -8,11 +12,13 @@ export class Game {
   private _targetScore: number;
   private _scores: Map<number, number>;
   private _winner: string | undefined;
-  private _currentHand: string | undefined;
+  private _currentHand: Hand;
+  private _randomizer: Randomizer;
 
   constructor({
     players = ["a", "b", "c", "d", "e"], // Probably this constructor is never used, becuase we use createGame() intead
     targetScore = 500,
+    randomizer = standardRandomizer,
   }: Props) {
     if (players.length < 2)
       throw new Error("A game requires at least 2 players.");
@@ -23,7 +29,8 @@ export class Game {
     this._targetScore = targetScore;
     this._scores = new Map(players.map((_, i) => [i, 0]));
     this._winner = undefined;
-    this._currentHand = "A";
+    this._randomizer = randomizer;
+    this._currentHand = new Hand(this._players.length, this._randomizer);
   }
 
   get playerCount() {
@@ -60,6 +67,7 @@ export function createGame(props: Partial<Props>): Game {
   const defaultProps: Props = {
     players: ["A", "B"],
     targetScore: 500,
+    randomizer: standardRandomizer,
   };
 
   const mergedProps = { ...defaultProps, ...props };
