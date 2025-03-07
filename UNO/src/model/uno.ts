@@ -54,13 +54,7 @@ export class Game {
     this._cardsPerPlayer = cardsPerPlayer;
     this._shuffler = shuffler;
 
-    this._currentHand = new Hand({
-      players,
-      dealer,
-      cardsPerPlayer,
-      shuffler,
-    });
-    this._currentHand.onEnd(() => this.endHand());
+    this.startNewHand();
   }
 
   get playerCount() {
@@ -97,8 +91,6 @@ export class Game {
       throw new Error("Cannot end the hand while it is still in progress.");
     }
 
-    console.log("End hand");
-
     const handWinner = this._currentHand.winner();
     const handScore = this._currentHand.score();
 
@@ -114,21 +106,23 @@ export class Game {
       return;
     }
 
-    this._dealer = this.calculateNextDealer(this._dealer);
-    this.startNewHand(handWinner);
+    // todo: change dealer
+    // this._dealer = this.calcu`lateNextDealer(this._dealer);
+    this.startNewHand();
   }
 
   private calculateNextDealer(currentDealer: number): number {
     return (currentDealer + 1) % this._players.length;
   }
 
-  private startNewHand(dealer: number): void {
+  private startNewHand(): void {
     this._currentHand = new Hand({
       players: this._players,
       dealer: this._dealer,
       cardsPerPlayer: this._cardsPerPlayer,
       shuffler: this._shuffler,
     });
+    this._currentHand.onEnd(() => this.endHand());
   }
 }
 
