@@ -1,26 +1,20 @@
 <script setup lang="ts">
 import ControlButton from '@/components/ControlButton.vue'
+import UnoGames from '@/components/UnoGames.vue'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
+import { useUserStore } from '@/stores/userStore'
 import axiosInstance from '@/utils/axiosInstance'
-import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated, showMessage } from '@/utils/helpers'
+import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated } from '@/utils/helpers'
 import { AxiosError } from 'axios'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
 
 type FormData = z.infer<typeof startGameFormSchema>
 type FormErrors = Partial<Record<keyof FormData, string>>
 
-interface Game {
-  id: string
-  name: string
-  status: 'waiting' | 'paused' | 'in progress' | 'finished'
-  targetScore: number
-  cardsPerPlayer: number
-  users: { id: number; username: string }[]
-}
-
 const router = useRouter()
+const userStore = useUserStore()
 
 const form = reactive<{
   name: string
@@ -32,30 +26,24 @@ const form = reactive<{
   cardsPerPlayer: 7,
 })
 
-const allGames = ref<Game[]>([])
 const errors = ref<FormErrors>({})
 const loadingCreatingGame = ref(false)
 const errorCreatingGame = ref<string | null>(null)
-const loadingGames = ref(false)
-const errorLoadingGames = ref<string | null>(null)
 
 const handleSubmit = async () => {
   const formData = {
     name: form.name,
     targetScore: form.targetScore,
     cardsPerPlayer: form.cardsPerPlayer,
-    creatorId: userData.value.id,
+    creatorId: userStore.userInfo.id,
   }
 
   try {
     startGameFormSchema.parse(formData)
-    loadingGames.value = true
-    errorLoadingGames.value = null
 
     await axiosInstance.post('/api/games', formData)
     errorCreatingGame.value = null
     errors.value = {}
-    await fetchGames()
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
@@ -73,85 +61,21 @@ const handleSubmit = async () => {
   }
 }
 
-const fetchGames = async () => {
-  loadingGames.value = true
-  errorLoadingGames.value = null
-
-  try {
-    const response = await axiosInstance.get('/api/games')
-    allGames.value = response.data
-  } catch (err) {
-    errorLoadingGames.value = 'Failed to fetch games'
-    console.error(err)
-  } finally {
-    loadingGames.value = false
-  }
-}
-
-const waitingGames = computed(() => allGames.value.filter((game) => game.status === 'waiting'))
-const pausedGames = computed(() => allGames.value.filter((game) => game.status === 'paused'))
-const inProgressGames = computed(() =>
-  allGames.value.filter((game) => game.status === 'in progress'),
-)
-const finishedGames = computed(() => allGames.value.filter((game) => game.status === 'finished'))
-
-const handleJoinGame = async (gameId: string) => {
-  try {
-    const response = await axiosInstance.post(`/api/games/${gameId}/join`, {
-      userId: userData.value.id,
-    })
-    showMessage(`You have joined the game ${response.data.name}`)
-    fetchGames()
-  } catch (error) {
-    showMessage('Failed to join game')
-    console.error(error)
-  }
-}
-
-const handleStartGame = async (gameId: string) => {
-  try {
-    const response = await axiosInstance.post(`/api/games/${gameId}/start`)
-    showMessage(response.data.message)
-    fetchGames()
-  } catch (error) {
-    showMessage('Failed to left the game')
-    console.error(error)
-  }
-}
-const handleLeaveGame = async (gameId: string) => {
-  try {
-    const response = await axiosInstance.post(`/api/games/${gameId}/leave`, {
-      userId: userData.value.id,
-    })
-    showMessage(response.data.message)
-    fetchGames()
-  } catch (error) {
-    showMessage('Failed to left the game')
-    console.error(error)
-  } finally {
-    loadingGames.value = false
-  }
-}
-
-const userData = ref<{ id?: number; username?: string }>({})
-
 onMounted(async () => {
   const userInfo = await fetchUserInfo()
-  if (userInfo) {
-    userData.value = userInfo
-  }
+  userStore.setUserInfo(userInfo)
+
   await redirectIfNotAuthenticated({
     router,
     message: 'You must be logged in to create or join a game',
   })
-  fetchGames()
 })
 </script>
 
 <template>
   <div class="p-2">
     <div class="flex items-center justify-end gap-2">
-      <span class="font-bold">{{ userData.username }}</span>
+      <span class="font-bold">{{ userStore.userInfo.username }}</span>
       <ControlButton variant="cancel" @click="logoutUser" class="w-32 bg-background">
         Logout
       </ControlButton>
@@ -204,170 +128,7 @@ onMounted(async () => {
           <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
         </div>
       </form>
-      <div>
-        <h2 class="mb-6 text-center text-3xl font-semibold">Games</h2>
-        <div class="grid grid-cols-4 gap-4">
-          <div v-if="loadingGames" class="text-gray-500">Loading games...</div>
-          <div v-else-if="errorLoadingGames" class="text-red-500">{{ errorLoadingGames }}</div>
-
-          <div v-if="waitingGames.length > 0">
-            <h2 class="font-bold text-gray-600">WAITING</h2>
-            <ul>
-              <li
-                v-for="game in waitingGames"
-                :key="game.id"
-                class="mb-4 flex w-full items-center justify-between rounded border border-border p-1 shadow"
-              >
-                <div class="flex w-full items-center justify-between">
-                  <div>
-                    <div class="text-lg font-bold">{{ game.name }}</div>
-                    <div class="text-sm text-gray-600">
-                      {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                      <span class="font-bold">
-                        {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600">
-                      Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                    </p>
-                    <p class="text-sm text-gray-600">
-                      Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                    </p>
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <ControlButton
-                      v-if="
-                        game.status === 'waiting' &&
-                        game.users.length < 4 &&
-                        !game.users.some((user) => user.id === userData.id)
-                      "
-                      variant="secondary"
-                      @click="handleJoinGame(game.id)"
-                      class="w-32"
-                    >
-                      Join Game
-                    </ControlButton>
-                    <ControlButton
-                      v-if="
-                        game.status === 'waiting' &&
-                        game.users.length > 1 &&
-                        game.users.some((user) => user.id === userData.id)
-                      "
-                      variant="primary"
-                      @click="handleStartGame(game.id)"
-                      class="w-32"
-                    >
-                      Start Game
-                    </ControlButton>
-                    <ControlButton
-                      v-if="
-                        game.status === 'waiting' &&
-                        game.users.some((user) => user.id === userData.id)
-                      "
-                      variant="cancel"
-                      @click="handleLeaveGame(game.id)"
-                      class="w-32"
-                    >
-                      Leave Game
-                    </ControlButton>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div v-if="pausedGames.length > 0">
-            <h2 class="font-bold text-gray-600">PAUSED</h2>
-            <ul>
-              <li
-                v-for="game in pausedGames"
-                :key="game.id"
-                class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
-              >
-                <div class="flex">
-                  <div>
-                    <div class="text-lg font-bold">{{ game.name }}</div>
-                    <div class="text-sm text-gray-600">
-                      {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                      <span class="font-bold">
-                        {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600">
-                      Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                    </p>
-                    <p class="text-sm text-gray-600">
-                      Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                    </p>
-                  </div>
-                  <div>
-                    <ControlButton
-                      variant="secondary"
-                      @click="handleLeaveGame(game.id)"
-                      class="w-32"
-                    >
-                      Resume Game(todo)
-                    </ControlButton>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div v-if="inProgressGames.length > 0">
-            <h2 class="font-bold text-gray-600">IN PROGRESS</h2>
-            <ul>
-              <li
-                v-for="game in inProgressGames"
-                :key="game.id"
-                class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
-              >
-                <div>
-                  <div class="text-lg font-bold">{{ game.name }}</div>
-                  <div class="text-sm text-gray-600">
-                    {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                    <span class="font-bold">
-                      {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                    </span>
-                  </div>
-                  <p class="text-sm text-gray-600">
-                    Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div v-if="finishedGames.length > 0">
-            <h2 class="font-bold text-gray-600">FINISHED</h2>
-            <ul>
-              <li
-                v-for="game in finishedGames"
-                :key="game.id"
-                class="mb-4 flex w-full items-center justify-between rounded border border-border p-4 shadow"
-              >
-                <div>
-                  <div class="text-lg font-bold">{{ game.name }}</div>
-                  <div class="text-sm text-gray-600">
-                    {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
-                    <span class="font-bold">
-                      {{ game.users.map((u) => u.username).join(', ') || 'None' }}
-                    </span>
-                  </div>
-                  <p class="text-sm text-gray-600">
-                    Target score: <span class="font-bold">{{ game.targetScore }}</span>
-                  </p>
-                  <p class="text-sm text-gray-600">
-                    Cards per player: <span class="font-bold">{{ game.cardsPerPlayer }}</span>
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <UnoGames />
     </div>
   </div>
 </template>
