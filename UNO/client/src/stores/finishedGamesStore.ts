@@ -2,10 +2,10 @@ import { computed, reactive, type Reactive } from 'vue'
 import { defineStore } from 'pinia'
 import type { IndexedGame } from '../../../shared/types'
 
-export const useFinishedGamesStore = defineStore('ongoing games', () => {
+export const useFinishedGamesStore = defineStore('finished games', () => {
   const gameList = reactive<IndexedGame[]>([])
   const games = computed((): Reactive<Readonly<IndexedGame[]>> => gameList)
-  const game = (id: number): IndexedGame | undefined => gameList.find((g) => g.id === id)
+  const game = (id: string): IndexedGame | undefined => gameList.find((g) => g.id === id)
   const update = (game: IndexedGame) => {
     const index = gameList.findIndex((g) => g.id === game.id)
     if (index > -1) {
@@ -17,7 +17,7 @@ export const useFinishedGamesStore = defineStore('ongoing games', () => {
     if (gameList.some((g) => g.id === game.id)) {
       update(game)
     } else {
-      gameList.push(game)
+      gameList.unshift(game)
     }
   }
 

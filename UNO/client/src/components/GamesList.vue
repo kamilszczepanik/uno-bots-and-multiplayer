@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, onMounted } from 'vue'
+import { defineProps } from 'vue'
 import ControlButton from './ControlButton.vue'
 import type { IndexedGame, IndexedGameSpecs } from '../../../shared/types'
 import * as api from '@/model/api'
@@ -14,9 +14,7 @@ const { games } = defineProps<{
 const router = useRouter()
 const userInfo = useUserStore().userInfo
 const currentUserId = userInfo.id
-onMounted(() => {
-  console.log()
-})
+
 const handleJoinGame = async (game: IndexedGameSpecs) => {
   await api.join(game, userInfo)
 }
