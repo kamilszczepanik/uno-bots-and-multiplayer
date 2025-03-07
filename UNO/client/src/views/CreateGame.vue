@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import ControlButton from '@/components/ControlButton.vue'
-import GamesDashboard from '@/components/GamesDashboard.vue'
 import { startGameFormSchema } from '@/schemas/startGameFormSchema'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import axiosInstance from '@/utils/axiosInstance'
-import { fetchUserInfo, logoutUser, redirectIfNotAuthenticated } from '@/utils/helpers'
+import { logoutUser } from '@/utils/helpers'
 import { AxiosError } from 'axios'
-import { onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref } from 'vue'
 import { z } from 'zod'
 
 type FormData = z.infer<typeof startGameFormSchema>
 type FormErrors = Partial<Record<keyof FormData, string>>
 
-const router = useRouter()
 const gameStore = useGameStore()
 const userStore = useUserStore()
 
@@ -62,16 +59,6 @@ const handleSubmit = async () => {
     loadingCreatingGame.value = false
   }
 }
-
-onMounted(async () => {
-  const userInfo = await fetchUserInfo()
-  userStore.setUserInfo(userInfo)
-
-  await redirectIfNotAuthenticated({
-    router,
-    message: 'You must be logged in to create or join a game',
-  })
-})
 </script>
 
 <template>
@@ -132,7 +119,6 @@ onMounted(async () => {
           <ControlButton variant="primary" type="submit"> Create Game </ControlButton>
         </div>
       </form>
-      <GamesDashboard />
     </div>
   </div>
 </template>

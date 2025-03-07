@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import GameSetup from '../views/GameSetup.vue'
+import CreateGame from '@/views/CreateGame.vue'
 import GameInProgress from '@/views/GameInProgress.vue'
 import GameOver from '@/views/GameOver.vue'
 import HandOver from '@/views/HandOver.vue'
@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/',
     name: 'Game Setup',
-    component: GameSetup,
+    component: CreateGame,
   },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },

@@ -3,26 +3,32 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/auth'
 import gameRoutes from './routes/game'
+import { WebSocket } from 'ws'
 
 dotenv.config()
 
-const app: Application = express()
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  }),
-)
-app.use(express.json())
+function start_server(ws: WebSocket) {
+  const gameserver: Application = express()
+  gameserver.use(
+    cors({
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    }),
+  )
+  gameserver.use(express.json())
 
-app.use('/api', gameRoutes)
-app.use('/api/auth', authRoutes)
+  gameserver.use('/api', gameRoutes)
+  gameserver.use('/api/auth', authRoutes)
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('UNO Multiplayer Server is running!')
-})
+  gameserver.get('/', (req: Request, res: Response) => {
+    res.send('UNO Multiplayer Server is running!')
+  })
 
-const PORT: number = 8000
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
-})
+  const PORT: number = 8000
+  gameserver.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`)
+  })
+}
+
+const ws = new WebSocket('ws://localhost:9090/publish')
+ws.onopen = (e) => start_server(e.target)
