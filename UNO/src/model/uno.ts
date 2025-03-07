@@ -1,23 +1,47 @@
-export interface IGame {
+export interface Props {
   players: string[];
   targetScore: number;
 }
 
 export class Game {
   private _players: string[];
+  private _targetScore: number;
+  private _scores: Map<number, number>;
 
   constructor({
-    players = ["a", "b", "c", "d", "e"],
+    players = ["a", "b", "c", "d", "e"], // Probably this constructor is never used, becuase we use createGame() intead
     targetScore = 500,
-  }: IGame) {
+  }: Props) {
     this._players = players;
+    this._targetScore = targetScore;
+    this._scores = new Map(players.map((_, i) => [i, 0]));
   }
 
-  player(playerNo: number) {
-    return this._players[playerNo];
+  get playerCount() {
+    return this._players.length;
+  }
+  get targetScore() {
+    return this._targetScore;
   }
 
-  start() {
-    console.log(`${this._players} has started!`);
+  player(playerNumber: number) {
+    return this._players[playerNumber];
   }
+
+  score(playerNumber: number) {
+    if (!this._scores.has(playerNumber))
+      throw new Error("Invalid player number");
+
+    return this._scores.get(playerNumber);
+  }
+}
+
+export function createGame(props: Partial<Props>): Game {
+  const defaultProps: Props = {
+    players: ["A", "B"],
+    targetScore: 500,
+  };
+
+  const mergedProps = { ...defaultProps, ...props };
+  return new Game(mergedProps);
 }

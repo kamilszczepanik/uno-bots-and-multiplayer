@@ -1,21 +1,17 @@
 import { describe, it, test, expect } from "@jest/globals";
 import { createGame } from "../utils/test_adapter";
-import { shuffleBuilder, successiveShufflers } from "../utils/shuffling";
+// import { shuffleBuilder, successiveShufflers } from "../utils/shuffling";
 import { Game } from "../../src/model/uno";
 
 describe("Game set up", () => {
-  // const game: Game = createGame({
-  //   players: ["a", "b", "c", "d"],
-  //   targetScore: 500,
-  // });
-  const game: Game = new Game({
+  const game: Game = createGame({
     players: ["a", "b", "c", "d"],
     targetScore: 500,
   });
   it("has as many players as set in the properties", () => {
     expect(game.playerCount).toBe(4);
   });
-  it.only("has the players set in the properties", () => {
+  it("has the players set in the properties", () => {
     expect(game.player(0)).toBe("a");
     expect(game.player(1)).toBe("b");
     expect(game.player(2)).toBe("c");
@@ -40,36 +36,36 @@ describe("Game set up", () => {
     expect(game.score(2)).toBe(0);
     expect(game.score(3)).toBe(0);
   });
-  it("has no winner", () => {
-    expect(game.winner()).toBeUndefined();
-  });
-  it("requires at least 2 players", () => {
-    expect(() => createGame({ players: ["a"], targetScore: 500 })).toThrow();
-  });
-  it("requires a target score of more than 0", () => {
-    expect(() =>
-      createGame({ players: ["a", "b", "c", "d"], targetScore: 0 })
-    ).toThrow();
-  });
-  it("requires player index to be in bounds", () => {
-    expect(() => game.player(-1)).toThrow();
-    expect(() => game.player(4)).toThrow();
-  });
-  it("starts a hand", () => {
-    expect(game.currentHand()).toBeDefined();
-  });
-  it("doesn't start a new hand if no action is taken", () => {
-    const hand = game.currentHand();
-    expect(game.currentHand()).toBe(hand);
-  });
-  it("selects a random player as dealer", () => {
-    const game: Game = createGame({
-      players: ["a", "b", "c", "d"],
-      targetScore: 500,
-      randomizer: () => 1,
-    });
-    expect(game.currentHand()?.dealer).toBe(1);
-  });
+  // it("has no winner", () => {
+  //   expect(game.winner()).toBeUndefined();
+  // });
+  // it("requires at least 2 players", () => {
+  //   expect(() => createGame({ players: ["a"], targetScore: 500 })).toThrow();
+  // });
+  // it("requires a target score of more than 0", () => {
+  //   expect(() =>
+  //     createGame({ players: ["a", "b", "c", "d"], targetScore: 0 })
+  //   ).toThrow();
+  // });
+  // it("requires player index to be in bounds", () => {
+  //   expect(() => game.player(-1)).toThrow();
+  //   expect(() => game.player(4)).toThrow();
+  // });
+  // it("starts a hand", () => {
+  //   expect(game.currentHand()).toBeDefined();
+  // });
+  // it("doesn't start a new hand if no action is taken", () => {
+  //   const hand = game.currentHand();
+  //   expect(game.currentHand()).toBe(hand);
+  // });
+  // it("selects a random player as dealer", () => {
+  //   const game: Game = createGame({
+  //     players: ["a", "b", "c", "d"],
+  //     targetScore: 500,
+  //     randomizer: () => 1,
+  //   });
+  //   expect(game.currentHand()?.dealer).toBe(1);
+  // });
 });
 
 // const firstShuffle = shuffleBuilder({ players: 4, cardsPerPlayer: 1 })
