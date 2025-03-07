@@ -10,7 +10,9 @@ const gameStore = useGameStore()
 const showCatchUnoFailureModal = ref(false)
 
 const handleSayUno = () => {
-  handleGameAction(() => gameStore.currentHand?.sayUno(USER_INDEX))
+  handleGameAction(() => gameStore.currentHand?.sayUno(USER_INDEX), {
+    successMessage: 'You said UNO',
+  })
 }
 
 const handleCatchUnoFailure = () => {
