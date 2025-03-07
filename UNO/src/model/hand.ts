@@ -26,6 +26,7 @@ export class Hand {
   private _shuffler: Shuffler<deck.Card>;
   private _playersWhoDrewCard: Set<number> = new Set();
   private _playersWhoSaidUno: Set<number> = new Set();
+  private _onEndCallbacks: ((event: { winner: number }) => void)[] = [];
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -232,6 +233,8 @@ export class Hand {
     if (playerHand.length === 0) {
       this._ended = true;
       this._winner = this._currentPlayerIndex;
+      this.triggerEndCallbacks();
+
       return cardToPlay;
     }
 
@@ -493,6 +496,24 @@ export class Hand {
 
   get playerCount() {
     return this._players.length;
+  }
+
+  onEnd(callback: (event: { winner: number }) => void): void {
+    this._onEndCallbacks.push(callback);
+  }
+
+  private triggerEndCallbacks(): void {
+    if (!this.hasEnded()) {
+      throw new Error("Cannot trigger callbacks before the hand has ended.");
+    }
+
+    const winner = this.winner();
+    if (winner === undefined) {
+      throw new Error("Cannot trigger callbacks without a winner.");
+    }
+
+    const event = { winner };
+    this._onEndCallbacks.forEach((callback) => callback(event));
   }
 }
 
