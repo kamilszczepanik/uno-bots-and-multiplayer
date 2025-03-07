@@ -9,11 +9,11 @@ import { handleGameAction, showMessage } from '@/utils/helpers'
 import SelectColorModal from './SelectColorModal.vue'
 
 const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.currentHand)
+const currentHand = computed(() => gameStore.gameInstance?.currentHand())
 const showSelectColorModal = ref(false)
 const selectedCardIndex = ref<number | null>(null)
-const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
-const userHand = computed(() => gameStore.currentHand?.playerHand(USER_INDEX))
+const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
+const userHand = computed(() => currentHand.value?.playerHand(USER_INDEX))
 const userIsCurrentPlayer = computed(() => currentPlayerIndex.value === USER_INDEX)
 
 const handlePlayCard = (index: number) => {

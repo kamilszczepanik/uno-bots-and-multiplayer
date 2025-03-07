@@ -4,7 +4,7 @@ import { Hand } from "../model/hand";
 import { Game } from "../model/uno";
 
 const CHANCE_TO_CATCH_UNO_FAILURE = Math.random() < 0.33;
-const CHANCE_TO_SAY_UNO = Math.random() < 0.4;
+const CHANCE_TO_SAY_UNO = Math.random() < 0.5;
 const DELAY_TO_SAY_UNO_MS = 2000;
 const DELAY_TO_ATTEMPT_CATCH_MS = 2000;
 export const DELAY_TO_MAKE_MOVE_MS = 2000;

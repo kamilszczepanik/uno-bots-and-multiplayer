@@ -17,7 +17,9 @@ const { opponentIndex, placement } = defineProps({
 
 const gameStore = useGameStore()
 
-const opponentHand = computed(() => gameStore.currentHand?.playerHand(opponentIndex) ?? [])
+const opponentHand = computed(
+  () => gameStore.gameInstance?.currentHand()?.playerHand(opponentIndex) ?? [],
+)
 
 const rotation = computed(() => {
   switch (placement) {

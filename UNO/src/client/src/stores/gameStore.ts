@@ -8,7 +8,7 @@ export const useGameStore = defineStore('game', {
   }),
 
   getters: {
-    currentHand: (state) => state.gameInstance?.currentHand() ?? null,
+    // currentHand: (state) => state.gameInstance?.currentHand() ?? null,
   },
 
   actions: {

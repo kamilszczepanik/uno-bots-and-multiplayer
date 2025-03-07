@@ -7,9 +7,9 @@ import { USER_INDEX } from '@/utils/constants'
 import { handleGameAction, showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.currentHand)
+const currentHand = computed(() => gameStore.gameInstance?.currentHand())
 const drawPile = computed(() => gameStore.gameInstance?.currentHand()?.drawPile())
-const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
+const currentPlayerIndex = computed(() => currentHand.value?.playerInTurn())
 const userIsCurrentPlayer = computed(() => {
   return currentPlayerIndex.value === USER_INDEX
 })

@@ -25,7 +25,7 @@ const handleEndGame = () => {
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     @click.self="closeModal"
   >
-    <div class="bg-backgroundSoft z-50 w-96 space-y-4 rounded-lg p-4">
+    <div class="z-50 w-96 space-y-4 rounded-lg bg-backgroundSoft p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold">Are you sure you want to end the game?</h2>
       </div>
