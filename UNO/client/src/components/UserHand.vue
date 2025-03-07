@@ -1,26 +1,32 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import GameCard from './GameCard.vue'
 import PlayerInfo from './PlayerInfo.vue'
-import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
 import GameControls from './GameControls.vue'
-import { fetchUserInfo, redirectIfNotAuthenticated, showMessage } from '@/utils/helpers'
+import { showMessage } from '@/utils/helpers'
 import SelectColorModal from './SelectColorModal.vue'
-import { useUserStore } from '@/stores/userStore'
 import { useRouter } from 'vue-router'
+import type { IndexedGame } from '../../../shared/types'
 
-const gameStore = useGameStore()
-const userStore = useUserStore()
+const { game, userId } = defineProps<{
+  game: IndexedGame
+  userId: string
+}>()
+
 const router = useRouter()
-const currentHand = computed(() => gameStore.currentHand)
+
 const showSelectColorModal = ref(false)
 const selectedCardIndex = ref<number | null>(null)
-const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
-const userIsCurrentPlayer = computed(() => currentPlayerId.value === userStore.userInfo.id)
+console.log('game', game)
+const currentHand = computed(() => game.hands[game.currentRound - 1])
+console.log('currentHand', currentHand.value)
+
+// const currentPlayerId = computed(() => currentHand.value?.currentPlayerId)
+// const userIsCurrentPlayer = computed(() => currentPlayerId.value === userId)
+const userIsCurrentPlayer = true
 const userHand = computed(() => {
   const playerHands = currentHand.value?.playerHands
-  const userId = userStore.userInfo.id
 
   if (!playerHands) {
     return []
@@ -37,9 +43,9 @@ const userHand = computed(() => {
 })
 
 const handlePlayCard = (index: number) => {
-  if (!userIsCurrentPlayer.value) {
-    return showMessage("It's not your turn")
-  }
+  // if (!userIsCurrentPlayer.value) {
+  //   return showMessage("It's not your turn")
+  // }
 
   const card = userHand.value?.[index]
   if (!card) {
@@ -54,16 +60,6 @@ const handlePlayCard = (index: number) => {
 
   // handleGameAction(() => currentHand.value?.play(index))
 }
-
-onMounted(async () => {
-  const userInfo = await fetchUserInfo()
-  userStore.setUserInfo(userInfo)
-
-  await redirectIfNotAuthenticated({
-    router,
-    message: 'You must be logged in to create or join a game',
-  })
-})
 
 const spacing = computed(() => {
   if (!userHand.value) return 0

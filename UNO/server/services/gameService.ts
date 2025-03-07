@@ -28,14 +28,14 @@ export const setupGame = async ({
     where: { id },
     data: {
       id,
-      name: `Game ${name}`,
+      name,
       status: 'in_progress',
       currentRound: 1,
       targetScore,
       cardsPerPlayer,
       scores: Object.fromEntries(game.scores),
       players: {
-        connect: playerIds.map((id) => ({ id })), // Ensure IDs are correctly used
+        connect: playerIds.map((id) => ({ id })),
       },
     },
     select: {
@@ -44,6 +44,10 @@ export const setupGame = async ({
       targetScore: true,
       cardsPerPlayer: true,
       status: true,
+      currentRound: true,
+      scores: true,
+      winner: true,
+      winnerId: true,
       players: {
         select: {
           id: true,
@@ -75,7 +79,7 @@ export const setupGame = async ({
     ),
   )
 
-  const dbHand = await prisma.hand.create({
+  await prisma.hand.create({
     data: {
       gameId: dbGame.id,
       dealerId: currentPlayerId,
@@ -93,5 +97,20 @@ export const setupGame = async ({
     },
   })
 
-  return { dbGame, dbHand }
+  const allHands = await prisma.hand.findMany({
+    where: { gameId: dbGame.id },
+  })
+
+  const handsMap = allHands.reduce(
+    (acc, hand, index) => {
+      acc[index] = hand
+      return acc
+    },
+    {} as Record<number, (typeof allHands)[number]>,
+  )
+
+  return {
+    dbGame,
+    hands: handsMap,
+  }
 }

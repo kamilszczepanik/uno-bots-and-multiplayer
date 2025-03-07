@@ -41,9 +41,7 @@ router.get('/games/:gameId', async (req: Request, res: Response) => {
       return
     }
 
-    const currentHand = game.hands.length > 0 ? game.hands[0] : null
-    // broadcast it
-    res.json({ game, currentHand })
+    res.json({ game })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: `Failed to fetch game ${gameId}` })
@@ -174,7 +172,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
       username,
     }))
 
-    const { dbGame } = await setupGame({
+    const { dbGame, hands } = await setupGame({
       id: gameId,
       name: game.name,
       targetScore: game.targetScore,
@@ -185,6 +183,7 @@ router.post('/games/:gameId/start', async (req: Request, res: Response) => {
 
     const formattedGame = {
       ...dbGame,
+      hands,
       status: dbGame.status as GameStatus,
     }
 

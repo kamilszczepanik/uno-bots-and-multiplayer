@@ -75,7 +75,7 @@ onMounted(async () => {
     </div>
 -->
     <div class="flex justify-center">
-      <UserHand />
+      <UserHand :game="game" :user-id="userStore.userInfo.id" />
     </div>
   </div>
 </template>

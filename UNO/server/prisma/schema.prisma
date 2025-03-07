@@ -57,7 +57,7 @@ model Hand {
   status             String  @default("in_progress")
 
   gameId      String
-  game        Game   @relation("GameHands", fields: [gameId], references: [id])
+  game        Game   @relation("GameHands", fields: [gameId], references: [id], onDelete: Cascade)
   players     User[]
   discardPile Json
   drawPile    Json
