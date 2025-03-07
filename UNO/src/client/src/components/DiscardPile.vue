@@ -4,9 +4,9 @@ import GameCard from './GameCard.vue'
 import { useGameStore } from '@/stores/gameStore'
 
 const gameStore = useGameStore()
+const newColor = computed(() => currentHand.value?.newColor)
 const currentHand = computed(() => gameStore.gameInstance?.currentHand())
 const topCard = computed(() => currentHand.value?.discardPile().top())
-const newColor = computed(() => currentHand.value?.newColor)
 </script>
 
 <template>
