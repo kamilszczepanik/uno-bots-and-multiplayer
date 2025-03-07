@@ -5,13 +5,15 @@ import { defineStore } from 'pinia'
 export const useGameStore = defineStore('game', {
   state: () => ({
     gameInstance: null as Game | null,
-    playerCount: 0,
   }),
+
+  getters: {
+    currentHand: (state) => state.gameInstance?.currentHand() ?? null,
+  },
 
   actions: {
     initializeGame(props: GameServiceProps) {
-      const game = GameService.initializeGame(props)
-      this.playerCount = GameService.getPlayerCount(game)
+      this.gameInstance = GameService.initializeGame(props)
     },
   },
 })
