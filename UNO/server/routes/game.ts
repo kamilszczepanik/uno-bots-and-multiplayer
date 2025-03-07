@@ -411,36 +411,38 @@ export async function resolveAction(action: Action) {
 
   console.log('game after action', game)
 
-  const serializedGame = serializeGame(game)
-  const serializedHand = serializeHand(game.currentHand()!)
+  // const serializedGame = serializeGame(game)
+  const currentHand = game.currentHand()
+
+  if (!currentHand) {
+    throw new Error('Current hand is not defined')
+  }
 
   const updatedGame = await prisma.game.update({
     where: { id: action.gameId },
     data: {
-      status: serializedGame.status,
-      scores: serializedGame.scores,
-      currentRound: serializedGame.currentRound,
-      winnerId: serializedGame.winnerId,
+      currentRound: game.currentRound,
+      scores: game.scores,
+      // status: handle status setting
+      winnerId: game.winner(),
+      hands: {
+        connect: {
+          currentPlayerId: currentHand.playerInTurn(),
+          newColor: currentHand.newColor,
+          discardPile: currentHand.discardPile().cards,
+          drawPile: currentHand.drawPile().cards,
+          playerHands: currentHand.playerHands,
+          playingDirection: currentHand.playingDirection,
+          dealerId: currentHand.dealer,
+          winnerId: currentHand.winner(),
+          playersWhoDrewCard: currentHand.playersThatDrewCard,
+          playersWhoSaidUno: currentHand.playersThatSaidUno,
+        },
+      },
     },
     include: {
       players: true,
       hands: true,
-    },
-  })
-
-  await prisma.hand.updateMany({
-    where: { gameId: action.gameId, status: 'in_progress' },
-    data: {
-      currentPlayerId: serializedHand.currentPlayerId,
-      dealerId: serializedHand.dealerId,
-      winnerId: serializedHand.winnerId,
-      playersWhoDrewCard: serializedHand.playersWhoDrewCard,
-      playersWhoSaidUno: serializedHand.playersWhoSaidUno,
-      newColor: serializedHand.newColor,
-      playingDirection: serializedHand.playingDirection,
-      discardPile: serializedHand.discardPile,
-      drawPile: serializedHand.drawPile,
-      playerHands: serializedHand.playerHands,
     },
   })
 

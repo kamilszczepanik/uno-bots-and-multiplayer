@@ -3,6 +3,7 @@ import { createGame, Game } from 'models/src/model/uno'
 import prisma from '../utils/db.server'
 import { IndexedGameSpecs } from '../../shared/types'
 import { Card } from 'models/src/model/deck'
+import type { Game as DbGame } from '@prisma/client'
 
 class GameManager {
   private games = new Map<string, Game>()
@@ -138,6 +139,14 @@ class GameManager {
 
   clearGame(gameId: string): void {
     this.games.delete(gameId)
+  }
+
+  serializeGame(game: Game): DbGame {
+    game.currentHand()
+    // takes the game object with all the properties, including currentHand
+    // return the serialized game that matches the database schema
+
+    return {}
   }
 }
 
