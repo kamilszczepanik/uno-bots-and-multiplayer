@@ -121,13 +121,13 @@ describe("Playing a hand", () => {
     test("the game still has no winner", () => {
       expect(game.winner()).toBeUndefined();
     });
-    test.skip("the score is updated", () => {
+    test("the score is updated", () => {
       expect(game.score(0)).toBe(0);
       expect(game.score(1)).toBe(78);
       expect(game.score(2)).toBe(0);
       expect(game.score(3)).toBe(0);
     });
-    test.skip("a new hand is started", () => {
+    test("a new hand is started", () => {
       expect(game.currentHand()).not.toBe(hand);
     });
   });
