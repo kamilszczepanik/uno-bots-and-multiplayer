@@ -165,7 +165,7 @@ describe("Before first action in hand", () => {
     });
     expect(hand.playerInTurn()).toBe(0);
   });
-  it.only("rolls over if dealer is the first player and the top card is reverse", () => {
+  it("rolls over if dealer is the first player and the top card is reverse", () => {
     const shuffler = shuffleBuilder().discard().is({ type: "REVERSE" }).build();
     const hand: Hand = createHand({
       players: ["a", "b", "c", "d"],
