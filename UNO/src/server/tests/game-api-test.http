@@ -1,0 +1,42 @@
+### Create a new game
+POST http://localhost:8000/api/games
+Content-Type: application/json
+
+{
+  "name": "Game 1",
+  "creatorId": 1
+}
+
+### Create another game
+POST http://localhost:8000/api/games
+Content-Type: application/json
+
+{
+  "name": "Game 2",
+  "creatorId": 2
+}
+
+### List all games
+GET http://localhost:8000/api/games
+
+### Join a game (replace {{gameId}})
+POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/join
+Content-Type: application/json
+
+{
+  "userId": 3
+}
+
+### Join a game again (should fail if user is already in the game)
+POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/join
+Content-Type: application/json
+
+{
+  "userId": 3
+}
+
+### Start a game (replace {{gameId}})
+POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/start
+
+### Delete a game (replace {{gameId}})
+DELETE http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645
