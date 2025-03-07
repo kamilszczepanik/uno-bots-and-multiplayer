@@ -3,7 +3,6 @@ import { onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { shuffleBuilder } from '../../../../__test__/utils/shuffling'
 import type { Props } from '../../../model/uno'
-import { standardRandomizer } from '../../../utils/random_utils'
 import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
@@ -31,7 +30,7 @@ onMounted(() => {
   const mockProps: Props = {
     players: ['Player One', 'Player Two', 'Player Three', 'Player Four'],
     targetScore: 500,
-    randomizer: standardRandomizer,
+    randomizer: () => 3,
     shuffler: firstShuffle,
     cardsPerPlayer: 7,
   }

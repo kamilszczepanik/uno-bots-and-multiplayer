@@ -70,4 +70,5 @@ const spacing = computed(() => {
       </div>
     </div>
   </div>
+  <div v-else></div>
 </template>
