@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-import { useGameStore } from '@/stores/gameStore'
+import type { IndexedGame } from '../../../shared/types'
 
-const gameStore = useGameStore()
-const currentHand = computed(() => gameStore.currentHand)
+const { game } = defineProps<{
+  game: IndexedGame
+}>()
+
+const currentHand = computed(() => game.hands[game.currentRound - 1])
 const discardPile = computed(() => {
   const pile = currentHand.value?.discardPile
   return pile ? JSON.parse(pile).cards : []
@@ -12,7 +15,7 @@ const discardPile = computed(() => {
 const topCard = computed(() => {
   return discardPile.value[discardPile.value.length - 1]
 })
-const newColor = computed(() => gameStore.currentHand?.newColor)
+const newColor = computed(() => currentHand.value.newColor)
 </script>
 
 <template>

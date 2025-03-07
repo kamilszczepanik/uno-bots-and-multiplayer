@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-
-import { useGameStore } from '@/stores/gameStore'
 import { showMessage } from '@/utils/helpers'
 import { useUserStore } from '@/stores/userStore'
 import type { Card } from 'models/src/model/deck'
+import type { IndexedGame } from '../../../shared/types'
 
-const gameStore = useGameStore()
+const { game } = defineProps<{
+  game: IndexedGame
+}>()
+
 const userStore = useUserStore()
-const currentHand = computed(() => gameStore.currentHand)
+const currentHand = computed(() => game.hands[game.currentRound - 1])
+
 const drawPile = computed(() => {
   const pile = currentHand.value?.drawPile
   return pile ? (JSON.parse(pile)._cards as Card[]) : []

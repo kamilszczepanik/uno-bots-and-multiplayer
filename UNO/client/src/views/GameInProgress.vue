@@ -6,6 +6,8 @@ import { useUserStore } from '@/stores/userStore'
 import GameStatus from '@/components/GameStatus.vue'
 import UserHand from '@/components/UserHand.vue'
 import OpponentHand from '@/components/OpponentHand.vue'
+import DiscardPile from '@/components/DiscardPile.vue'
+import DrawPile from '@/components/DrawPile.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,8 +64,8 @@ onMounted(async () => {
 
       <div class="flex w-1/2 flex-col items-center justify-center">
         <div class="flex gap-12">
-          <!-- <DiscardPile />
-          <DrawPile /> -->
+          <DiscardPile :game="game" />
+          <DrawPile :game="game" />
         </div>
       </div>
 
