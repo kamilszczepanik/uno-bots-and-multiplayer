@@ -17,6 +17,7 @@ export class Hand {
   private _deck: deck.Deck;
   private _playerHands: Map<number, deck.Card[]>;
   private _discardPile: DiscardPile;
+  private _drawPile: DrawPile;
 
   constructor({
     players = ["A", "B", "C", "D"],
@@ -49,11 +50,13 @@ export class Hand {
       }
     }
 
+    //todo: implement shuffling if top card is undefined
     const topCard = this._deck.deal();
     if (!topCard) {
       throw new Error("Deck is empty; cannot initialize discard pile.");
     }
     this._discardPile = new DiscardPile([topCard]);
+    this._drawPile = new DrawPile(this._deck.cards);
   }
 
   get dealer() {
@@ -101,6 +104,10 @@ export class Hand {
   discardPile(): DiscardPile {
     return this._discardPile;
   }
+
+  drawPile(): DrawPile {
+    return this._drawPile;
+  }
 }
 
 export function createHand(props: Partial<Props>): Hand {
@@ -128,5 +135,21 @@ class DiscardPile {
 
   top(): deck.Card | undefined {
     return this._cards[this._cards.length - 1];
+  }
+}
+
+class DrawPile {
+  private _cards: deck.Card[];
+
+  constructor(cards: deck.Card[]) {
+    this._cards = cards;
+  }
+
+  get size() {
+    return this._cards.length;
+  }
+
+  deal(): deck.Card | undefined {
+    return this._cards.shift();
   }
 }
