@@ -26,10 +26,7 @@ const handleNextRound = () => {
     showMessage('The current hand is still in progress.')
     return
   }
-  console.log(previousHand.hasEnded(), ' is ended?')
 
-  // todo: end current hand
-  // gameStore.gameInstance?.endHand()
   router.push('/playing-hand')
 }
 

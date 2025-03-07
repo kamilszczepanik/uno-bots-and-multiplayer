@@ -9,6 +9,7 @@ import OpponentHand from '@/components/OpponentHand.vue'
 import BotService, { DELAY_TO_MAKE_MOVE_MS } from '../../../services/BotService'
 import { useRouter } from 'vue-router'
 import { showMessage } from '@/utils/helpers'
+import { USER_INDEX } from '@/utils/constants'
 
 const gameStore = useGameStore()
 const router = useRouter()
@@ -28,6 +29,9 @@ const handleBotTurn = (botIndex: number) => {
 }
 
 onMounted(() => {
+  if (currentPlayerIndex.value && currentPlayerIndex.value !== USER_INDEX) {
+    handleBotTurn(currentPlayerIndex.value)
+  }
   if (!gameStore.currentHand) {
     router.push('/').then(() => {
       showMessage('Provide details in the form to create a game.')

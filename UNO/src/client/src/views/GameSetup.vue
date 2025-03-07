@@ -49,7 +49,7 @@ const handleSubmit = async () => {
     }
 
     gameStore.initializeGame(props)
-    router.push('/hand')
+    router.push('/playing-hand')
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors.value = error.errors.reduce<Record<string, string>>((acc, curr) => {
