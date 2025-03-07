@@ -4,6 +4,7 @@ import GameCard from './GameCard.vue'
 
 import { useGameStore } from '@/stores/gameStore'
 import { USER_INDEX } from '@/utils/constants'
+import { showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const currentHand = computed(() => gameStore.currentHand)
@@ -23,7 +24,7 @@ const visibleCards = computed(() => {
 
 const onClick = () => {
   if (!userIsCurrentPlayer.value) {
-    alert('Not your turn')
+    showMessage('Not your turn')
     return
   }
 
