@@ -385,16 +385,6 @@ export class Hand {
   }): boolean {
     const accusedPlayerCards = this.playerHand(accused);
 
-    // todo: fix say uno tests
-    // console.log(
-    //   `Player ${accuser} is accusing player ${accused} of UNO failure. Accused player has ${JSON.stringify(
-    //     accusedPlayerCards
-    //   )} cards.
-    //     And the players that told uno were
-    //   )}`
-    // );
-    // console.log(this._playersWhoSaidUno);
-
     if (
       accusedPlayerCards.length > 1 ||
       this._lastPlayerIndex !== accused ||
@@ -422,24 +412,17 @@ export class Hand {
       throw new Error("Cannot say UNO! If player has more than two cards.");
     }
 
-    const canPlayOneCard = playerHand.some((card) =>
-      this.isCardPlayable(card, topCard)
-    );
-
-    if (!canPlayOneCard) {
-      throw new Error(
-        "Cannot say UNO! if no playable card exists among the two cards."
+    if (playerHand.length === 2) {
+      const canPlayOneCard = playerHand.some((card) =>
+        this.isCardPlayable(card, topCard)
       );
-    }
 
-    // todo: fix say uno tests
-    // console.log(
-    //   `Player ${
-    //     this._players[playerNumber]
-    //   } says UNO, his hand is ${JSON.stringify(
-    //     playerHand
-    //   )} --- top card is ${JSON.stringify(topCard)}!`
-    // );
+      if (!canPlayOneCard) {
+        throw new Error(
+          "Cannot say UNO! if no playable card exists among the two cards."
+        );
+      }
+    }
 
     this._playersWhoSaidUno.add(playerNumber);
   }
