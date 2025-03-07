@@ -1,7 +1,7 @@
 import { createGame, Game } from 'models/src/model/uno'
 
 import prisma from '../utils/db.server'
-import { GameStatus, IndexedGame, IndexedGameSpecs } from '../../shared/types'
+import { GameStatus, IndexedGameSpecs } from '../../shared/types'
 import { Card } from 'models/src/model/deck'
 
 class GameManager {
@@ -148,7 +148,7 @@ class GameManager {
     gameInstance: Game
     gameId: string
     handId: string
-  }): Promise<IndexedGame> {
+  }) {
     const dbGame = await prisma.game.findUnique({
       where: { id: gameId },
       include: { players: true, hands: true },
@@ -158,6 +158,7 @@ class GameManager {
       throw new Error('Game not found')
     }
 
+    const playerIds = dbGame.players.map(({ id }) => id) as string[]
     const currentHand = gameInstance.currentHand()
 
     if (!currentHand) {
@@ -167,24 +168,47 @@ class GameManager {
     const winnerId = null
     const status: GameStatus = 'in_progress'
 
+    const currentPlayerIndex = currentHand.playerInTurn()
+
+    if (
+      currentPlayerIndex === undefined ||
+      currentPlayerIndex < 0 ||
+      currentPlayerIndex >= playerIds.length
+    ) {
+      throw new Error(
+        'Current player index is out of range or not set properly.',
+      )
+    }
+
+    const currentPlayerId = playerIds[currentPlayerIndex]
+
+    const playerHands = JSON.stringify(
+      playerIds.reduce(
+        (acc, playerId, index) => {
+          acc[playerId] = currentHand.playerHand(index)
+          return acc
+        },
+        {} as Record<string, Card[]>,
+      ),
+    )
+
     const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
         currentRound: gameInstance.currentRound,
         status: status,
-        scores: JSON.stringify(gameInstance.scores),
+        scores: Object.fromEntries(gameInstance.scores),
         winnerId: winnerId,
         hands: {
           update: {
             where: { id: handId },
             data: {
-              currentPlayerId: currentHand.playerInTurn()?.toString(),
+              currentPlayerId,
               newColor: currentHand.newColor,
               discardPile: JSON.stringify(currentHand.discardPile()),
               drawPile: JSON.stringify(currentHand.drawPile()),
-              playerHands: JSON.stringify(currentHand.playerHands),
+              playerHands,
               playingDirection: currentHand.playingDirection as string,
-              dealerId: currentHand.dealer.toString(),
               winnerId: currentHand.winner()?.toString(),
               playersWhoDrewCard: JSON.stringify(
                 currentHand.playersThatDrewCard,
@@ -197,24 +221,17 @@ class GameManager {
       include: { players: true, hands: true },
     })
 
+    // ✅ Standardize hands format before returning
+    const allHands = await prisma.hand.findMany({
+      where: { gameId: dbGame.id },
+    })
+
+    const handsArray = Object.values(allHands) // ✅ Convert object to array
+
     return {
       ...updatedGame,
       status: updatedGame.status as GameStatus,
-      scores: JSON.parse(updatedGame.scores as unknown as string) || {},
-      hands: updatedGame.hands.map((hand) => ({
-        ...hand,
-        playingDirection: hand.playingDirection as
-          | 'Clockwise'
-          | 'counterclockwise',
-        playersWhoDrewCard:
-          JSON.parse(hand.playersWhoDrewCard as unknown as string) || [],
-        playersWhoSaidUno:
-          JSON.parse(hand.playersWhoSaidUno as unknown as string) || [],
-        playerHands: JSON.parse(hand.playerHands as unknown as string),
-        discardPile: JSON.parse(hand.discardPile as unknown as string),
-        drawPile: JSON.parse(hand.drawPile as unknown as string),
-        status: hand.status as GameStatus,
-      })),
+      hands: handsArray, // ✅ Ensure hands is always an array
       players: updatedGame.players,
     }
   }
