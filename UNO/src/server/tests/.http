@@ -13,7 +13,7 @@ Content-Type: application/json
 
 {
     "username": "testuser2",
-    "password": "securepass456"
+    "password": "password123"
 }
 
 ### Register a duplicate user (should fail)

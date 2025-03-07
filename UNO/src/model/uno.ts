@@ -88,6 +88,10 @@ export class Game {
     return this._players;
   }
 
+  get scores() {
+    return this._scores;
+  }
+
   score(playerNumber: number) {
     if (!this._scores.has(playerNumber))
       throw new Error("Invalid player number");

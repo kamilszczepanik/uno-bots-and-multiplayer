@@ -14,6 +14,7 @@ interface Game {
 export const useGameStore = defineStore('game', {
   state: () => ({
     allGames: ref<Game[]>([]),
+    game: ref<Game>(),
     loading: ref(false),
     error: ref<string | null>(null),
   }),
@@ -29,6 +30,20 @@ export const useGameStore = defineStore('game', {
       } catch (err) {
         this.error = 'Failed to fetch games'
         console.error('Error fetching games:', err)
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchGame(gameId: string) {
+      this.loading = true
+      this.error = null
+
+      try {
+        const response = await axiosInstance.get(`/api/games/${gameId}`)
+        this.game = response.data
+      } catch (err) {
+        this.error = 'Failed to fetch game'
+        console.error('Error fetching game:', err)
       } finally {
         this.loading = false
       }

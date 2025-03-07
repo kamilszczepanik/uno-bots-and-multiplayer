@@ -78,9 +78,11 @@ onMounted(async () => {
   <div class="p-2">
     <div class="flex items-center justify-end gap-2">
       <span class="font-bold">{{ userStore.userInfo.username }}</span>
-      <ControlButton variant="cancel" @click="logoutUser" class="w-32 bg-background">
-        Logout
-      </ControlButton>
+      <div>
+        <ControlButton variant="cancel" @click="logoutUser" class="w-32 bg-background">
+          Logout
+        </ControlButton>
+      </div>
     </div>
     <h1 class="text-center text-7xl">UNO</h1>
     <div class="flex w-full flex-col justify-around gap-4 pt-8">

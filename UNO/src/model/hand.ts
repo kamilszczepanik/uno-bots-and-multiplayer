@@ -513,6 +513,10 @@ export class Hand {
     return this._playersThatSaidUno;
   }
 
+  get playersThatDrewCard() {
+    return this._playersWhoDrewCard;
+  }
+
   get players() {
     return this._players;
   }

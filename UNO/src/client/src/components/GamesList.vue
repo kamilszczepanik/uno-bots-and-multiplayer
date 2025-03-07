@@ -13,7 +13,7 @@ interface Game {
   status: string
   targetScore: number
   cardsPerPlayer: number
-  users: User[]
+  players: User[]
 }
 
 defineProps<{
@@ -28,9 +28,9 @@ defineProps<{
 </script>
 
 <template>
-  <div v-if="games.length > 0">
+  <div>
     <h2 class="font-bold text-gray-600">{{ title }}</h2>
-    <ul>
+    <ul v-if="games.length > 0">
       <li
         v-for="game in games"
         :key="game.id"
@@ -40,9 +40,9 @@ defineProps<{
           <div>
             <div class="text-lg font-bold">{{ game.name }}</div>
             <div class="text-sm text-gray-600">
-              {{ game.users.length }} {{ game.users.length !== 1 ? 'Players' : 'Player' }}:
+              {{ game.players.length }} {{ game.players.length !== 1 ? 'Players' : 'Player' }}:
               <span class="font-bold">
-                {{ game.users.map((u) => u.username).join(', ') || 'None' }}
+                {{ game.players.map((u) => u.username).join(', ') || 'None' }}
               </span>
             </div>
             <p class="text-sm text-gray-600">
@@ -56,8 +56,8 @@ defineProps<{
             <ControlButton
               v-if="
                 game.status === 'waiting' &&
-                game.users.length < 4 &&
-                !game.users.some((user) => user.id === userId)
+                game.players.length < 4 &&
+                !game.players.some((user) => user.id === userId)
               "
               variant="secondary"
               @click="() => onJoinGame && onJoinGame(game.id)"
@@ -68,8 +68,8 @@ defineProps<{
             <ControlButton
               v-if="
                 game.status === 'waiting' &&
-                game.users.length > 1 &&
-                game.users.some((user) => user.id === userId)
+                game.players.length > 1 &&
+                game.players.some((user) => user.id === userId)
               "
               variant="primary"
               @click="onStartGame?.(game.id)"
@@ -78,7 +78,7 @@ defineProps<{
               Start Game
             </ControlButton>
             <ControlButton
-              v-if="game.users.some((user) => user.id === userId) && game.status === 'waiting'"
+              v-if="game.players.some((user) => user.id === userId) && game.status === 'waiting'"
               variant="cancel"
               @click="onLeaveGame?.(game.id)"
               class="w-32"
@@ -86,7 +86,9 @@ defineProps<{
               Leave Game
             </ControlButton>
             <ControlButton
-              v-if="game.users.some((user) => user.id === userId) && game.status === 'in progress'"
+              v-if="
+                game.players.some((user) => user.id === userId) && game.status === 'in progress'
+              "
               variant="secondary"
               @click="onOpenGame?.(game.id)"
               class="w-32"

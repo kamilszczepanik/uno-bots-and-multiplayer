@@ -1,3 +1,4 @@
+import { setupGame } from '../services/gameService'
 import prisma from '../utils/db.server'
 import { Request, RequestHandler, Response } from 'express'
 
@@ -7,7 +8,7 @@ export const listGames: RequestHandler = async (
 ) => {
   try {
     const games = await prisma.game.findMany({
-      include: { users: true },
+      include: { players: true },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -50,14 +51,16 @@ export const createGame: RequestHandler = async (
     const game = await prisma.game.create({
       data: {
         name,
-        creatorId,
         targetScore,
         cardsPerPlayer,
-        users: {
+        currentRound: 1,
+        status: 'waiting',
+        scores: {},
+        players: {
           connect: { id: creatorId },
         },
       },
-      include: { users: true },
+      include: { players: true },
     })
 
     res.status(201).json(game)
@@ -76,7 +79,7 @@ export const joinGame: RequestHandler = async (req, res) => {
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      include: { users: true },
+      include: { players: true },
     })
 
     if (!game || game.status !== 'waiting') {
@@ -85,12 +88,12 @@ export const joinGame: RequestHandler = async (req, res) => {
       return
     }
 
-    if (game.users.length >= 3) {
+    if (game.players.length >= 3) {
       res.status(400).json({ error: 'Game is full' })
       return
     }
 
-    if (game.users.some((user) => user.id === userId)) {
+    if (game.players.some((user) => user.id === userId)) {
       res.status(400).json({ error: 'User is already in the game' })
       return
     }
@@ -98,11 +101,11 @@ export const joinGame: RequestHandler = async (req, res) => {
     const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
-        users: {
+        players: {
           connect: { id: userId },
         },
       },
-      include: { users: true },
+      include: { players: true },
     })
 
     res.json(updatedGame)
@@ -123,7 +126,7 @@ export const startGame: RequestHandler = async (
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      include: { users: true },
+      include: { players: true },
     })
 
     if (!game || game.status !== 'waiting') {
@@ -131,14 +134,19 @@ export const startGame: RequestHandler = async (
       return
     }
 
-    if (game.users.length < 2) {
+    if (game.players.length < 2) {
       res.status(400).json({ error: 'Not enough players to start the game' })
       return
     }
 
-    await prisma.game.update({
-      where: { id: gameId },
-      data: { status: 'in progress' },
+    await setupGame({
+      gameId,
+      name: game.name,
+      targetScore: game.targetScore,
+      cardsPerPlayer: game.cardsPerPlayer,
+      status: game.status,
+      currentRound: game.currentRound,
+      playerIds: game.players.map((player) => player.id),
     })
 
     res.json({ message: 'Game started' })
@@ -157,7 +165,7 @@ export const deleteGame: RequestHandler = async (
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      include: { users: true },
+      include: { players: true },
     })
 
     if (!game) {
@@ -165,7 +173,7 @@ export const deleteGame: RequestHandler = async (
       return
     }
 
-    if (game.users.length > 1) {
+    if (game.players.length > 1) {
       res
         .status(400)
         .json({ error: 'Cannot delete a game with more than one player' })
@@ -190,7 +198,7 @@ export const leaveGame = async (req: Request, res: Response) => {
   try {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
-      select: { users: true, name: true },
+      select: { players: true, name: true },
     })
 
     if (!game) {
@@ -198,7 +206,7 @@ export const leaveGame = async (req: Request, res: Response) => {
       return
     }
 
-    if (!game.users.some((user) => user.id === userId)) {
+    if (!game.players.some((user) => user.id === userId)) {
       res.status(400).json({ error: 'User is not in the game' })
       return
     }
@@ -206,22 +214,22 @@ export const leaveGame = async (req: Request, res: Response) => {
     const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
-        users: {
+        players: {
           disconnect: { id: userId },
         },
       },
       select: {
         id: true,
-        users: true,
+        players: true,
       },
     })
 
-    if (updatedGame.users.length === 0) {
+    if (updatedGame.players.length === 0) {
       await prisma.game.delete({
         where: { id: updatedGame.id },
       })
       res.json({
-        message: `You have left the game ${game.name} and the game has been deleted, since there was no other users.`,
+        message: `You have left the game ${game.name} and the game has been deleted, since there was no other players.`,
       })
     } else {
       res.json({ message: `You have left the game ${game.name}` })

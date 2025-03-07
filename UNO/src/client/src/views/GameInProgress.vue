@@ -1,41 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import DrawPile from '@/components/DrawPile.vue'
 import DiscardPile from '@/components/DiscardPile.vue'
 import UserHand from '@/components/UserHand.vue'
 import GameStatus from '@/components/GameStatus.vue'
-import OpponentHand from '@/components/OpponentHand.vue'
-import { useRoute, useRouter } from 'vue-router'
-import axiosInstance from '@/utils/axiosInstance'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const gameStore = useGameStore()
 const gameId = route.params.id as string
-const router = useRouter()
-const game = ref(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-
-const fetchGame = async () => {
-  try {
-    loading.value = true
-    game.value = await axiosInstance.get(`/api/games/${gameId}`)
-    if (!game.value) {
-      throw new Error('Game not found')
-    }
-  } catch (err) {
-    error.value = 'Failed to load game'
-    console.error(err)
-    router.push('/')
-  } finally {
-    loading.value = false
-  }
-
-  console.log(game.value)
-}
 
 onMounted(() => {
-  fetchGame()
+  gameStore.fetchGame(gameId)
 })
 </script>
 <template>
