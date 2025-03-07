@@ -4,7 +4,7 @@
   "description": "UNO Multiplayer Server",
   "main": "index.js",
   "scripts": {
-    "dev": "npx ts-node app.ts",
+    "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint './**/*.{js,ts}'",
     "lint:fix": "eslint './**/*.{js,ts}' --fix",
