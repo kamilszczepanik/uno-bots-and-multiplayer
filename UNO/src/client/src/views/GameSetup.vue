@@ -47,7 +47,7 @@ const handleSubmit = async () => {
       targetScore: formData.targetScore,
       cardsPerPlayer: formData.cardsPerPlayer,
     }
-
+    gameStore.setGameSettings(props)
     gameStore.initializeGame(props)
     router.push('/playing-hand')
   } catch (error) {
@@ -146,12 +146,7 @@ const removeBot = (index: number) => {
         </div>
         <p v-if="errors.bots" class="text-red-500">{{ errors.bots }}</p>
 
-        <ControlButton
-          variant="secondary"
-          class="focus:shadow-outline mt-2 rounded-full border border-primary-500 px-4 py-2 font-bold text-primary-700 focus:outline-none disabled:cursor-not-allowed"
-          @click="addBot"
-          :disabled="form.bots.length >= 3"
-        >
+        <ControlButton variant="secondary" @click="addBot" :disabled="form.bots.length >= 3">
           Add Bot
         </ControlButton>
       </div>

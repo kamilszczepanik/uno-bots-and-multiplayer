@@ -8,18 +8,21 @@ import { showMessage } from '@/utils/helpers'
 
 const gameStore = useGameStore()
 const router = useRouter()
-const game = gameStore.gameInstance
-const currentHand = computed(() => game?.currentHand())
+const game = computed(() => gameStore.gameInstance)
+const currentHand = computed(() => game.value?.currentHand())
+const previousHand = computed(() => game.value?.previousHand)
+const gameWinner = computed(() => game.value?.winner())
+const targetScore = computed(() => game.value?.targetScore)
 
 const winner = computed(() => {
-  const winnerIndex = currentHand.value?.winner()
-  return winnerIndex !== undefined ? gameStore.gameInstance?.player(winnerIndex) : 'Unknown'
+  const winnerIndex = previousHand.value?.winner()
+  return winnerIndex !== undefined ? game.value?.player(winnerIndex) : 'Unknown'
 })
 
 const handleNextRound = () => {
-  const previousHand = gameStore.gameInstance?.previousHand
+  const previousHand = game.value?.previousHand
 
-  if (gameStore.gameInstance?.winner() !== undefined) {
+  if (game.value?.winner() !== undefined) {
     showMessage('The game has already ended.')
     return
   }
@@ -38,7 +41,8 @@ const handleEndGame = () => {
 }
 
 onMounted(() => {
-  if (game?.winner) {
+  console.log(gameWinner)
+  if (gameWinner.value) {
     router.push('/game-over').then(() => {
       showMessage('The game is over!')
     })
@@ -57,6 +61,9 @@ onMounted(() => {
     <h2 class="text-center text-3xl font-bold">Hand Over</h2>
     <p class="text-xl font-semibold text-green-600">
       Winner: <span class="font-bold">{{ winner }}</span>
+    </p>
+    <p>
+      Target score is <span class="font-bold">{{ targetScore }}</span>
     </p>
     <ScoreBoard />
 

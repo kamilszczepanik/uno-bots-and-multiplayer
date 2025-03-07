@@ -39,7 +39,12 @@ const handleStartNewGame = () => {
   router.push('/')
 }
 const handleRestartTheGame = () => {
-  console.log('restart')
+  try {
+    gameStore.restartGame()
+    router.push('/playing-hand')
+  } catch {
+    showMessage('Unable to restart the game: ')
+  }
 }
 </script>
 

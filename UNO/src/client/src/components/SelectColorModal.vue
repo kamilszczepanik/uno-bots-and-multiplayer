@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, defineEmits } from 'vue'
-import ControlButton from './ControlButton.vue'
 import { handleGameAction, showMessage } from '@/utils/helpers'
 import { useGameStore } from '@/stores/gameStore'
 import { colors, type Color } from '../../../model/deck'
@@ -43,12 +42,13 @@ const colorClasses: Record<string, string> = {
     <div class="z-50 w-96 space-y-4 rounded-lg bg-backgroundSoft p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-bold">Select the color that you want</h2>
-        <ControlButton
+        <button
           variant="destructive"
-          class="w-11 border border-red-600 text-red-600 hover:bg-backgroundSoft"
+          class="h-10 w-10 rounded-full border border-red-600 text-red-600 hover:bg-backgroundSoft"
           @click="closeModal"
-          >X</ControlButton
         >
+          X
+        </button>
       </div>
       <div class="flex flex-wrap justify-center gap-2">
         <button

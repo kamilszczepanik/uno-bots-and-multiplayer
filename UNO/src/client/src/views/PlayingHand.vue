@@ -34,7 +34,6 @@ onMounted(() => {
     handleBotTurn(currentPlayerIndex.value)
   }
   if (!currentHand.value) {
-    console.log('here we gio')
     router.push('/').then(() => {
       showMessage('Provide details in the form to create a game.')
     })
