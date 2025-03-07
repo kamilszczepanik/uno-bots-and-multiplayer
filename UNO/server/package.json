@@ -6,7 +6,7 @@
   "author": "Tomasz Grzesiak",
   "license": "ISC",
   "scripts": {
-    "dev": "nodemon",
+    "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint './**/*.{js,ts}'",
     "lint:fix": "eslint './**/*.{js,ts}' --fix",
@@ -19,8 +19,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "sqlite3": "^5.1.7",
-    "models": "../models"
+    "models": "../models",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
@@ -33,6 +33,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
     "prisma": "^6.2.1",
     "ts-node": "^10.9.2",

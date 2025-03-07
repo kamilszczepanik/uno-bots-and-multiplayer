@@ -1,5 +1,5 @@
-import { Card } from '../../model/deck'
-import { createGame } from '../../model/uno' // Your existing game logic
+import { Card } from 'models/src/model/deck'
+import { createGame } from 'models/src/model/uno'
 import prisma from '../utils/db.server'
 
 interface StartGameProps {
