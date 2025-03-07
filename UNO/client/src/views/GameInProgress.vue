@@ -1,33 +1,46 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
 import { useUserStore } from '@/stores/userStore'
 import GameStatus from '@/components/GameStatus.vue'
+import UserHand from '@/components/UserHand.vue'
+import * as api from '@/model/api'
+import { showMessage } from '@/utils/helpers'
 
-const inProgressGamesStore = useInProgressGamesStore()
-const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
+
+const userStore = useUserStore()
+const inProgressGamesStore = useInProgressGamesStore()
+
 const id = computed(() => route.params.id)
 const game = computed(() => inProgressGamesStore.game(id.value as string))
 
-// const enabled = computed(
-//   () =>
-//     game.value !== undefined &&
-//     userStore.userInfo.id === game.value.players[game.value.playerInTurn],
-// )
-// const finished = computed(() => game.value === undefined || is_finished(game.value))
-// const standings = computed(() => {
-//   if (game.value === undefined) return []
-//   const g = game.value
-//   const standings: [string, number][] = scores(g).map((s, i) => [g.players[i], s])
-//   standings.sort(([_, score1], [__, score2]) => score2 - score1)
-//   return standings
-// })
+onMounted(async () => {
+  if (userStore.userInfo.id === undefined) {
+    router.push(`/login?game=${id.value}`)
+    return
+  }
 
-if (userStore.userInfo.id === undefined) router.push(`/login?game=${id.value}`)
-else if (game.value === undefined) router.replace('/')
+  if (game.value === undefined) {
+    try {
+      const fetchedGame = await api.game(id.value as string)
+      if (fetchedGame) {
+        inProgressGamesStore.upsert(fetchedGame)
+      } else {
+        router.push('/').then(() => {
+          showMessage('Game not found.')
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      router.push('/').then(() => {
+        showMessage('Failed to fetch game.')
+      })
+    }
+  }
+})
 </script>
 <template>
   <div class="flex h-screen w-full flex-col" v-if="game && userStore.userInfo.id">
@@ -60,9 +73,9 @@ else if (game.value === undefined) router.replace('/')
         <OpponentHand v-if="players.length > 3" :placement="'right'" :opponent-index="3" />
       </div>
     </div>
-
+-->
     <div class="flex justify-center">
       <UserHand />
-    </div> -->
+    </div>
   </div>
 </template>

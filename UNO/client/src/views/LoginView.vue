@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axiosInstance from '@/utils/axiosInstance'
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
 import ControlButton from '@/components/ControlButton.vue'
@@ -21,6 +21,7 @@ const form = ref<LoginForm>({
   password: '',
 })
 
+const route = useRoute()
 const router = useRouter()
 const errors = ref<FormErrors>({})
 const userStore = useUserStore()
@@ -45,7 +46,11 @@ const handleSubmit = async () => {
       userStore.setUserInfo(userInfo)
     }
 
-    router.push('/').then(() => {
+    if (route.query.game) {
+      router.replace(`/game/${route.query.game}`)
+    }
+
+    router.replace('/').then(() => {
       showMessage('You have successfully login.')
     })
   } catch (error) {
