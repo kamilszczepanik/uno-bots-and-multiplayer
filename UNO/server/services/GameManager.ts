@@ -1,9 +1,8 @@
 import { createGame, Game } from 'models/src/model/uno'
 
 import prisma from '../utils/db.server'
-import { IndexedGameSpecs } from '../../shared/types'
+import { GameStatus, IndexedGame, IndexedGameSpecs } from '../../shared/types'
 import { Card } from 'models/src/model/deck'
-import type { Game as DbGame } from '@prisma/client'
 
 class GameManager {
   private games = new Map<string, Game>()
@@ -141,12 +140,83 @@ class GameManager {
     this.games.delete(gameId)
   }
 
-  serializeGame(game: Game): DbGame {
-    game.currentHand()
-    // takes the game object with all the properties, including currentHand
-    // return the serialized game that matches the database schema
+  async saveGame({
+    gameInstance,
+    gameId,
+    handId,
+  }: {
+    gameInstance: Game
+    gameId: string
+    handId: string
+  }): Promise<IndexedGame> {
+    const dbGame = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { players: true, hands: true },
+    })
 
-    return {}
+    if (!dbGame) {
+      throw new Error('Game not found')
+    }
+
+    const currentHand = gameInstance.currentHand()
+
+    if (!currentHand) {
+      throw new Error('Current hand not found')
+    }
+
+    const winnerId = null
+    const status: GameStatus = 'in_progress'
+
+    const updatedGame = await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        currentRound: gameInstance.currentRound,
+        status: status,
+        scores: JSON.stringify(gameInstance.scores),
+        winnerId: winnerId,
+        hands: {
+          update: {
+            where: { id: handId },
+            data: {
+              currentPlayerId: currentHand.playerInTurn()?.toString(),
+              newColor: currentHand.newColor,
+              discardPile: JSON.stringify(currentHand.discardPile()),
+              drawPile: JSON.stringify(currentHand.drawPile()),
+              playerHands: JSON.stringify(currentHand.playerHands),
+              playingDirection: currentHand.playingDirection as string,
+              dealerId: currentHand.dealer.toString(),
+              winnerId: currentHand.winner()?.toString(),
+              playersWhoDrewCard: JSON.stringify(
+                currentHand.playersThatDrewCard,
+              ),
+              playersWhoSaidUno: JSON.stringify(currentHand.playersThatSaidUno),
+            },
+          },
+        },
+      },
+      include: { players: true, hands: true },
+    })
+
+    return {
+      ...updatedGame,
+      status: updatedGame.status as GameStatus,
+      scores: JSON.parse(updatedGame.scores as unknown as string) || {},
+      hands: updatedGame.hands.map((hand) => ({
+        ...hand,
+        playingDirection: hand.playingDirection as
+          | 'Clockwise'
+          | 'counterclockwise',
+        playersWhoDrewCard:
+          JSON.parse(hand.playersWhoDrewCard as unknown as string) || [],
+        playersWhoSaidUno:
+          JSON.parse(hand.playersWhoSaidUno as unknown as string) || [],
+        playerHands: JSON.parse(hand.playerHands as unknown as string),
+        discardPile: JSON.parse(hand.discardPile as unknown as string),
+        drawPile: JSON.parse(hand.drawPile as unknown as string),
+        status: hand.status as GameStatus,
+      })),
+      players: updatedGame.players,
+    }
   }
 }
 

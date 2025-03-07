@@ -1,4 +1,4 @@
-import { Color } from "models/src/model/deck";
+import type { Color } from "models/src/model/deck";
 
 export interface User {
   id: string | null;
@@ -10,12 +10,12 @@ export interface Hand {
   dealerId: string;
   currentPlayerId: string;
   newColor: string | undefined;
-  playersWhoDrewCard: string[];
-  playersWhoSaidUno: string[];
+  playersWhoDrewCard: string;
+  playersWhoSaidUno: string;
   playingDirection: "Clockwise" | "counterclockwise";
   discardPile: string;
   drawPile: string;
-  status: "in_progress" | "ended";
+  status: GameStatus;
   playerHands: string;
   winnerId: string | null;
 }
@@ -56,4 +56,4 @@ export type GameStatus = "waiting" | "in_progress" | "paused" | "finished";
 type RawAction =
   | { type: "draw" }
   | { type: "play"; cardIndex: number; color: Color | undefined };
-export type Action = RawAction & { gameId: string };
+export type Action = RawAction & { gameId: string; handId: string };

@@ -36,7 +36,7 @@ const onClick = async () => {
     return
   }
 
-  await api.draw(game)
+  await api.draw({ gameId: game.id, handId: currentHand.value.id })
 }
 </script>
 

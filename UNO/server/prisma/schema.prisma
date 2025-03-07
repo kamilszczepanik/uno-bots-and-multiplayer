@@ -50,8 +50,8 @@ model Hand {
   currentPlayerId    String
   dealerId           String
   winnerId           String?
-  playersWhoDrewCard Json
-  playersWhoSaidUno  Json
+  playersWhoDrewCard String
+  playersWhoSaidUno  String
   newColor           String
   playingDirection   String  @default("clockwise")
   status             String  @default("in_progress")

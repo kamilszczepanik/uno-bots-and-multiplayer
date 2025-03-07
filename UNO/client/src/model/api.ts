@@ -98,10 +98,20 @@ async function perform_action(action: Action) {
   return post(`api/games/${action.gameId}/actions`, action)
 }
 
-export async function draw(game: IndexedGame) {
-  return perform_action({ gameId: game.id, type: 'draw' })
+export async function draw({ gameId, handId }: { gameId: string; handId: string }) {
+  return perform_action({ type: 'draw', gameId, handId })
 }
 
-export async function play(game: IndexedGame, cardIndex: number, color?: Color) {
-  return perform_action({ gameId: game.id, type: 'play', cardIndex, color })
+export async function play({
+  gameId,
+  handId,
+  cardIndex,
+  color,
+}: {
+  gameId: string
+  handId: string
+  cardIndex: number
+  color: Color | undefined
+}) {
+  return perform_action({ gameId, handId, type: 'play', cardIndex, color })
 }

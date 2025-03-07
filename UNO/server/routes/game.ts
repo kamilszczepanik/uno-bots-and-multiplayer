@@ -389,62 +389,32 @@ router.delete('/games/:gameId', async (req: Request, res: Response) => {
 })
 
 export async function resolveAction(action: Action) {
-  const game = await gameManager.getGame(action.gameId)
+  const gameInstance = await gameManager.getGame(action.gameId)
 
-  if (!game) {
+  if (!gameInstance) {
     throw new Error('Game not found')
   }
-  console.log('game before action', game)
 
   switch (action.type) {
     case 'draw': {
-      game.currentHand()?.draw()
+      gameInstance.currentHand()?.draw()
       break
     }
     case 'play': {
-      game.currentHand()?.play(action.cardIndex, action.color)
+      gameInstance.currentHand()?.play(action.cardIndex, action.color)
       break
     }
     default:
       throw new Error('Invalid action')
   }
 
-  console.log('game after action', game)
-
-  // const serializedGame = serializeGame(game)
-  const currentHand = game.currentHand()
-
-  if (!currentHand) {
-    throw new Error('Current hand is not defined')
-  }
-
-  const updatedGame = await prisma.game.update({
-    where: { id: action.gameId },
-    data: {
-      currentRound: game.currentRound,
-      scores: game.scores,
-      // status: handle status setting
-      winnerId: game.winner(),
-      hands: {
-        connect: {
-          currentPlayerId: currentHand.playerInTurn(),
-          newColor: currentHand.newColor,
-          discardPile: currentHand.discardPile().cards,
-          drawPile: currentHand.drawPile().cards,
-          playerHands: currentHand.playerHands,
-          playingDirection: currentHand.playingDirection,
-          dealerId: currentHand.dealer,
-          winnerId: currentHand.winner(),
-          playersWhoDrewCard: currentHand.playersThatDrewCard,
-          playersWhoSaidUno: currentHand.playersThatSaidUno,
-        },
-      },
-    },
-    include: {
-      players: true,
-      hands: true,
-    },
+  const updatedGame = await gameManager.saveGame({
+    gameInstance,
+    gameId: action.gameId,
+    handId: action.handId,
   })
+
+  broadcast(updatedGame)
 
   return updatedGame
 }
@@ -452,7 +422,7 @@ interface TypedRequest<BodyType> extends Request {
   body: BodyType
 }
 
-type Body = Action & { gameId: string }
+type Body = Action & { gameId: string; handId: string }
 
 router.post(
   '/games/:id/actions',
@@ -460,8 +430,6 @@ router.post(
     try {
       const game = resolveAction(req.body)
       res.send(game)
-
-      // broadcast(game)
     } catch (error: unknown) {
       console.log(error)
     }
