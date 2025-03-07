@@ -15,6 +15,7 @@ const gameStore = useGameStore()
 const router = useRouter()
 const players = computed(() => gameStore.gameInstance?.players || [])
 const currentPlayerIndex = computed(() => gameStore.currentHand?.playerInTurn())
+const currentHand = computed(() => gameStore.currentHand)
 
 watch(currentPlayerIndex, (newIndex) => {
   if (newIndex !== null && newIndex !== undefined && newIndex !== 0) {
@@ -29,6 +30,7 @@ const handleBotTurn = (botIndex: number) => {
 }
 
 onMounted(() => {
+  console.log('currentHand.value', currentHand.value)
   if (currentPlayerIndex.value && currentPlayerIndex.value !== USER_INDEX) {
     handleBotTurn(currentPlayerIndex.value)
   }
@@ -50,15 +52,15 @@ onMounted(() => {
         <GameStatus />
       </div>
       <div class="flex w-1/2 justify-center">
-        <OpponentHand v-if="players.length === 1" :placement="'top'" :opponent-index="1" />
-        <OpponentHand v-else-if="players.length > 1" :placement="'top'" :opponent-index="2" />
+        <OpponentHand v-if="players.length === 2" :placement="'top'" :opponent-index="1" />
+        <OpponentHand v-else-if="players.length > 2" :placement="'top'" :opponent-index="2" />
       </div>
       <div class="w-1/4"></div>
     </div>
 
     <div class="flex flex-grow">
       <div class="flex w-1/4 items-center justify-center">
-        <OpponentHand v-if="players.length > 1" :placement="'left'" :opponent-index="1" />
+        <OpponentHand v-if="players.length > 2" :placement="'left'" :opponent-index="1" />
       </div>
 
       <div class="flex w-1/2 flex-col items-center justify-center">
