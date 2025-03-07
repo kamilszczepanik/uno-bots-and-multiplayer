@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes'
+import gameRoutes from './routes/gameRoutes'
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ app.use(
 )
 app.use(express.json())
 
+app.use('/api', gameRoutes)
 app.use('/api/auth', authRoutes)
 
 app.get('/', (req: Request, res: Response) => {

@@ -18,7 +18,6 @@ export const useGameStore = defineStore('game', {
     initializeGame(props: GameServiceProps) {
       this.game = GameService.initializeGame(props)
 
-      // Store settings for restarting later
       this.setGameSettings({
         players: props.players,
         targetScore: props.targetScore,
@@ -39,7 +38,6 @@ export const useGameStore = defineStore('game', {
         throw new Error('Game settings are not available to restart the game.')
       }
 
-      // Restart the game using stored settings
       this.initializeGame({
         ...this.gameSettings,
       })

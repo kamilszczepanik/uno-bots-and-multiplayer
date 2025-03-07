@@ -14,7 +14,24 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
+  id           Int    @id @default(autoincrement())
+  username     String @unique
+  password     String
+  games        Game[] @relation("GameUsers")
+  createdGames Game[] @relation("GameCreator")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id        String @id @default(uuid())
+  name      String
+  status    String @default("waiting")
+  users     User[] @relation("GameUsers")
+  creatorId Int
+  creator   User   @relation("GameCreator", fields: [creatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
