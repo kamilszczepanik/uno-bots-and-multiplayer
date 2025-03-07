@@ -81,7 +81,7 @@ describe("Initial deck", () => {
   });
 });
 
-describe.only("Deck methods", () => {
+describe("Deck methods", () => {
   describe("shuffle", () => {
     const deck = createInitialDeck();
     it("calls the shuffler", () => {
@@ -91,7 +91,7 @@ describe.only("Deck methods", () => {
     });
   });
   describe("deal", () => {
-    let deck: deck.Deck = createInitialDeck();
+    let deck: deck.Props = createInitialDeck();
     let shuffledCards: Readonly<deck.Card[]> = [];
     const memoShuffler = memoizingShuffler(standardShuffler);
     beforeEach(() => {

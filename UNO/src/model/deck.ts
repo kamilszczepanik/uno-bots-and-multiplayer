@@ -1,3 +1,5 @@
+import { Shuffler } from "../utils/random_utils";
+
 export type Color = "BLUE" | "GREEN" | "RED" | "YELLOW";
 export type CardType =
   | "NUMBERED"
@@ -19,13 +21,14 @@ export interface Props {
   size: number;
   filter(predicate: (card: Card) => boolean): Props;
   deal(): Card | undefined;
-  cards: Array<Card>;
+  cards: Card[];
+  shuffle(shuffler: Shuffler<Card>): void;
 }
 
 class Deck implements Props {
-  cards: Array<Card>;
+  cards: Card[];
 
-  constructor(cards: Array<Card>) {
+  constructor(cards: Card[]) {
     this.cards = cards;
   }
 
@@ -34,12 +37,15 @@ class Deck implements Props {
   }
 
   filter(predicate: (card: Card) => boolean): Props {
-    // return a new Deck with filtered cards
     return new Deck(this.cards.filter(predicate));
   }
 
   deal(): Card | undefined {
     return this.cards.shift();
+  }
+
+  shuffle(shuffler: Shuffler<Card>): void {
+    shuffler(this.cards);
   }
 }
 
