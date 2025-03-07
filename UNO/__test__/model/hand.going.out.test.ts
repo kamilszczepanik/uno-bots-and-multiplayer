@@ -87,17 +87,17 @@ describe('catching failure to say "UNO!"', () => {
       hand.play(0);
       expect(hand.catchUnoFailure({ accuser: 3, accused: 0 })).toBeFalsy();
     });
-    it.skip("fails if the next player has drawn a card", () => {
+    it("fails if the next player has drawn a card", () => {
       hand.play(1);
       hand.draw();
       expect(hand.catchUnoFailure({ accuser: 3, accused: 0 })).toBeFalsy();
     });
-    it.skip("cannot be applied twice", () => {
+    it("cannot be applied twice", () => {
       hand.play(0);
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeTruthy();
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeFalsy();
     });
-    it.skip("can succeed after first accusing the wrong player", () => {
+    it("can succeed after first accusing the wrong player", () => {
       hand.play(0);
       expect(hand.catchUnoFailure({ accuser: 2, accused: 1 })).toBeFalsy();
       expect(hand.catchUnoFailure({ accuser: 2, accused: 0 })).toBeTruthy();
