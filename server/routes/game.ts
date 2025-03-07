@@ -1,4 +1,4 @@
-import { gameManager } from './../services/GameManager'
+import { gameManager } from '../services/GameManager'
 import { Request, Response, Router } from 'express'
 
 import prisma from '../utils/db.server'

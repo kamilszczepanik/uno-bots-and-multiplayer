@@ -3,7 +3,7 @@ import {
   Shuffler,
   standardRandomizer,
   standardShuffler,
-} from "./../utils/random_utils";
+} from "../utils/random_utils";
 import { Card } from "./deck";
 import { Hand } from "./hand";
 
