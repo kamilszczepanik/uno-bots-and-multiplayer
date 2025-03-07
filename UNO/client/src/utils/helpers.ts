@@ -11,16 +11,17 @@ export const showMessage = (message: string) => {
   })
 }
 
-export function handleGameAction(
+export async function handleGameAction(
   action: () => void,
   options?: { successMessage?: string; errorMessage?: string },
 ) {
   try {
-    action()
+    await action()
     if (options?.successMessage) {
       showMessage(options.successMessage)
     }
   } catch (error) {
+    console.error(error)
     if (error instanceof Error) {
       showMessage(options?.errorMessage || error.message)
     } else {

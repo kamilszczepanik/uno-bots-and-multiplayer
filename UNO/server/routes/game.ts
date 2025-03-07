@@ -431,7 +431,7 @@ router.post(
       const game = resolveAction(req.body)
       res.send(game)
     } catch (error: unknown) {
-      console.log(error)
+      console.error(error)
     }
   },
 )

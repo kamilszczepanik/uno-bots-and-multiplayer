@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useInProgressGamesStore } from '@/stores/inProgressGamesStore'
 import { useUserStore } from '@/stores/userStore'
@@ -31,19 +31,6 @@ onMounted(async () => {
     }
   }
 })
-
-watch(
-  () => inProgressGamesStore.games,
-  () => {
-    console.log(inProgressGamesStore.game(id.value as string))
-    const updatedGame = inProgressGamesStore.game(id.value as string)
-    if (updatedGame) {
-      console.log('Game updated via WebSocket:', updatedGame)
-    }
-    console.log(inProgressGamesStore.game(id.value as string))
-  },
-  { deep: true },
-)
 </script>
 <template>
   <div class="flex h-screen w-full flex-col" v-if="game && currentHand && userStore.userInfo.id">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import GameCard from './GameCard.vue'
-import { showMessage } from '@/utils/helpers'
+import { handleGameAction, showMessage } from '@/utils/helpers'
 import { useUserStore } from '@/stores/userStore'
 import type { Card } from 'models/src/model/deck'
 import type { IndexedGame } from '../../../shared/types'
@@ -36,7 +36,9 @@ const onClick = async () => {
     return
   }
 
-  await api.draw({ gameId: game.id, handId: currentHand.value.id })
+  handleGameAction(async () => await api.draw({ gameId: game.id, handId: currentHand.value.id }), {
+    errorMessage: 'Failed to draw a card.',
+  })
 }
 </script>
 

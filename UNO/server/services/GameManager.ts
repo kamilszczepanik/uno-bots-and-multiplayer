@@ -221,17 +221,16 @@ class GameManager {
       include: { players: true, hands: true },
     })
 
-    // ✅ Standardize hands format before returning
     const allHands = await prisma.hand.findMany({
       where: { gameId: dbGame.id },
     })
 
-    const handsArray = Object.values(allHands) // ✅ Convert object to array
+    const handsArray = Object.values(allHands)
 
     return {
       ...updatedGame,
       status: updatedGame.status as GameStatus,
-      hands: handsArray, // ✅ Ensure hands is always an array
+      hands: handsArray,
       players: updatedGame.players,
     }
   }
