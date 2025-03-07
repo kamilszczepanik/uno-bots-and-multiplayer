@@ -67,7 +67,6 @@ onMounted(() => {
 
     <div class="flex w-96 gap-8">
       <ControlButton variant="primary" @click="handleNextRound"> Next Round </ControlButton>
-      <ControlButton variant="destructive" @click="handleEndGame"> End Game </ControlButton>
     </div>
   </div>
 </template>

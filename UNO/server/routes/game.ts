@@ -414,10 +414,6 @@ export async function resolveAction(action: Action) {
         ?.catchUnoFailure({ accused: action.accused, accuser: action.accuser })
       break
     }
-    case 'end_game': {
-      console.log('end game')
-      break
-    }
     default:
       throw new Error('Invalid action')
   }
