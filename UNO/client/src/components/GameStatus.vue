@@ -1,12 +1,9 @@
-<!-- score, round, turn -->
-
 <script setup lang="ts">
-import { useGameStore } from '@/stores/gameStore'
-import { computed } from 'vue'
+import type { IndexedGame } from '../../../shared/types'
 
-const gameStore = useGameStore()
-const game = computed(() => gameStore.game)
-const currentHand = computed(() => gameStore.currentHand)
+defineProps<{
+  game: IndexedGame
+}>()
 </script>
 
 <template>
@@ -27,15 +24,18 @@ const currentHand = computed(() => gameStore.currentHand)
     <div class="flex items-center space-x-2">
       <span>Playing direction:</span>
       <div class="flex items-center space-x-1">
-        <span class="font-bold">{{ currentHand?.playingDirection }}</span>
+        <!-- todo: fix direction -->
+        <!-- <span class="font-bold">{{ game.hands[game.currentRound - 1].playingDirection }}</span>
         <span
           :class="[
             'transform font-bold transition-transform duration-300',
-            currentHand?.playingDirection === 'Clockwise' ? 'rotate-0' : 'rotate-180',
+            game.hands[game.currentRound - 1].playingDirection === 'Clockwise'
+              ? 'rotate-0'
+              : 'rotate-180',
           ]"
         >
           ⟳
-        </span>
+        </span> -->
       </div>
     </div>
   </div>

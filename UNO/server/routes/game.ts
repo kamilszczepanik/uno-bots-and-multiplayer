@@ -20,6 +20,7 @@ router.get('/games', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch games' })
   }
 })
+
 router.get('/games/:gameId', async (req: Request, res: Response) => {
   const { gameId } = req.params
 
@@ -41,7 +42,7 @@ router.get('/games/:gameId', async (req: Request, res: Response) => {
     }
 
     const currentHand = game.hands.length > 0 ? game.hands[0] : null
-
+    // broadcast it
     res.json({ game, currentHand })
   } catch (error) {
     console.error(error)

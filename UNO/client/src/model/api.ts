@@ -29,6 +29,11 @@ export async function games(): Promise<IndexedGame[]> {
   return response as IndexedGame[]
 }
 
+export async function game(gameId: string): Promise<IndexedGame> {
+  const response = await get(`/api/games/${gameId}`)
+  return response as IndexedGame
+}
+
 export async function join(game: IndexedGameSpecs, player: User) {
   return post(`/api/games/${game.id}/join`, { userId: player.id })
     .then(() => {
