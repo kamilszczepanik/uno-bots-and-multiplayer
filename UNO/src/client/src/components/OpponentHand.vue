@@ -31,6 +31,7 @@ const rotation = computed(() => {
       return ''
   }
 })
+
 const spacing = computed(() => {
   if (!opponentHand.value) {
     return 0
