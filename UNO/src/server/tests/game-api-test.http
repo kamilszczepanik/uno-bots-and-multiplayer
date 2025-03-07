@@ -23,6 +23,11 @@ Content-Type: application/json
 ### List all games
 GET http://localhost:8000/api/games
 
+
+### Get game status
+GET http://localhost:8000/api/games/1bf83fc7-3348-4ebb-9f59-fc5e65e52845
+
+
 ### Join a game (replace {{gameId}})
 POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/join
 Content-Type: application/json
@@ -52,3 +57,4 @@ POST http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645/start
 
 ### Delete a game (replace {{gameId}})
 DELETE http://localhost:8000/api/games/9af4b7b7-0fea-4d1e-8b6d-0a84934b6645
+

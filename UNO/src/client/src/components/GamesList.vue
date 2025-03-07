@@ -23,6 +23,7 @@ defineProps<{
   onJoinGame?: (gameId: string) => void
   onStartGame?: (gameId: string) => void
   onLeaveGame?: (gameId: string) => void
+  onOpenGame?: (gameId: string) => void
 }>()
 </script>
 
@@ -83,6 +84,14 @@ defineProps<{
               class="w-32"
             >
               Leave Game
+            </ControlButton>
+            <ControlButton
+              v-if="game.users.some((user) => user.id === userId) && game.status === 'in progress'"
+              variant="secondary"
+              @click="onOpenGame?.(game.id)"
+              class="w-32"
+            >
+              Open Game
             </ControlButton>
           </div>
         </div>

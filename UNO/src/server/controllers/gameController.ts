@@ -18,6 +18,24 @@ export const listGames: RequestHandler = async (
   }
 }
 
+export const gameStatus: RequestHandler = async (
+  req: Request,
+  res: Response,
+) => {
+  const { gameId } = req.params
+
+  try {
+    const game = await prisma.game.findUniqueOrThrow({
+      where: { id: gameId },
+    })
+
+    res.json(game)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: `Failed to fetch game ${gameId}` })
+  }
+}
+
 export const createGame: RequestHandler = async (
   req: Request,
   res: Response,

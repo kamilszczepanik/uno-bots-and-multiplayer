@@ -5,7 +5,9 @@ import { showMessage } from '@/utils/helpers'
 import { computed, onMounted, ref } from 'vue'
 import GamesList from './GamesList.vue'
 import { useGameStore } from '@/stores/gameStore'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const userStore = useUserStore()
 const gameStore = useGameStore()
 const allGames = computed(() => gameStore.allGames)
@@ -57,6 +59,10 @@ const handleLeaveGame = async (gameId: string) => {
   }
 }
 
+const handleOpenGame = async (gameId: string) => {
+  router.push(`/game/${gameId}`)
+}
+
 onMounted(async () => {
   gameStore.fetchGames()
 })
@@ -82,7 +88,12 @@ onMounted(async () => {
           :userId="userStore.userInfo.id"
           @leave-game="handleLeaveGame"
         />
-        <GamesList :games="inProgressGames" title="IN PROGRESS" :userId="userStore.userInfo.id" />
+        <GamesList
+          :games="inProgressGames"
+          title="IN PROGRESS"
+          :userId="userStore.userInfo.id"
+          @open-game="handleOpenGame"
+        />
         <GamesList :games="finishedGames" title="FINISHED" :userId="userStore.userInfo.id" />
       </div>
     </div>

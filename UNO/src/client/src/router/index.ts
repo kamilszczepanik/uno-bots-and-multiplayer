@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import GameSetup from '../views/GameSetup.vue'
-import PlayingHand from '@/views/PlayingHand.vue'
+import GameInProgress from '@/views/GameInProgress.vue'
 import GameOver from '@/views/GameOver.vue'
 import HandOver from '@/views/HandOver.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
@@ -15,7 +15,7 @@ const routes = [
   },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },
-  { path: '/playing-hand', name: 'Playing Hand', component: PlayingHand },
+  { path: '/game/:id', name: 'Game In Progress', component: GameInProgress, props: true },
   { path: '/hand-over', name: 'Hand Over', component: HandOver },
   { path: '/game-over', name: 'Game Over', component: GameOver },
   {
