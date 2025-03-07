@@ -546,7 +546,7 @@ class DiscardPile {
   }
 }
 
-class DrawPile {
+export class DrawPile {
   private _cards: deck.Card[];
 
   constructor(cards: deck.Card[]) {
