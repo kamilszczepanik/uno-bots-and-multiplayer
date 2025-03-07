@@ -495,6 +495,12 @@ export class Hand {
     return this._players.length;
   }
 
+  get playingDirection() {
+    return this._playingDirectionModifier === 1
+      ? "Clockwise"
+      : "Counterclockwise";
+  }
+
   onEnd(callback: (event: { winner: number }) => void): void {
     this._onEndCallbacks.push(callback);
   }

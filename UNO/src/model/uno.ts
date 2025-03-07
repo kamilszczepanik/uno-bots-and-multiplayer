@@ -19,10 +19,11 @@ export class Game {
   private _players: string[];
   private _targetScore: number;
   private _scores: Map<number, number>;
-  private _winner: number | undefined;
+  private _winner: number | undefined = undefined;
   private _currentHand: Hand | undefined;
   private _dealer: number;
   private _cardsPerPlayer: number;
+  private _currentRound: number = 1;
   private _shuffler: Shuffler<Card>;
 
   constructor({
@@ -48,7 +49,6 @@ export class Game {
     this._players = players;
     this._targetScore = targetScore;
     this._scores = new Map(players.map((_, i) => [i, 0]));
-    this._winner = undefined;
 
     this._dealer = dealer;
     this._cardsPerPlayer = cardsPerPlayer;
@@ -63,6 +63,10 @@ export class Game {
 
   get targetScore() {
     return this._targetScore;
+  }
+
+  get currentRound() {
+    return this._currentRound;
   }
 
   winner() {
@@ -114,6 +118,7 @@ export class Game {
 
     // todo: change dealer for next hand, if needed
     // this._dealer = this.calcu`lateNextDealer(this._dealer);
+    this._currentRound++;
     this.startNewHand();
   }
 
