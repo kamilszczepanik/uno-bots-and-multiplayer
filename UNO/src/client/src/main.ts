@@ -1,7 +1,6 @@
 import './assets/main.css'
 import 'vue3-toastify/dist/index.css'
 import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
