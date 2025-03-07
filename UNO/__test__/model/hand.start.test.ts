@@ -139,7 +139,7 @@ describe("Hand set up", () => {
   });
 });
 
-describe.skip("Before first action in hand", () => {
+describe("Before first action in hand", () => {
   it("begins with the player to the left of the dealer unless the top card is draw, reverse or skip", () => {
     const hand: Hand = createHand({
       players: ["a", "b", "c", "d"],

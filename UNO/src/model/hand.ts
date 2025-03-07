@@ -50,8 +50,6 @@ export class Hand {
       }
     }
 
-    console.log(this._playerHands);
-
     const initializeDiscardPile = (): DiscardPile => {
       const topCard = this._deck.deal();
       if (!topCard) {
@@ -63,6 +61,16 @@ export class Hand {
         this._deck.cards.push(topCard);
         this._deck.shuffle(shuffler);
         return initializeDiscardPile();
+      }
+
+      if (topCard.type === "DRAW") {
+        const nextPlayer = (this._dealer + 1) % this._players.length;
+        for (let i = 0; i < 2; i++) {
+          const card = this._deck.deal();
+          if (card) {
+            this._playerHands.get(nextPlayer)!.push(card);
+          }
+        }
       }
 
       return new DiscardPile([topCard]);
@@ -120,6 +128,16 @@ export class Hand {
 
   drawPile(): DrawPile {
     return this._drawPile;
+  }
+
+  playerInTurn(): number {
+    if (this._discardPile.top()?.type === "REVERSE") {
+      return (this._dealer - 1 + this._players.length) % this._players.length;
+    }
+    if (this._discardPile.top()?.type === "SKIP") {
+      return (this._dealer + 2) % this._players.length;
+    }
+    return (this._dealer + 1) % this._players.length;
   }
 }
 
