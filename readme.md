@@ -2,6 +2,39 @@
 
 This is an implementation of multi-player UNO.
 
+**Code**: <a href="https://github.com/kamilszczepanik/uno-bots-and-multiplayer" target="_blank">https://github.com/kamilszczepanik/uno-bots-and-multiplayer</a>  
+**Year**: 2024/2025  
+**Timespan**: 3 weeks  
+
+## Overview
+
+1. Project for studies with 3 main parts:
+2. 1 - Class based UNO implementation in Typescript using Test Driven Development.
+3. 2 - Frontend interface implemented in Vue for gameplay with bots.
+4. 3 - Multiplayer
+
+## Tech Stack
+
+- • **Language**: Typescript
+- • **Frameworks/Libraries**: Vue.js, Pinia, Zod, Vue Router, Web Sockets
+- • **Styling**: Tailwind
+- • **Other tools**: Vite, JWT
+
+## Key Features
+
+- • Uno full gameplay
+- • Bots automation
+- • Schema validation, error handling
+- • User account creation and login
+- • Multiplayer
+- • Re-usable components
+- • Design & implementation
+- • Seeded data for smooth testing
+- • Web Sockets for real-time update
+- • Multiple games at once
+- • Secured path for games
+
+
 ## Running the application
 
 Get the project from github
